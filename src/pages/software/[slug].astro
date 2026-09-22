@@ -17,48 +17,59 @@ const { app } = Astro.props;
 const aff = affiliates[app.affiliate];
 const isGeneric = app.affiliate === 'generic';
 const ctaUrl = isGeneric ? app.url : aff.url;
-const ctaLabel = isGeneric ? '前往官网' : `前往 ${aff.name}`;
+const ctaLabelZh = isGeneric ? '前往官网' : `前往 ${aff.name}`;
+const ctaLabelEn = isGeneric ? 'Visit official site' : `Go to ${aff.name}`;
 ---
 <BaseLayout title={`${app.name} 评测推荐 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
   <div class="container">
     <article class="article">
-      <span class="cat">{app.category}</span>
-      <h1>{app.name}</h1>
-      <div class="meta">
-        {app.price} · {app.setapp ? '可订阅 Setapp' : '独立购买'}
+      <div class="card-row">
+        <img class="app-icon-lg" src={`/images/apps/${app.slug}.png`} alt={app.name} width="72" height="72" />
+        <div style="flex:1;min-width:0">
+          <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
+          <h1 style="margin:4px 0 6px"><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></h1>
+          <div class="meta">{app.price} · {app.setapp ? <span><span class="zh">可订阅 Setapp</span><span class="en">On Setapp</span></span> : <span><span class="zh">独立购买</span><span class="en">Standalone</span></span>}</div>
+        </div>
       </div>
-      <p style="font-size:17px">{app.tagline}</p>
-      <p>{app.description}</p>
+
+      <p style="font-size:17px"><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
+      <p><span class="zh">{app.description}</span><span class="en">{app.descriptionEn}</span></p>
 
       {app.bestFor && (
         <section>
-          <h2>适合谁</h2>
-          <p>{app.bestFor}</p>
+          <h2><span class="zh">适合谁</span><span class="en">Who it's for</span></h2>
+          <p><span class="zh">{app.bestFor}</span><span class="en">{app.bestForEn}</span></p>
         </section>
       )}
 
       {app.pros && app.pros.length > 0 && (
         <section>
-          <h2>优点</h2>
-          <ul>{app.pros.map((p) => <li>{p}</li>)}</ul>
+          <h2><span class="zh">优点</span><span class="en">Pros</span></h2>
+          <ul>{app.pros.map((p, i) => <li><span class="zh">{p}</span><span class="en">{app.prosEn?.[i]}</span></li>)}</ul>
         </section>
       )}
 
       {app.cons && app.cons.length > 0 && (
         <section>
-          <h2>不足</h2>
-          <ul>{app.cons.map((c) => <li>{c}</li>)}</ul>
+          <h2><span class="zh">不足</span><span class="en">Cons</span></h2>
+          <ul>{app.cons.map((c, i) => <li><span class="zh">{c}</span><span class="en">{app.consEn?.[i]}</span></li>)}</ul>
         </section>
       )}
 
       <div class="affiliate-box">
-        <h3>获取 {app.name}</h3>
+        <h3><span class="zh">获取 {app.name}</span><span class="en">Get {app.nameEn}</span></h3>
         <p>
-          通过下方链接购买不会增加你的花费，但能为我们带来佣金（{aff.commission}），
-          帮助我们持续产出内容，感谢支持 🙏
+          <span class="zh">通过下方链接购买不会增加你的花费，但能为我们带来佣金（{aff.commission}），帮助我们持续产出内容，感谢支持 🙏</span>
+          <span class="en">Purchases through the link below cost you nothing extra but may earn us a commission ({aff.commissionEn}), helping us keep creating content. Thank you!</span>
         </p>
-        <p><a class="btn" href={ctaUrl} rel="nofollow sponsored" target="_blank">{ctaLabel} →</a></p>
-        <p style="font-size:13px;margin-top:8px">{aff.note}</p>
+        <p>
+          <a class="btn" href={ctaUrl} rel="nofollow sponsored" target="_blank">
+            <span class="zh">{ctaLabelZh} →</span><span class="en">{ctaLabelEn} →</span>
+          </a>
+        </p>
+        <p style="font-size:13px;margin-top:8px">
+          <span class="zh">{aff.note}</span><span class="en">{aff.noteEn}</span>
+        </p>
       </div>
     </article>
 

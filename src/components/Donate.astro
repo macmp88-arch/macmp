@@ -1,17 +1,17 @@
 ---
 const items = [
-  { label: '微信支付', src: '/images/pay-wechat.jpg', alt: '微信支付二维码' },
-  { label: '支付宝', src: '/images/pay-alipay.jpg', alt: '支付宝二维码' },
+  { zh: '微信支付', en: 'WeChat Pay', src: '/images/pay-wechat.jpg', alt: '微信支付二维码' },
+  { zh: '支付宝', en: 'Alipay', src: '/images/pay-alipay.jpg', alt: '支付宝二维码' },
 ];
 ---
 <section class="donate" id="donate">
-  <h2>支持 MacMP</h2>
-  <p>如果你觉得内容有帮助，欢迎扫码请我们喝杯咖啡 ☕ 你的支持会让我们走得更远。</p>
+  <h2><span class="zh">支持 MacMP</span><span class="en">Support MacMP</span></h2>
+  <p><span class="zh">如果你觉得内容有帮助，欢迎扫码请我们喝杯咖啡 ☕ 你的支持会让我们走得更远。</span><span class="en">If you find our content helpful, buy us a coffee ☕ — your support keeps us going.</span></p>
   <div class="donate-grid">
     {items.map((item) => (
       <figure>
         <img src={item.src} alt={item.alt} loading="lazy" width="260" height="380" />
-        <figcaption>{item.label}</figcaption>
+        <figcaption><span class="zh">{item.zh}</span><span class="en">{item.en}</span></figcaption>
       </figure>
     ))}
   </div>

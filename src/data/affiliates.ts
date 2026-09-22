@@ -13,7 +13,9 @@ export interface Affiliate {
   id: string;
   name: string;
   commission: string;
+  commissionEn: string;
   note: string;
+  noteEn: string;
   url: string;
 }
 
@@ -22,28 +24,36 @@ export const affiliates: Record<string, Affiliate> = {
     id: 'setapp',
     name: 'Setapp',
     commission: '20% 长期复购分成',
+    commissionEn: '20% recurring commission',
     note: '你带来的用户每月续费都分 20%，是最值得长期做的渠道。',
+    noteEn: 'You earn 20% of every monthly renewal from users you bring in.',
     url: 'https://setapp.com/?ref=YOUR_ID',
   },
   macpaw: {
     id: 'macpaw',
     name: 'MacPaw（CleanMyMac X）',
     commission: '35% 一次性分成',
+    commissionEn: '35% per sale',
     note: 'Cookie 长达 180 天，单价高、转化好。',
+    noteEn: '180-day cookie window, high price and great conversion.',
     url: 'https://macpaw.com/?ref=YOUR_ID',
   },
   crossover: {
     id: 'crossover',
     name: 'CrossOver',
     commission: '10% 一次性分成',
+    commissionEn: '10% per sale',
     note: 'Mac 跑 Windows 软件 / 游戏的刚需工具。',
+    noteEn: 'An essential tool for running Windows apps and games on Mac.',
     url: 'https://www.codeweavers.com/crossover?ref=YOUR_ID',
   },
   generic: {
     id: 'generic',
     name: '官方/通用渠道',
     commission: '按各 App 联盟计划',
+    commissionEn: 'Varies by app',
     note: '订阅类 App 通常在 25%-30% 复购分成，优先注册其官方联盟。',
+    noteEn: 'Subscription apps usually offer 25%-30% recurring commission.',
     url: '#',
   },
 };

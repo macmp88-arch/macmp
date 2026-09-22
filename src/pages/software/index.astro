@@ -5,19 +5,24 @@ import { apps } from '../../data/apps';
 const title = 'Mac 软件推荐 · MacMP';
 const description = '精选正版 Mac 应用评测与推荐：效率工具、系统维护、窗口管理、本地 AI 等。';
 
-const categories = ['全部', ...Array.from(new Set(apps.map((a) => a.category)))];
+const catMap = new Map<string, string>();
+apps.forEach((a) => catMap.set(a.category, a.categoryEn));
+const categories = Array.from(catMap.entries());
 ---
 <BaseLayout title={title} description={description} path="/software">
   <div class="container" style="padding-top:40px">
-    <h1 style="font-size:34px;margin:0 0 8px">Mac 软件推荐</h1>
-    <p style="color:var(--ink-2);margin:0 0 24px">持续更新的正版 Mac 应用清单，按需筛选。</p>
+    <h1 style="font-size:34px;margin:0 0 8px"><span class="zh">Mac 软件推荐</span><span class="en">Mac Software</span></h1>
+    <p style="color:var(--ink-2);margin:0 0 24px"><span class="zh">持续更新的正版 Mac 应用清单，按需筛选。</span><span class="en">A curated, constantly updated list of Mac apps.</span></p>
 
     <div class="toolbar">
-      <input id="search" type="search" placeholder="搜索软件名称 / 功能 / 标签…" autocomplete="off" />
+      <input id="search" type="search" placeholder="搜索软件名称 / 功能 / 标签… Search…" autocomplete="off" />
       <div class="chips" id="chips">
-        {categories.map((c) => (
-          <button type="button" class="chip" data-cat={c} class:list={['chip', { active: c === '全部' }]}>
-            {c}
+        <button type="button" class="chip active" data-cat="全部">
+          <span class="zh">全部</span><span class="en">All</span>
+        </button>
+        {categories.map(([zh, en]) => (
+          <button type="button" class="chip" data-cat={zh}>
+            <span class="zh">{zh}</span><span class="en">{en}</span>
           </button>
         ))}
       </div>
@@ -28,19 +33,24 @@ const categories = ['全部', ...Array.from(new Set(apps.map((a) => a.category))
         <article
           class="card app-item"
           data-category={app.category}
-          data-search={`${app.name} ${app.tags.join(' ')} ${app.tagline} ${app.category}`}
+          data-search={`${app.name} ${app.nameEn} ${app.tags.join(' ')} ${app.tagline} ${app.taglineEn} ${app.category}`}
         >
-          <span class="cat">{app.category}</span>
-          <h3><a href={`/software/${app.slug}/`}>{app.name}</a></h3>
-          <p>{app.tagline}</p>
-          <div class="meta">
-            <span>{app.price}</span>
-            {app.setapp && <span class="badge">Setapp 可订阅</span>}
+          <div class="card-row">
+            <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" />
+            <div class="card-body">
+              <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
+              <h3><a href={`/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
+              <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
+              <div class="meta">
+                <span>{app.price}</span>
+                {app.setapp && <span class="badge"><span class="zh">Setapp 可订阅</span><span class="en">On Setapp</span></span>}
+              </div>
+            </div>
           </div>
         </article>
       ))}
     </div>
-    <p id="empty" class="empty" hidden>没有找到匹配的软件，换个关键词试试。</p>
+    <p id="empty" class="empty" hidden><span class="zh">没有找到匹配的软件，换个关键词试试。</span><span class="en">No matching apps. Try another keyword.</span></p>
   </div>
 </BaseLayout>
 

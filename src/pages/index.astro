@@ -16,60 +16,54 @@ const gradientMap: Record<string, string> = {
 const featured = apps.slice(0, 6);
 ---
 <BaseLayout path="/">
-  <!-- Hero -->
   <section class="hero">
-    <p class="eyebrow">全新出发 · 只推正版</p>
+    <p class="eyebrow"><span class="zh">全新出发 · 只推正版</span><span class="en">Official apps only</span></p>
     <h1>MacMP</h1>
-    <p class="sub">发现好用的 Mac 软件与优惠。</p>
+    <p class="sub"><span class="zh">发现好用的 Mac 软件与优惠。</span><span class="en">Discover the best Mac apps and deals.</span></p>
     <div class="hero-links">
-      <a href="/software/">浏览软件推荐</a>
-      <a href="/ai-local/">了解本地 AI</a>
+      <a href="/software/"><span class="zh">浏览软件推荐</span><span class="en">Browse software</span></a>
+      <a href="/ai-local/"><span class="zh">了解本地 AI</span><span class="en">Local AI</span></a>
     </div>
   </section>
 
-  <!-- 主视觉：Setapp 大卡片 -->
   <section class="container" style="padding-top:8px">
     <div class="tile" style="background: linear-gradient(145deg,#000 0%,#2b2b2e 100%); min-height:460px">
-      <p class="tile-eyebrow">订阅合集</p>
-      <h3>一个订阅，畅用 240+ 款应用。</h3>
-      <p>Setapp 汇集 CleanMyMac X、Ulysses、MindNode 等精选正版应用，重度用户比单独购买更划算。</p>
+      <img class="app-icon-lg" src="/images/apps/setapp.png" alt="Setapp" width="72" height="72" />
+      <p class="tile-eyebrow"><span class="zh">订阅合集</span><span class="en">Subscription Bundle</span></p>
+      <h3><span class="zh">一个订阅，畅用 240+ 款应用。</span><span class="en">240+ apps. One subscription.</span></h3>
+      <p><span class="zh">Setapp 汇集 CleanMyMac X、Ulysses、MindNode 等精选正版应用，重度用户比单独购买更划算。</span><span class="en">Setapp brings together CleanMyMac X, Ulysses, MindNode and more — cheaper than buying each app separately.</span></p>
       <div class="tile-links">
-        <a href="/software/setapp/">了解更多</a>
-        <a href="https://setapp.com/?ref=YOUR_ID" rel="nofollow sponsored" target="_blank">前往试用</a>
+        <a href="/software/setapp/"><span class="zh">了解更多</span><span class="en">Learn more</span></a>
+        <a href="https://setapp.com/?ref=YOUR_ID" rel="nofollow sponsored" target="_blank"><span class="zh">前往试用</span><span class="en">Try it</span></a>
       </div>
     </div>
   </section>
 
-  <!-- 精选软件瓷砖 -->
   <section class="section container">
     <div class="section-head">
-      <h2>精选软件</h2>
-      <a href="/software/">查看全部</a>
+      <h2><span class="zh">精选软件</span><span class="en">Featured Apps</span></h2>
+      <a href="/software/"><span class="zh">查看全部</span><span class="en">View all</span></a>
     </div>
     <div class="tiles">
       {featured.map((app) => (
-        <a
-          href={`/software/${app.slug}/`}
-          class="tile"
-          style={`background: ${gradientMap[app.slug] ?? 'linear-gradient(145deg,#333,#555)'}`}
-        >
-          <p class="tile-eyebrow">{app.category}</p>
-          <h3>{app.name}</h3>
-          <p>{app.tagline}</p>
-          <span class="tile-links"><span>了解更多</span></span>
+        <a href={`/software/${app.slug}/`} class="tile" style={`background: ${gradientMap[app.slug] ?? 'linear-gradient(145deg,#333,#555)'}`}>
+          <img class="app-icon-lg" src={`/images/apps/${app.slug}.png`} alt={app.name} width="72" height="72" />
+          <p class="tile-eyebrow"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></p>
+          <h3><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></h3>
+          <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
+          <span class="tile-links"><span><span class="zh">了解更多</span><span class="en">Learn more</span></span></span>
         </a>
       ))}
     </div>
   </section>
 
-  <!-- 本地 AI 深色区块 -->
   <section class="band">
     <div class="container inner">
       <p class="eyebrow">本地 AI</p>
-      <h2>在 Mac 上跑通大模型。</h2>
-      <p>从 Ollama 入门到本地知识库，一步步把 Apple Silicon 的算力变成你的私人 AI。</p>
+      <h2><span class="zh">在 Mac 上跑通大模型。</span><span class="en">Run AI models on your Mac.</span></h2>
+      <p><span class="zh">从 Ollama 入门到本地知识库，一步步把 Apple Silicon 的算力变成你的私人 AI。</span><span class="en">From Ollama basics to a local knowledge base — turn your Apple Silicon into a private AI.</span></p>
       <div class="links">
-        <a href="/ai-local/">阅读教程</a>
+        <a href="/ai-local/"><span class="zh">阅读教程</span><span class="en">Read tutorials</span></a>
       </div>
     </div>
   </section>

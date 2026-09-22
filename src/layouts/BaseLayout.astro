@@ -15,10 +15,10 @@ const {
 } = Astro.props;
 
 const nav = [
-  { href: '/software/', label: '软件推荐', active: path.startsWith('/software') },
-  { href: '/deals/', label: '优惠情报', active: path.startsWith('/deals') },
-  { href: '/ai-local/', label: '本地 AI', active: path.startsWith('/ai-local') },
-  { href: '/support/', label: '支持我们', active: path.startsWith('/support') },
+  { href: '/software/', zh: '软件推荐', en: 'Software', active: path.startsWith('/software') },
+  { href: '/deals/', zh: '优惠情报', en: 'Deals', active: path.startsWith('/deals') },
+  { href: '/ai-local/', zh: '本地 AI', en: 'Local AI', active: path.startsWith('/ai-local') },
+  { href: '/support/', zh: '支持我们', en: 'Support', active: path.startsWith('/support') },
 ];
 ---
 <!doctype html>
@@ -36,9 +36,12 @@ const nav = [
     <meta property="og:type" content="website" />
     <meta property="og:url" content={new URL(path, Astro.site).toString()} />
     <Analytics />
-      <script is:inline type="text/javascript">
+    <script is:inline>
+      (function(){try{var l=localStorage.getItem('lang')||'zh';document.documentElement.setAttribute('lang', l==='en'?'en':'zh-CN');}catch(e){}})();
+    </script>
+    <script is:inline type="text/javascript">
 (function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7823876-a1c9-450d-95ec-cbdeedd2f2851.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');
-</script>
+    </script>
   </head>
   <body>
     <header class="site-header">
@@ -49,11 +52,18 @@ const nav = [
           </svg>
           <span>Mac<span style="color:var(--blue)">MP</span></span>
         </a>
-        <nav class="nav">
-          {nav.map((item) => (
-            <a href={item.href} class={item.active ? 'active' : ''}>{item.label}</a>
-          ))}
-        </nav>
+        <div style="display:flex;align-items:center;gap:20px">
+          <nav class="nav">
+            {nav.map((item) => (
+              <a href={item.href} class={item.active ? 'active' : ''}>
+                <span class="zh">{item.zh}</span><span class="en">{item.en}</span>
+              </a>
+            ))}
+          </nav>
+          <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">
+            <span class="zh">English</span><span class="en">中文</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -65,34 +75,42 @@ const nav = [
       <div class="container">
         <div class="cols">
           <div>
-            <h4>发现</h4>
+            <h4><span class="zh">发现</span><span class="en">Discover</span></h4>
             <ul>
-              <li><a href="/software/">软件推荐</a></li>
-              <li><a href="/deals/">优惠情报</a></li>
-              <li><a href="/ai-local/">本地 AI</a></li>
+              <li><a href="/software/"><span class="zh">软件推荐</span><span class="en">Software</span></a></li>
+              <li><a href="/deals/"><span class="zh">优惠情报</span><span class="en">Deals</span></a></li>
+              <li><a href="/ai-local/"><span class="zh">本地 AI</span><span class="en">Local AI</span></a></li>
             </ul>
           </div>
           <div>
-            <h4>支持</h4>
+            <h4><span class="zh">支持</span><span class="en">Support</span></h4>
             <ul>
-              <li><a href="/support/">打赏支持</a></li>
-              <li><a href="/#subscribe">订阅邮件</a></li>
-              <li><a href="/about/">关于本站</a></li>
+              <li><a href="/support/"><span class="zh">打赏支持</span><span class="en">Donate</span></a></li>
+              <li><a href="/#subscribe"><span class="zh">订阅邮件</span><span class="en">Newsletter</span></a></li>
+              <li><a href="/about/"><span class="zh">关于本站</span><span class="en">About</span></a></li>
             </ul>
           </div>
           <div>
-            <h4>声明</h4>
+            <h4><span class="zh">声明</span><span class="en">Disclosure</span></h4>
             <ul>
-              <li><a href="/about/">透明变现</a></li>
-              <li><a href="/about/">联系我们</a></li>
+              <li><a href="/about/"><span class="zh">透明变现</span><span class="en">Affiliate Disclosure</span></a></li>
+              <li><a href="/about/"><span class="zh">联系我们</span><span class="en">Contact</span></a></li>
             </ul>
           </div>
         </div>
         <div class="legal">
-          <p>本站部分链接为联盟链接，购买不会增加你的花费，但可能为我们带来佣金，感谢支持。</p>
-          <p>© {new Date().getFullYear()} macmp.com · Apple 与 macOS 是 Apple Inc. 的商标。</p>
+          <p><span class="zh">本站部分链接为联盟链接，购买不会增加你的花费，但可能为我们带来佣金，感谢支持。</span><span class="en">Some links are affiliate links. Purchases through them cost you nothing extra but may earn us a commission. Thanks for your support!</span></p>
+          <p>© {new Date().getFullYear()} macmp.com · <span class="zh">Apple 与 macOS 是 Apple Inc. 的商标。</span><span class="en">Apple and macOS are trademarks of Apple Inc.</span></p>
         </div>
       </div>
     </footer>
+
+    <script is:inline>
+      document.getElementById('langToggle').addEventListener('click', function(){
+        var en = document.documentElement.getAttribute('lang') === 'en';
+        document.documentElement.setAttribute('lang', en ? 'zh-CN' : 'en');
+        try{localStorage.setItem('lang', en ? 'zh' : 'en');}catch(e){}
+      });
+    </script>
   </body>
 </html>
