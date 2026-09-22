@@ -12,7 +12,7 @@ export const site = {
 
   // 统计：Google Analytics (gtag) 与百度统计，填了 ID 才会注入脚本
   googleAnalyticsId: '', // 例：'G-XXXXXXXXXX'
-  baiduAnalyticsId: '', // 例：'a1b2c3d4...'（hm.js? 后的 id）
+  baiduAnalyticsId: '2785c9d131aa2b7d7a44ad7903c12a22',
 
   // 评论：Giscus（基于 GitHub Discussions，免费无广告）
   // 最快方式：运行 `node scripts/setup-giscus.mjs` 自动填写
