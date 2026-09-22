@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = '关于 MacMP';
+---
+<BaseLayout title={title} path="/about">
+  <div class="container" style="padding-top:40px">
+    <article class="article">
+      <h1>关于 MacMP</h1>
+      <p>
+        MacMP 是一个专注正版 Mac 软件与优惠情报的网站，前身域名 macmp.com 曾运营 Mac 相关站点。
+        现在我们重新出发，只做正版、安全的软件推荐。
+      </p>
+      <h2>我们的原则</h2>
+      <ul>
+        <li><strong>只推正版</strong>：破解软件有安全和法律风险，我们一律不碰。</li>
+        <li><strong>透明变现</strong>：部分链接为联盟链接，购买不增加你的花费，我们可能获得佣金。</li>
+        <li><strong>持续更新</strong>：评测与优惠信息尽量保持最新。</li>
+      </ul>
+      <h2>联系我们</h2>
+      <p>合作、投稿或纠错，欢迎通过邮件联系（上线后补充联系方式）。</p>
+    </article>
+  </div>
+</BaseLayout>

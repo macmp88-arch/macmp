@@ -1,0 +1,45 @@
+---
+import { site } from '../data/site';
+const { repo, repoId, category, categoryId, lang } = site.giscus;
+const configured = Boolean(repo && repoId && categoryId);
+---
+<section class="comments" style="margin:32px 0">
+  {
+    configured ? (
+      <script
+        src="https://giscus.app/client.js"
+        data-repo={repo}
+        data-repo-id={repoId}
+        data-category={category}
+        data-category-id={categoryId}
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang={lang || 'zh-CN'}
+        crossorigin="anonymous"
+        async
+      ></script>
+    ) : (
+      <div class="comments-placeholder">
+        <strong>评论功能待接入</strong>
+        <p>本站在 GitHub 上托管后，可通过 Giscus 免费开启评论（无需自建服务器）。</p>
+        <p>配置方法：编辑 <code>src/data/site.ts</code> 中的 <code>giscus</code> 字段。</p>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .comments-placeholder {
+    text-align: center;
+    padding: 32px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    color: var(--ink-2);
+  }
+  .comments-placeholder strong { color: var(--ink); }
+  code { background: var(--bg-2); padding: 2px 6px; border-radius: 4px; }
+</style>

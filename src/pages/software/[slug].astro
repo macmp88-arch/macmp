@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { apps } from '../../data/apps';
+import { affiliates } from '../../data/affiliates';
+import type { App } from '../../data/apps';
+import Comments from '../../components/Comments.astro';
+
+export function getStaticPaths() {
+  return apps.map((app) => ({ params: { slug: app.slug }, props: { app } }));
+}
+
+interface Props {
+  app: App;
+}
+
+const { app } = Astro.props;
+const aff = affiliates[app.affiliate];
+---
+<BaseLayout title={`${app.name} 评测推荐 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
+  <div class="container">
+    <article class="article">
+      <span class="cat">{app.category}</span>
+      <h1>{app.name}</h1>
+      <div class="meta">
+        {app.price} · {app.setapp ? '可订阅 Setapp' : '独立购买'}
+      </div>
+      <p style="font-size:17px">{app.tagline}</p>
+      <p>{app.description}</p>
+
+      <h2>为什么推荐</h2>
+      <ul>
+        <li>正版、安全、持续更新，避免破解版带来的安全与法律风险。</li>
+        <li>{app.setapp ? '已收录于 Setapp，订阅后可畅用。' : '支持独立购买，一次性或订阅均可。'}</li>
+        <li>适合 {app.tags.join('、')} 场景。</li>
+      </ul>
+
+      <div class="affiliate-box">
+        <h3>获取 {app.name}</h3>
+        <p>
+          通过下方链接购买不会增加你的花费，但能为我们带来佣金（{aff.commission}），
+          帮助我们持续产出内容，感谢支持 🙏
+        </p>
+        <p><a class="btn" href={aff.url} rel="nofollow sponsored" target="_blank">前往 {aff.name} →</a></p>
+        <p style="font-size:13px;margin-top:8px">{aff.note}</p>
+      </div>
+    </article>
+
+    <Comments />
+  </div>
+</BaseLayout>

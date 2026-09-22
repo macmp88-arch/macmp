@@ -1,0 +1,21 @@
+---
+interface Props {
+  slug: string;
+  name: string;
+  category: string;
+  tagline: string;
+  price: string;
+  setapp?: boolean;
+}
+
+const { slug, name, category, tagline, price, setapp = false } = Astro.props;
+---
+<article class="card">
+  <span class="cat">{category}</span>
+  <h3><a href={`/software/${slug}/`}>{name}</a></h3>
+  <p>{tagline}</p>
+  <div class="meta">
+    <span>{price}</span>
+    {setapp && <span class="badge">Setapp 可订阅</span>}
+  </div>
+</article>

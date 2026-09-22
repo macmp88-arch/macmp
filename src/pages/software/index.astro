@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { apps } from '../../data/apps';
+
+const title = 'Mac 软件推荐 · MacMP';
+const description = '精选正版 Mac 应用评测与推荐：效率工具、系统维护、窗口管理、本地 AI 等。';
+
+const categories = ['全部', ...Array.from(new Set(apps.map((a) => a.category)))];
+---
+<BaseLayout title={title} description={description} path="/software">
+  <div class="container" style="padding-top:40px">
+    <h1 style="font-size:34px;margin:0 0 8px">Mac 软件推荐</h1>
+    <p style="color:var(--ink-2);margin:0 0 24px">持续更新的正版 Mac 应用清单，按需筛选。</p>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="搜索软件名称 / 功能 / 标签…" autocomplete="off" />
+      <div class="chips" id="chips">
+        {categories.map((c) => (
+          <button type="button" class="chip" data-cat={c} class:list={['chip', { active: c === '全部' }]}>
+            {c}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="grid" id="grid">
+      {apps.map((app) => (
+        <article
+          class="card app-item"
+          data-category={app.category}
+          data-search={`${app.name} ${app.tags.join(' ')} ${app.tagline} ${app.category}`}
+        >
+          <span class="cat">{app.category}</span>
+          <h3><a href={`/software/${app.slug}/`}>{app.name}</a></h3>
+          <p>{app.tagline}</p>
+          <div class="meta">
+            <span>{app.price}</span>
+            {app.setapp && <span class="badge">Setapp 可订阅</span>}
+          </div>
+        </article>
+      ))}
+    </div>
+    <p id="empty" class="empty" hidden>没有找到匹配的软件，换个关键词试试。</p>
+  </div>
+</BaseLayout>
+
+<script>
+  const grid = document.getElementById('grid') as HTMLElement;
+  const search = document.getElementById('search') as HTMLInputElement;
+  const empty = document.getElementById('empty') as HTMLElement;
+  const chips = document.getElementById('chips') as HTMLElement;
+  let activeCat = '全部';
+
+  function applyFilter() {
+    const q = search.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll<HTMLElement>('.app-item').forEach((el) => {
+      const matchCat = activeCat === '全部' || el.dataset.category === activeCat;
+      const matchQ = !q || (el.dataset.search || '').toLowerCase().includes(q);
+      const show = matchCat && matchQ;
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    empty.hidden = visible !== 0;
+  }
+
+  search.addEventListener('input', applyFilter);
+  chips.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.chip');
+    if (!btn) return;
+    activeCat = btn.dataset.cat || '全部';
+    document.querySelectorAll<HTMLElement>('.chip').forEach((c) => c.classList.toggle('active', c === btn));
+    applyFilter();
+  });
+</script>
+
+<style>
+  .toolbar { margin-bottom: 24px; }
+  #search {
+    width: 100%;
+    max-width: 420px;
+    padding: 12px 18px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 980px;
+    outline: none;
+    background: #fff;
+  }
+  #search:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .chip {
+    padding: 8px 16px;
+    border-radius: 980px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--blue); color: var(--blue); }
+  .chip.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .empty { text-align: center; color: var(--ink-2); padding: 40px 0; }
+</style>

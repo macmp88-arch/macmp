@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Mac 软件优惠情报 · MacMP';
+const description = 'Mac 软件限免、折扣与 Bundle 套装优惠情报，帮你用更低价格入手正版应用。';
+---
+<BaseLayout title={title} description={description} path="/deals">
+  <div class="container" style="padding-top:40px">
+    <h1 style="font-size:32px;margin:0 0 8px">优惠情报</h1>
+    <p style="color:var(--text-2);margin:0 0 24px">限免、折扣、Bundle 套装，持续更新（此处为占位数据）。</p>
+
+    <div class="grid">
+      <article class="card">
+        <span class="cat">限免</span>
+        <h3><a href="/deals/">Setapp 新用户试用</a></h3>
+        <p>Setapp 提供 7 天免费试用，试用期可畅用全部 240+ 款应用。</p>
+        <div class="meta"><span>长期有效</span><span class="badge green">推荐</span></div>
+      </article>
+      <article class="card">
+        <span class="cat">折扣</span>
+        <h3><a href="/deals/">CleanMyMac X 优惠</a></h3>
+        <p>MacPaw 官方不定期推出订阅折扣，可叠加联盟返利。</p>
+        <div class="meta"><span>不定期</span><span class="badge">官方渠道</span></div>
+      </article>
+      <article class="card">
+        <span class="cat">Bundle</span>
+        <h3><a href="/deals/">Mac 软件 Bundle 套装</a></h3>
+        <p>Bundle 套装通常以 2-4 折打包多款软件，适合一次性补齐常用工具。</p>
+        <div class="meta"><span>限时</span><span class="badge">高性价比</span></div>
+      </article>
+    </div>
+  </div>
+</BaseLayout>

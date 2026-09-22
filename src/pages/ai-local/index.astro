@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { aiPosts } from '../../data/aiPosts';
+import Newsletter from '../../components/Newsletter.astro';
+
+const title = 'Mac 本地 AI 教程 · MacMP';
+const description = '用 Apple Silicon Mac 本地部署大模型：Ollama、OpenClaw、模型推荐与硬件选购指南。';
+---
+<BaseLayout title={title} description={description} path="/ai-local">
+  <div class="container" style="padding-top:40px">
+    <h1 style="font-size:34px;margin:0 0 8px">本地 AI · 用 Mac 跑大模型</h1>
+    <p style="color:var(--ink-2);margin:0 0 24px;max-width:640px">
+      M 系列芯片的 Mac 是本地部署大模型的热门选择。这里从零开始，教你在 Mac 上跑通本地 AI。
+    </p>
+
+    <div class="grid">
+      {aiPosts.map((post) => (
+        <article class="card">
+          <span class="cat">{post.tags.join(' · ')}</span>
+          <h3><a href={`/ai-local/${post.slug}/`}>{post.title}</a></h3>
+          <p>{post.summary}</p>
+          <div class="meta"><span>{post.date}</span><span class="badge green">教程</span></div>
+        </article>
+      ))}
+    </div>
+
+    <Newsletter />
+  </div>
+</BaseLayout>

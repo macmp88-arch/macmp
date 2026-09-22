@@ -1,0 +1,20 @@
+---
+import { site } from '../data/site';
+
+const { googleAnalyticsId, baiduAnalyticsId } = site;
+---
+{
+  (googleAnalyticsId || baiduAnalyticsId) && (
+    <fragment>
+      {googleAnalyticsId && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}></script>
+          <script set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${googleAnalyticsId}');`} />
+        </>
+      )}
+      {baiduAnalyticsId && (
+        <script set:html={`var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?${baiduAnalyticsId}";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();`} />
+      )}
+    </fragment>
+  )
+}

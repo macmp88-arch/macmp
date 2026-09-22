@@ -1,0 +1,39 @@
+---
+const items = [
+  { label: '微信支付', src: '/images/pay-wechat.jpg', alt: '微信支付二维码' },
+  { label: '支付宝', src: '/images/pay-alipay.jpg', alt: '支付宝二维码' },
+];
+---
+<section class="donate" id="donate">
+  <h2>支持 MacMP</h2>
+  <p>如果你觉得内容有帮助，欢迎扫码请我们喝杯咖啡 ☕ 你的支持会让我们走得更远。</p>
+  <div class="donate-grid">
+    {items.map((item) => (
+      <figure>
+        <img src={item.src} alt={item.alt} loading="lazy" width="260" height="380" />
+        <figcaption>{item.label}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>
+
+<style>
+  .donate { text-align: center; padding: 48px 0 8px; }
+  .donate h2 { font-size: 30px; letter-spacing: -0.015em; margin: 0 0 8px; }
+  .donate > p { color: var(--ink-2); max-width: 480px; margin: 0 auto 24px; }
+  .donate-grid {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .donate-grid figure { margin: 0; }
+  .donate-grid img {
+    width: 240px;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .donate-grid figcaption { margin-top: 10px; font-size: 15px; font-weight: 600; }
+</style>

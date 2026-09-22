@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
+import { aiPosts } from '../../data/aiPosts';
+import type { AiPost } from '../../data/aiPosts';
+
+export function getStaticPaths() {
+  return aiPosts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: AiPost;
+}
+
+const { post } = Astro.props;
+---
+<BaseLayout title={`${post.title} · MacMP`} description={post.summary} path={`/ai-local/${post.slug}`}>
+  <div class="container">
+    <article class="article">
+      <span class="cat">{post.tags.join(' · ')}</span>
+      <h1>{post.title}</h1>
+      <div class="meta">{post.date} · MacMP 本地 AI 教程（初稿）</div>
+      <p style="font-size:17px">{post.summary}</p>
+
+      {post.sections.map((section) => (
+        <section>
+          <h2>{section.heading}</h2>
+          {section.paragraphs.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+
+      <div class="affiliate-box">
+        <h3>推荐硬件</h3>
+        <p>跑本地模型，内存是关键。M4 Mac mini 是当前性价比很高的选择（上链接前请替换为你的硬件联盟/返利链接）。</p>
+        <p><a class="btn" href="https://www.apple.com/mac-mini/" target="_blank" rel="nofollow sponsored">查看 Mac mini →</a></p>
+      </div>
+    </article>
+
+    <Comments />
+  </div>
+</BaseLayout>
