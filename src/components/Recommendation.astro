@@ -1,0 +1,76 @@
+---
+import { apps } from '../data/apps';
+import { affiliates } from '../data/affiliates';
+import type { App } from '../data/apps';
+
+interface Props {
+  slugs?: string[];
+  titleZh?: string;
+  titleEn?: string;
+}
+
+const {
+  slugs = ['setapp', 'cleanmymac-x', 'raycast', 'crossover'],
+  titleZh = '编辑推荐',
+  titleEn = "Editor's Picks",
+} = Astro.props;
+
+const picks = slugs
+  .map((s) => apps.find((a) => a.slug === s))
+  .filter((a): a is App => Boolean(a));
+---
+<section class="promo">
+  <div class="promo-head">
+    <h2><span class="zh">{titleZh}</span><span class="en">{titleEn}</span></h2>
+    <span class="promo-note"><span class="zh">广告 · 联盟推荐</span><span class="en">Sponsored · Affiliate</span></span>
+  </div>
+  <div class="promo-grid">
+    {picks.map((app) => {
+      const aff = affiliates[app.affiliate];
+      const href = app.affiliate === 'generic' ? app.url : aff.url;
+      return (
+        <a class="promo-card" href={href} rel="nofollow sponsored" target="_blank">
+          <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
+          <span class="promo-body">
+            <strong><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></strong>
+            <span class="promo-tag"><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></span>
+          </span>
+          <span class="promo-cta"><span class="zh">了解 →</span><span class="en">View →</span></span>
+        </a>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  .promo { margin: 36px 0; }
+  .promo-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .promo-head h2 { font-size: 22px; letter-spacing: -0.01em; margin: 0; font-weight: 700; }
+  .promo-note { font-size: 12px; color: var(--ink-2); }
+  .promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .promo-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    color: var(--ink);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .promo-card:hover { border-color: var(--blue); transform: translateY(-2px); text-decoration: none; }
+  .promo-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .promo-body strong { font-size: 15px; line-height: 1.3; }
+  .promo-tag { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .promo-cta { font-size: 13px; color: var(--blue); font-weight: 600; white-space: nowrap; }
+</style>

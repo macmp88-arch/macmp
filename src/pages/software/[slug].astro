@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
+import Recommendation from '../../components/Recommendation.astro';
 import { apps } from '../../data/apps';
 import { affiliates } from '../../data/affiliates';
 import type { App } from '../../data/apps';
@@ -19,6 +20,11 @@ const isGeneric = app.affiliate === 'generic';
 const ctaUrl = isGeneric ? app.url : aff.url;
 const ctaLabelZh = isGeneric ? '前往官网' : `前往 ${aff.name}`;
 const ctaLabelEn = isGeneric ? 'Visit official site' : `Go to ${aff.name}`;
+
+const relatedSlugs = [
+  ...apps.filter((a) => a.slug !== app.slug && a.category === app.category).map((a) => a.slug),
+  'setapp', 'cleanmymac-x', 'raycast', 'crossover',
+].filter((v, i, arr) => arr.indexOf(v) === i).slice(0, 4);
 ---
 <BaseLayout title={`${app.name} 评测推荐 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
   <div class="container">
@@ -72,6 +78,8 @@ const ctaLabelEn = isGeneric ? 'Visit official site' : `Go to ${aff.name}`;
         </p>
       </div>
     </article>
+
+    <Recommendation slugs={relatedSlugs} titleZh="相关推荐" titleEn="Related Picks" />
 
     <Comments />
   </div>

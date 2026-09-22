@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
+import Recommendation from '../../components/Recommendation.astro';
 import { aiPosts } from '../../data/aiPosts';
 import type { AiPost } from '../../data/aiPosts';
 
@@ -35,6 +36,8 @@ const { post } = Astro.props;
         <p><a class="btn" href="https://www.apple.com/mac-mini/" target="_blank" rel="nofollow sponsored">查看 Mac mini →</a></p>
       </div>
     </article>
+
+    <Recommendation />
 
     <Comments />
   </div>

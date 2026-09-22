@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { apps } from '../../data/apps';
+import Recommendation from '../../components/Recommendation.astro';
 
 const title = 'Mac 软件推荐 · MacMP';
 const description = '精选正版 Mac 应用评测与推荐：效率工具、系统维护、窗口管理、本地 AI 等。';
@@ -50,6 +51,7 @@ const categories = Array.from(catMap.entries());
         </article>
       ))}
     </div>
+    <Recommendation />
     <p id="empty" class="empty" hidden><span class="zh">没有找到匹配的软件，换个关键词试试。</span><span class="en">No matching apps. Try another keyword.</span></p>
   </div>
 </BaseLayout>

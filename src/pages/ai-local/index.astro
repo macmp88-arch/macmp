@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { aiPosts } from '../../data/aiPosts';
 import Newsletter from '../../components/Newsletter.astro';
+import Recommendation from '../../components/Recommendation.astro';
 
 const title = 'Mac 本地 AI 教程 · MacMP';
 const description = '用 Apple Silicon Mac 本地部署大模型：Ollama、OpenClaw、模型推荐与硬件选购指南。';
@@ -24,6 +25,7 @@ const description = '用 Apple Silicon Mac 本地部署大模型：Ollama、Open
       ))}
     </div>
 
+    <Recommendation />
     <Newsletter />
   </div>
 </BaseLayout>
