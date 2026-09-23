@@ -2,12 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Donate from '../components/Donate.astro';
 import Newsletter from '../components/Newsletter.astro';
+import Contact from '../components/Contact.astro';
 
 const title = '支持 MacMP';
 const description = '如果你觉得 MacMP 的内容有帮助，欢迎扫码打赏支持，让我们持续产出优质内容。';
 ---
 <BaseLayout title={title} description={description} path="/support">
   <div class="container" style="padding-top:40px">
+    <Contact />
     <Donate />
     <Newsletter />
   </div>

@@ -4,57 +4,72 @@ import { apps } from '../data/apps';
 import Newsletter from '../components/Newsletter.astro';
 import Donate from '../components/Donate.astro';
 import Recommendation from '../components/Recommendation.astro';
+import Contact from '../components/Contact.astro';
 
-const gradientMap: Record<string, string> = {
-  setapp: 'linear-gradient(145deg, #1d1d1f 0%, #3c3c40 100%)',
-  'cleanmymac-x': 'linear-gradient(145deg, #0071e3 0%, #40a0ff 100%)',
-  raycast: 'linear-gradient(145deg, #ff375f 0%, #ff7a59 100%)',
-  crossover: 'linear-gradient(145deg, #0a84ff 0%, #5ac8fa 100%)',
-  'bartender-5': 'linear-gradient(145deg, #30d158 0%, #5fd9a0 100%)',
-  magnet: 'linear-gradient(145deg, #5e5ce6 0%, #7d7aff 100%)',
-};
+const categories = [
+  { zh: '办公', en: 'Productivity', href: '/software/?type=办公' },
+  { zh: '媒体', en: 'Media', href: '/software/?type=媒体' },
+  { zh: '系统', en: 'System', href: '/software/?type=系统' },
+  { zh: '开发', en: 'Developer', href: '/software/?type=开发' },
+  { zh: '工具', en: 'Utilities', href: '/software/?type=工具' },
+  { zh: '教程', en: 'Tutorials', href: '/ai-local/' },
+];
 
-const featured = apps.slice(0, 6);
+const directory = apps.slice(0, 12);
 ---
 <BaseLayout path="/">
-  <section class="hero">
-    <p class="eyebrow"><span class="zh">全新出发 · 只推正版</span><span class="en">Official apps only</span></p>
+  <section class="hero" style="padding-bottom:20px">
+    <p class="eyebrow"><span class="zh">正版 Mac 软件推荐</span><span class="en">Official Mac software picks</span></p>
     <h1>MacMP</h1>
-    <p class="sub"><span class="zh">发现好用的 Mac 软件与优惠。</span><span class="en">Discover the best Mac apps and deals.</span></p>
+    <p class="sub"><span class="zh">发现好用的 Mac 软件、优惠与教程。</span><span class="en">Discover the best Mac apps, deals and tutorials.</span></p>
     <div class="hero-links">
-      <a href="/software/"><span class="zh">浏览软件推荐</span><span class="en">Browse software</span></a>
-      <a href="/ai-local/"><span class="zh">了解本地 AI</span><span class="en">Local AI</span></a>
+      <a href="/software/"><span class="zh">浏览全部软件</span><span class="en">Browse all software</span></a>
+      <a href="/deals/"><span class="zh">查看优惠情报</span><span class="en">View deals</span></a>
     </div>
   </section>
 
+  <!-- 分类导航 -->
+  <section class="container" style="padding:8px 0 0">
+    <div class="cat-nav">
+      {categories.map((c) => (
+        <a class="cat-nav-item" href={c.href}>
+          <span class="zh">{c.zh}</span><span class="en">{c.en}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- 软件目录 -->
+  <section class="section container">
+    <div class="section-head">
+      <h2><span class="zh">软件目录</span><span class="en">Software Directory</span></h2>
+      <a href="/software/"><span class="zh">全部 {apps.length} 款 →</span><span class="en">All {apps.length} apps →</span></a>
+    </div>
+    <div class="dir-grid">
+      {directory.map((app) => (
+        <a class="dir-card" href={`/software/${app.slug}/`}>
+          <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
+          <span class="dir-body">
+            <strong><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></strong>
+            <span class="dir-tag"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span> · {app.price}</span>
+          </span>
+          <span class="dir-go"><span class="zh">了解 →</span><span class="en">View →</span></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Setapp 主推 -->
   <section class="container" style="padding-top:8px">
-    <div class="tile" style="background: linear-gradient(145deg,#000 0%,#2b2b2e 100%); min-height:460px">
+    <div class="tile" style="background: linear-gradient(145deg,#000 0%,#2b2b2e 100%); min-height:380px">
       <img class="app-icon-lg" src="/images/apps/setapp.png" alt="Setapp" width="72" height="72" />
       <p class="tile-eyebrow"><span class="zh">订阅合集</span><span class="en">Subscription Bundle</span></p>
       <h3><span class="zh">一个订阅，畅用 240+ 款应用。</span><span class="en">240+ apps. One subscription.</span></h3>
-      <p><span class="zh">Setapp 汇集 CleanMyMac X、Ulysses、MindNode 等精选正版应用，重度用户比单独购买更划算。</span><span class="en">Setapp brings together CleanMyMac X, Ulysses, MindNode and more — cheaper than buying each app separately.</span></p>
+      <p><span class="zh">Setapp 汇集 CleanMyMac X、Ulysses、MindNode 等精选正版应用，重度用户比单独购买更划算。</span><span class="en">Setapp brings together CleanMyMac X, Ulysses, MindNode and more — cheaper than buying each separately.</span></p>
       <div class="tile-links">
         <a href="/software/setapp/"><span class="zh">了解更多</span><span class="en">Learn more</span></a>
         <a href="https://setapp.com/?ref=YOUR_ID" rel="nofollow sponsored" target="_blank"><span class="zh">前往试用</span><span class="en">Try it</span></a>
       </div>
-    </div>
-  </section>
-
-  <section class="section container">
-    <div class="section-head">
-      <h2><span class="zh">精选软件</span><span class="en">Featured Apps</span></h2>
-      <a href="/software/"><span class="zh">查看全部</span><span class="en">View all</span></a>
-    </div>
-    <div class="tiles">
-      {featured.map((app) => (
-        <a href={`/software/${app.slug}/`} class="tile" style={`background: ${gradientMap[app.slug] ?? 'linear-gradient(145deg,#333,#555)'}`}>
-          <img class="app-icon-lg" src={`/images/apps/${app.slug}.png`} alt={app.name} width="72" height="72" />
-          <p class="tile-eyebrow"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></p>
-          <h3><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></h3>
-          <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
-          <span class="tile-links"><span><span class="zh">了解更多</span><span class="en">Learn more</span></span></span>
-        </a>
-      ))}
     </div>
   </section>
 
@@ -74,7 +89,49 @@ const featured = apps.slice(0, 6);
   </section>
 
   <div class="container">
+    <Contact />
     <Donate />
     <Newsletter />
   </div>
 </BaseLayout>
+
+<style>
+  .cat-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 12px 0 8px;
+  }
+  .cat-nav-item {
+    padding: 9px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .cat-nav-item:hover { border-color: var(--blue); color: var(--blue); text-decoration: none; }
+  .dir-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .dir-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: var(--ink);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .dir-card:hover { border-color: var(--blue); transform: translateY(-2px); text-decoration: none; }
+  .dir-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .dir-body strong { font-size: 15px; }
+  .dir-tag { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dir-go { font-size: 13px; color: var(--blue); font-weight: 600; white-space: nowrap; }
+</style>
