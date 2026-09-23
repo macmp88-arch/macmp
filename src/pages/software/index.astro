@@ -1,29 +1,31 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { apps } from '../../data/apps';
 import Recommendation from '../../components/Recommendation.astro';
+import { apps } from '../../data/apps';
 
 const title = 'Mac 软件推荐 · MacMP';
-const description = '精选正版 Mac 应用评测与推荐：效率工具、系统维护、窗口管理、本地 AI 等。';
+const description = '精选正版 Mac 应用评测与推荐：办公、媒体、系统、开发、工具等。';
 
-const catMap = new Map<string, string>();
-apps.forEach((a) => catMap.set(a.category, a.categoryEn));
-const categories = Array.from(catMap.entries());
+const typeOrder = ['办公', '媒体', '系统', '开发', '工具'];
+const typeEnMap: Record<string, string> = {
+  办公: 'Productivity', 媒体: 'Media', 系统: 'System', 开发: 'Developer', 工具: 'Utilities',
+};
+const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
 ---
 <BaseLayout title={title} description={description} path="/software">
   <div class="container" style="padding-top:40px">
     <h1 style="font-size:34px;margin:0 0 8px"><span class="zh">Mac 软件推荐</span><span class="en">Mac Software</span></h1>
-    <p style="color:var(--ink-2);margin:0 0 24px"><span class="zh">持续更新的正版 Mac 应用清单，按需筛选。</span><span class="en">A curated, constantly updated list of Mac apps.</span></p>
+    <p style="color:var(--ink-2);margin:0 0 24px"><span class="zh">按分类浏览正版 Mac 应用，按需筛选。</span><span class="en">Browse curated Mac apps by category.</span></p>
 
     <div class="toolbar">
       <input id="search" type="search" placeholder="搜索软件名称 / 功能 / 标签… Search…" autocomplete="off" />
       <div class="chips" id="chips">
-        <button type="button" class="chip active" data-cat="全部">
+        <button type="button" class="chip active" data-type="全部">
           <span class="zh">全部</span><span class="en">All</span>
         </button>
-        {categories.map(([zh, en]) => (
-          <button type="button" class="chip" data-cat={zh}>
-            <span class="zh">{zh}</span><span class="en">{en}</span>
+        {types.map((t) => (
+          <button type="button" class="chip" data-type={t}>
+            <span class="zh">{t}</span><span class="en">{typeEnMap[t]}</span>
           </button>
         ))}
       </div>
@@ -33,11 +35,11 @@ const categories = Array.from(catMap.entries());
       {apps.map((app) => (
         <article
           class="card app-item"
-          data-category={app.category}
-          data-search={`${app.name} ${app.nameEn} ${app.tags.join(' ')} ${app.tagline} ${app.taglineEn} ${app.category}`}
+          data-type={app.type}
+          data-search={`${app.name} ${app.nameEn} ${app.tags.join(' ')} ${app.tagline} ${app.taglineEn} ${app.category} ${app.categoryEn}`}
         >
           <div class="card-row">
-            <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" />
+            <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
             <div class="card-body">
               <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
               <h3><a href={`/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
@@ -51,8 +53,9 @@ const categories = Array.from(catMap.entries());
         </article>
       ))}
     </div>
-    <Recommendation />
     <p id="empty" class="empty" hidden><span class="zh">没有找到匹配的软件，换个关键词试试。</span><span class="en">No matching apps. Try another keyword.</span></p>
+
+    <Recommendation />
   </div>
 </BaseLayout>
 
@@ -61,29 +64,37 @@ const categories = Array.from(catMap.entries());
   const search = document.getElementById('search') as HTMLInputElement;
   const empty = document.getElementById('empty') as HTMLElement;
   const chips = document.getElementById('chips') as HTMLElement;
-  let activeCat = '全部';
+  let activeType = '全部';
 
   function applyFilter() {
     const q = search.value.trim().toLowerCase();
     let visible = 0;
     document.querySelectorAll<HTMLElement>('.app-item').forEach((el) => {
-      const matchCat = activeCat === '全部' || el.dataset.category === activeCat;
+      const matchType = activeType === '全部' || el.dataset.type === activeType;
       const matchQ = !q || (el.dataset.search || '').toLowerCase().includes(q);
-      const show = matchCat && matchQ;
+      const show = matchType && matchQ;
       el.style.display = show ? '' : 'none';
       if (show) visible++;
     });
     empty.hidden = visible !== 0;
   }
 
+  function setActive(type: string) {
+    activeType = type;
+    document.querySelectorAll<HTMLElement>('.chip').forEach((c) => c.classList.toggle('active', c.dataset.type === type));
+    applyFilter();
+  }
+
   search.addEventListener('input', applyFilter);
   chips.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('.chip');
     if (!btn) return;
-    activeCat = btn.dataset.cat || '全部';
-    document.querySelectorAll<HTMLElement>('.chip').forEach((c) => c.classList.toggle('active', c === btn));
-    applyFilter();
+    setActive(btn.dataset.type || '全部');
   });
+
+  // 支持 ?type=办公 直达分类
+  const initial = new URLSearchParams(location.search).get('type');
+  if (initial) setActive(initial);
 </script>
 
 <style>
