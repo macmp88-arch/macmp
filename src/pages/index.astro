@@ -15,7 +15,7 @@ const categories = [
   { zh: '教程', en: 'Tutorials', href: '/ai-local/' },
 ];
 
-const directory = apps.slice(0, 12);
+const directory = apps.slice(0, 24);
 ---
 <BaseLayout path="/">
   <section class="hero" style="padding-bottom:20px">
@@ -26,6 +26,10 @@ const directory = apps.slice(0, 12);
       <a href="/software/"><span class="zh">浏览全部软件</span><span class="en">Browse all software</span></a>
       <a href="/deals/"><span class="zh">查看优惠情报</span><span class="en">View deals</span></a>
     </div>
+    <form class="hero-search" action="/software/" method="get">
+      <input type="search" name="q" placeholder="搜索软件… Search…" autocomplete="off" />
+      <button type="submit"><span class="zh">搜索</span><span class="en">Search</span></button>
+    </form>
   </section>
 
   <!-- 分类导航 -->
@@ -96,6 +100,34 @@ const directory = apps.slice(0, 12);
 </BaseLayout>
 
 <style>
+  .hero-search {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    max-width: 460px;
+    margin: 18px auto 0;
+  }
+  .hero-search input {
+    flex: 1;
+    padding: 12px 18px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 980px;
+    outline: none;
+    background: #fff;
+  }
+  .hero-search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  .hero-search button {
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 980px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .hero-search button:hover { background: var(--blue-hover); }
   .cat-nav {
     display: flex;
     flex-wrap: wrap;

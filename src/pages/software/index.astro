@@ -92,9 +92,13 @@ const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
     setActive(btn.dataset.type || '全部');
   });
 
-  // 支持 ?type=办公 直达分类
-  const initial = new URLSearchParams(location.search).get('type');
+  // 支持 ?type=办公 直达分类，?q=关键词 直达搜索
+  const params = new URLSearchParams(location.search);
+  const initialQ = params.get('q');
+  if (initialQ) search.value = initialQ;
+  const initial = params.get('type');
   if (initial) setActive(initial);
+  else applyFilter();
 </script>
 
 <style>
