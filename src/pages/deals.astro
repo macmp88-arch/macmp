@@ -3,33 +3,101 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Recommendation from '../components/Recommendation.astro';
 
 const title = 'Mac 软件优惠情报 · MacMP';
-const description = 'Mac 软件限免、折扣与 Bundle 套装优惠情报，帮你用更低价格入手正版应用。';
+const description = 'Mac 软件限免、官方试用与高性价比推荐，帮你用更低价格入手正版应用。';
+
+const free: any[] = [
+  { slug: 'iina', zh: 'IINA', en: 'IINA', dZh: '现代、简洁的开源视频播放器，格式兼容好。', dEn: 'A modern, clean open-source video player with great format support.', price: '免费', badge: 'free' },
+  { slug: 'rectangle', zh: 'Rectangle', en: 'Rectangle', dZh: '免费开源的窗口分屏工具，快捷键高效。', dEn: 'Free open-source window snapping with efficient shortcuts.', price: '免费', badge: 'free' },
+  { slug: 'appcleaner', zh: 'AppCleaner', en: 'AppCleaner', dZh: '彻底卸载应用，自动清理残留文件。', dEn: 'Uninstall apps completely and remove leftover files.', price: '免费', badge: 'free' },
+  { slug: 'homebrew', zh: 'Homebrew', en: 'Homebrew', dZh: 'Mac 必备的命令行软件包管理器。', dEn: 'The essential command-line package manager for Mac.', price: '免费', badge: 'free' },
+  { slug: 'raycast', zh: 'Raycast', en: 'Raycast', dZh: '极速启动器与命令面板，免费版已很强大。', dEn: 'A blazing-fast launcher; the free tier is already powerful.', price: '免费 + Pro', badge: 'free' },
+  { slug: 'bear', zh: 'Bear', en: 'Bear', dZh: '精美简洁的 Markdown 笔记应用。', dEn: 'A beautiful, minimal Markdown notes app.', price: '免费 + Pro', badge: 'free' },
+];
+
+const trial: any[] = [
+  { slug: 'setapp', zh: 'Setapp', en: 'Setapp', dZh: '7 天免费试用，一个订阅畅用 240+ 款应用。', dEn: '7-day free trial; 240+ apps in one subscription.', price: '$9.99/月起', badge: 'trial', url: 'https://setapp.com' },
+  { slug: 'cleanmymac-x', zh: 'CleanMyMac X', en: 'CleanMyMac X', dZh: '清理、提速、卸载，Mac 维护首选。', dEn: 'Cleanup, speed boost and uninstaller — the top Mac maintenance tool.', price: '$39.95/年起', badge: 'trial', url: 'https://macpaw.com/cleanmymac' },
+  { slug: 'parallels-desktop', zh: 'Parallels Desktop', en: 'Parallels Desktop', dZh: '14 天免费试用，在 Mac 上运行 Windows/Linux。', dEn: '14-day free trial; run Windows and Linux on your Mac.', price: '$99.99/年', badge: 'trial', url: 'https://www.parallels.com' },
+  { slug: '1password', zh: '1Password', en: '1Password', dZh: '14 天免费试用，安全存储并自动填充密码。', dEn: '14-day free trial; store and autofill all your passwords.', price: '$2.99/月', badge: 'trial', url: 'https://1password.com' },
+];
+
+const value: any[] = [
+  { slug: 'daisydisk', zh: 'DaisyDisk', en: 'DaisyDisk', dZh: '可视化揪出占满磁盘的大文件。', dEn: 'Visualize and delete the large files eating your disk.', price: '$9.99', badge: 'value', url: 'https://daisydiskapp.com' },
+  { slug: 'magnet', zh: 'Magnet', en: 'Magnet', dZh: '拖拽即可窗口分屏，经典便宜好用。', dEn: 'Drag to snap windows — classic, cheap and reliable.', price: '$4.99', badge: 'value', url: 'https://magnet.crowdcafe.com' },
+  { slug: 'mindnode', zh: 'MindNode', en: 'MindNode', dZh: '优雅的思维导图，梳理思路。', dEn: 'An elegant mind-mapping tool for organizing ideas.', price: '$19.99', badge: 'value', url: 'https://www.mindnode.com' },
+];
+
+const sections = [
+  { key: 'free', zh: '免费软件', en: 'Free Apps', descZh: '完全免费，放心用。', descEn: 'Completely free — use with confidence.' },
+  { key: 'trial', zh: '官方试用', en: 'Free Trials', descZh: '官方试用，先试后买。', descEn: 'Official free trials — try before you buy.' },
+  { key: 'value', zh: '高性价比', en: 'Best Value', descZh: '便宜好用的一次性买断。', descEn: 'Affordable one-time purchases.' },
+];
+
+const badgeZh: Record<string, string> = { free: '免费', trial: '试用', value: '性价比' };
+const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', value: 'Value' };
 ---
 <BaseLayout title={title} description={description} path="/deals">
   <div class="container" style="padding-top:40px">
-    <h1 style="font-size:32px;margin:0 0 8px">优惠情报</h1>
-    <p style="color:var(--text-2);margin:0 0 24px">限免、折扣、Bundle 套装，持续更新（此处为占位数据）。</p>
+    <h1 style="font-size:34px;margin:0 0 8px"><span class="zh">优惠情报</span><span class="en">Deals</span></h1>
+    <p style="color:var(--ink-2);margin:0 0 28px;max-width:640px">
+      <span class="zh">精选免费软件、官方试用与高性价比工具，链接均为官方渠道。</span>
+      <span class="en">Free apps, official trials and best-value tools — all links go to official channels.</span>
+    </p>
 
-    <div class="grid">
-      <article class="card">
-        <span class="cat">限免</span>
-        <h3><a href="/deals/">Setapp 新用户试用</a></h3>
-        <p>Setapp 提供 7 天免费试用，试用期可畅用全部 240+ 款应用。</p>
-        <div class="meta"><span>长期有效</span><span class="badge green">推荐</span></div>
-      </article>
-      <article class="card">
-        <span class="cat">折扣</span>
-        <h3><a href="/deals/">CleanMyMac X 优惠</a></h3>
-        <p>MacPaw 官方不定期推出订阅折扣，可叠加联盟返利。</p>
-        <div class="meta"><span>不定期</span><span class="badge">官方渠道</span></div>
-      </article>
-      <article class="card">
-        <span class="cat">Bundle</span>
-        <h3><a href="/deals/">Mac 软件 Bundle 套装</a></h3>
-        <p>Bundle 套装通常以 2-4 折打包多款软件，适合一次性补齐常用工具。</p>
-        <div class="meta"><span>限时</span><span class="badge">高性价比</span></div>
-      </article>
-    </div>
+    {sections.map((sec) => (
+      <section class="deal-section">
+        <div class="section-head">
+          <h2><span class="zh">{sec.zh}</span><span class="en">{sec.en}</span></h2>
+          <span style="font-size:13px;color:var(--ink-2)"><span class="zh">{sec.descZh}</span><span class="en">{sec.descEn}</span></span>
+        </div>
+        <div class="grid">
+          {(sec.key === 'free' ? free : sec.key === 'trial' ? trial : value).map((d: any) => (
+            <a class="card deal-card" href={d.url || '#'} target="_blank" rel="nofollow sponsored">
+              <div class="card-row">
+                <img class="app-icon" src={`/images/apps/${d.slug}.png`} alt={d.zh} width="48" height="48" loading="lazy" />
+                <div class="card-body">
+                  <span class="cat">
+                    <span class={`badge ${d.badge}`}><span class="zh">{badgeZh[d.badge]}</span><span class="en">{badgeEn[d.badge]}</span></span>
+                  </span>
+                  <h3><span class="zh">{d.zh}</span><span class="en">{d.en}</span></h3>
+                  <p><span class="zh">{d.dZh}</span><span class="en">{d.dEn}</span></p>
+                  <div class="meta">
+                    <span>{d.price}</span>
+                    <span class="deal-go"><span class="zh">前往 →</span><span class="en">Go →</span></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="deal-note">
+      <p>
+        <span class="zh">💡 优惠信息会不定期更新；价格以官方页面为准。部分链接为联盟链接，购买不会增加你的花费，但可能为我们带来佣金。</span>
+        <span class="en">💡 Deals are updated regularly; prices are subject to official pages. Some links are affiliate links — purchases cost you nothing extra but may earn us a commission.</span>
+      </p>
+    </section>
+
     <Recommendation />
   </div>
 </BaseLayout>
+
+<style>
+  .deal-section { margin: 28px 0; }
+  .deal-card { text-decoration: none; color: inherit; }
+  .deal-card:hover { border-color: var(--blue); }
+  .badge.free { background: #e6f4ea; color: #1d7a3b; }
+  .badge.trial { background: #e8f0fe; color: #0066cc; }
+  .badge.value { background: #fff1e0; color: #b45309; }
+  .deal-go { color: var(--blue); font-weight: 600; }
+  .deal-note {
+    margin: 28px 0;
+    padding: 16px 20px;
+    background: var(--bg-2);
+    border-radius: 14px;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+</style>
