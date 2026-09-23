@@ -14,6 +14,7 @@ export interface App {
   setapp: boolean;
   affiliate: string;
   url: string;
+  video?: string;
   tags: string[];
   bestFor?: string;
   bestForEn?: string;
@@ -21,6 +22,8 @@ export interface App {
   prosEn?: string[];
   cons?: string[];
   consEn?: string[];
+  features?: { title: string; titleEn: string; desc: string; descEn: string }[];
+  faqs?: { q: string; qEn: string; a: string; aEn: string }[];
 }
 
 export const apps: App[] = [
@@ -44,13 +47,26 @@ export const apps: App[] = [
     tagline: '一键清理、提速、卸载，Mac 维护首选', taglineEn: 'One-click cleanup, speed boost and app uninstaller',
     description: 'CleanMyMac X 是 Mac 上最知名的清理与维护工具，能清理系统垃圾、卸载残留、优化内存并监测健康状态，MacPaw 官方联盟分成高达 35%。',
     descriptionEn: 'CleanMyMac X is the best-known Mac cleaner and maintenance tool: it removes junk, uninstalls apps completely, optimizes memory and monitors system health.',
-    price: '约 $39.95/年', setapp: true, affiliate: 'macpaw', url: 'https://macpaw.com/cleanmymac',
+    price: '约 $39.95/年', setapp: true, affiliate: 'macpaw', url: 'https://macpaw.com/cleanmymac', video: 'https://www.youtube.com/embed/gF7BbJZXG0k',
     tags: ['清理', '提速', '卸载'],
     bestFor: '觉得 Mac 变慢、想要省心一键维护的用户', bestForEn: 'Users who feel their Mac is slowing down and want easy one-click maintenance',
     pros: ['界面直观，一键完成清理', '卸载彻底，不留残留', '含健康监测与隐私清理'],
     prosEn: ['Intuitive one-click cleanup', 'Thorough uninstall with no leftovers', 'Health monitoring and privacy cleanup'],
     cons: ['年费订阅价格偏高', '部分功能系统自带也能实现'],
     consEn: ['Annual subscription is pricey', 'Some features overlap with macOS built-ins'],
+    features: [
+      { title: '智能清理', titleEn: 'Smart Care', desc: '一键扫描系统垃圾、缓存与无用大文件，让 Mac 重获速度。', descEn: 'One-click scan removes system junk, caches and large unused files so your Mac feels fast again.' },
+      { title: '应用卸载器', titleEn: 'Uninstaller', desc: '彻底卸载应用及其残留文件，不留下任何垃圾。', descEn: 'Completely uninstalls apps and their leftovers so nothing is left behind.' },
+      { title: '恶意软件移除', titleEn: 'Malware Removal', desc: '实时检测并移除恶意软件与广告程序，守护 Mac 安全。', descEn: 'Detects and removes malware and adware in real time to keep your Mac safe.' },
+      { title: '隐私保护', titleEn: 'Privacy', desc: '清理浏览记录、聊天记录等敏感数据，保护个人隐私。', descEn: 'Clears browsing history, chat logs and other sensitive data to protect your privacy.' },
+      { title: '健康监测', titleEn: 'Health Monitor', desc: '监控内存、磁盘、CPU 与电池健康，异常及时提醒。', descEn: 'Monitors memory, disk, CPU and battery health and alerts you to issues.' },
+      { title: '提速优化', titleEn: 'Speed Up', desc: '优化登录项与后台进程，让 Mac 启动更快、运行更流畅。', descEn: 'Optimizes login items and background processes for faster startup and smoother performance.' },
+    ],
+    faqs: [
+      { q: 'CleanMyMac X 多少钱？', qEn: 'How much does CleanMyMac X cost?', a: '单买约 $39.95/年；也可以订阅 Setapp（约 $9.99/月），畅用包含 CleanMyMac X 在内的 240+ 款正版应用。', aEn: 'About $39.95/year standalone, or subscribe to Setapp (~$9.99/month) to use it alongside 240+ other premium apps.' },
+      { q: '有免费试用吗？', qEn: 'Is there a free trial?', a: '有。MacPaw 官网提供免费试用，Setapp 也提供 7 天免费试用。', aEn: 'Yes. MacPaw offers a free trial, and Setapp offers a 7-day free trial.' },
+      { q: '清理会不会误删重要文件？', qEn: 'Could it delete important files by mistake?', a: '不会。CleanMyMac X 有安全机制，默认只清理可安全删除的缓存与垃圾，重要文件和系统文件会自动跳过，删除前也可以预览。', aEn: 'No. It has safety mechanisms — by default it only removes safely deletable caches and junk, skips important and system files, and lets you preview before deleting.' },
+    ],
   },
   {
     slug: 'raycast', name: 'Raycast', nameEn: 'Raycast',
@@ -421,11 +437,23 @@ export const apps: App[] = [
     category: "视频剪辑", categoryEn: "Video Editing", type: "媒体", typeEn: "Media",
     tagline: "Apple 出品的专业视频剪辑软件", taglineEn: "Apple's professional video editor",
     description: "Final Cut Pro 是 Apple 出品的专业视频剪辑软件，支持多机位、HDR、ProRes 等，剪辑流畅高效，是 Mac 视频创作者的首选。", descriptionEn: "Final Cut Pro is Apple's professional video editor with multicam, HDR and ProRes support — smooth and powerful for Mac video creators.",
-    price: "$299.99（一次性）", setapp: false, affiliate: 'generic', url: "https://www.apple.com/final-cut-pro/",
+    price: "$299.99（一次性）", setapp: false, affiliate: 'generic', url: "https://www.apple.com/final-cut-pro/", video: "https://www.youtube.com/embed/dy3k9M8kqu0",
     tags: ["视频剪辑", "专业", "Apple"],
     bestFor: "专业视频剪辑师和内容创作者", bestForEn: "Professional video editors and creators",
     pros: ["剪辑流畅，性能优化好", "一次买断", "支持 HDR 与 ProRes"], prosEn: ["Smooth and well-optimized", "One-time purchase", "HDR and ProRes support"],
     cons: ["价格较高", "仅限 Mac"], consEn: ["Pricey", "Mac only"],
+    features: [
+      { title: "磁性时间线", titleEn: "Magnetic Timeline", desc: "片段自动吸附、不留黑场，让剪辑行云流水。", descEn: "Clips snap together with no gaps, making editing fluid." },
+      { title: "多机位剪辑", titleEn: "Multicam", desc: "最多同步 64 个角度，一键切换画面，高效处理多机位素材。", descEn: "Sync up to 64 angles and switch shots with a single click." },
+      { title: "HDR 与 ProRes", titleEn: "HDR & ProRes", desc: "全流程支持 HDR 与专业编码格式，画质无损。", descEn: "Full end-to-end HDR and pro codec support with lossless quality." },
+      { title: "Apple 芯片优化", titleEn: "Optimized for Apple Silicon", desc: "原生优化 M 系列芯片，剪辑与导出速度极快。", descEn: "Natively optimized for M-series chips — blazing-fast editing and export." },
+      { title: "Motion / Compressor 配套", titleEn: "Motion & Compressor", desc: "搭配 Motion 做特效、Compressor 做批量导出，形成完整工作流。", descEn: "Pair with Motion for effects and Compressor for batch export for a complete workflow." },
+    ],
+    faqs: [
+      { q: "Final Cut Pro 多少钱？", qEn: "How much does Final Cut Pro cost?", a: "$299.99 一次性买断（Mac App Store），没有订阅费用，一次购买长期使用。", aEn: "$299.99 one-time purchase on the Mac App Store — no subscription, buy once and use it long-term." },
+      { q: "有免费试用吗？", qEn: "Is there a free trial?", a: "有，Apple 官方提供 90 天免费试用，可以先体验再决定是否购买。", aEn: "Yes, Apple offers a 90-day free trial so you can try before you buy." },
+      { q: "支持 Apple Silicon 吗？", qEn: "Does it support Apple Silicon?", a: "完全原生支持 M 系列芯片，性能和功耗表现都很好。", aEn: "It fully supports Apple Silicon natively with excellent performance and efficiency." },
+    ],
   },
   {
     slug: "apple-motion", name: "Apple Motion", nameEn: "Apple Motion",

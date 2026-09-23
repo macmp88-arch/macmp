@@ -1,0 +1,414 @@
+---
+import { apps } from '../data/apps';
+
+const jsonStr = JSON.stringify(apps).replace(/</g, '\\u003c');
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>MacMP 管理后台</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <script type="application/json" id="apps-data" set:html={jsonStr}></script>
+
+    <header class="adm-head">
+      <a class="brand" href="/">⬅ 返回网站</a>
+      <span class="brand-sub">MacMP 管理后台 · Admin</span>
+      <button id="logout" class="logout" hidden>退出登录</button>
+    </header>
+
+    <!-- 登录 -->
+    <section id="login" class="panel">
+      <div class="login-card">
+        <h1>管理后台登录</h1>
+        <p>请输入账号与密码</p>
+        <form id="loginForm">
+          <label>账号 <input type="text" id="username" autocomplete="username" /></label>
+          <label>密码 <input type="password" id="password" autocomplete="current-password" /></label>
+          <button type="submit" class="btn">登录</button>
+          <p id="loginErr" class="err" hidden>账号或密码错误</p>
+        </form>
+        <p class="tip">安全说明：本后台为纯前端工具（网站是静态托管，没有服务器），登录仅作便捷入口，无法提供真正意义上的安全防护。请勿把这个密码用于其他任何重要账号；如需更安全，可在代码中更换密码哈希。</p>
+      </div>
+    </section>
+
+    <!-- 后台 -->
+    <section id="dash" class="panel" hidden>
+      <div class="dash-top">
+        <div>
+          <h1>软件管理</h1>
+          <p>共 <span id="count">0</span> 款软件 · 可编辑、添加、删除；修改后请导出并重新部署。</p>
+        </div>
+        <div class="dash-actions">
+          <button id="addBtn" class="btn">＋ 新增软件</button>
+          <button id="exportBtn" class="btn ghost">导出 apps.ts</button>
+          <button id="copyBtn" class="btn ghost">复制代码</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>名称</th><th>分类</th><th>价格</th><th>Setapp</th><th>联盟</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <p id="copyMsg" class="ok" hidden>已复制到剪贴板 ✅</p>
+      <p class="tip">
+        修改完成后：点击「导出 apps.ts」下载文件，用它替换项目里的
+        <code>src/data/apps.ts</code>，然后重新构建部署（推送 GitHub 后自动上线）。也可以直接把下载的文件发给开发者处理。
+      </p>
+    </section>
+
+    <!-- 编辑弹窗 -->
+    <div id="modal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <h2 id="modalTitle">编辑软件</h2>
+          <button id="closeBtn" class="close" type="button">✕</button>
+        </div>
+        <form id="appForm" class="form"></form>
+        <div class="modal-foot">
+          <button id="saveBtn" class="btn" type="button">保存</button>
+          <button id="cancelBtn" class="btn ghost" type="button">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const ADMIN_USER = 'macmp';
+      const ADMIN_SALT = 'macmp-site-2026::';
+      const ADMIN_HASH = '77e23691e01fa2773a98c7fc632b6ee4fa2e1b845f72d754bfe00acbde51a1b3';
+
+      async function hashPassword(pw) {
+        const data = new TextEncoder().encode(ADMIN_SALT + pw);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+      }
+      const APPS = JSON.parse(document.getElementById('apps-data')!.textContent!);
+      let editingIndex = -1;
+
+      const loginEl = document.getElementById('login') as HTMLElement;
+      const dashEl = document.getElementById('dash') as HTMLElement;
+      const logoutEl = document.getElementById('logout') as HTMLButtonElement;
+      const modal = document.getElementById('modal') as HTMLElement;
+      const tbody = document.getElementById('tbody') as HTMLElement;
+      const countEl = document.getElementById('count') as HTMLElement;
+
+      const textFields: [string, string, string, string][] = [
+        ['slug', 'Slug（唯一，英文小写连字符）', 'text', '例如：cleanmymac-x'],
+        ['name', '中文名', 'text', '例如：CleanMyMac X'],
+        ['nameEn', '英文名', 'text', 'Name in English'],
+        ['category', '分类（中文）', 'text', '例如：系统维护'],
+        ['categoryEn', '分类（英文）', 'text', 'Category in English'],
+        ['type', '大类（中文：办公/媒体/系统/开发/工具）', 'text', '例如：系统'],
+        ['typeEn', '大类（英文）', 'text', 'System / Media / ...'],
+        ['tagline', '一句话简介（中文）', 'text', ''],
+        ['taglineEn', '一句话简介（英文）', 'text', ''],
+        ['description', '详细介绍（中文）', 'textarea', ''],
+        ['descriptionEn', '详细介绍（英文）', 'textarea', ''],
+        ['price', '价格', 'text', '例如：约 $39.95/年'],
+        ['affiliate', '联盟渠道', 'select', 'setapp|macpaw|crossover|generic'],
+        ['url', '官方网址', 'text', 'https://...'],
+        ['video', '官方视频链接（可选）', 'text', 'https://www.youtube.com/embed/...'],
+        ['tags', '标签（逗号分隔）', 'text', '清理,提速,卸载'],
+        ['bestFor', '适合谁（中文）', 'text', ''],
+        ['bestForEn', '适合谁（英文）', 'text', ''],
+        ['pros', '优点（每行一条，中文）', 'textarea', ''],
+        ['prosEn', '优点（每行一条，英文）', 'textarea', ''],
+        ['cons', '不足（每行一条，中文）', 'textarea', ''],
+        ['consEn', '不足（每行一条，英文）', 'textarea', ''],
+      ];
+
+      function render() {
+        countEl.textContent = String(APPS.length);
+        tbody.innerHTML = APPS.map((a: any, i: number) => `
+          <tr>
+            <td><strong>${esc(a.name)}</strong><br><span class="muted">${esc(a.slug)}</span></td>
+            <td>${esc(a.category)}</td>
+            <td>${esc(a.price)}</td>
+            <td>${a.setapp ? '✅' : '—'}</td>
+            <td>${esc(a.affiliate)}</td>
+            <td class="ops">
+              <button data-act="edit" data-i="${i}">编辑</button>
+              <button data-act="del" data-i="${i}" class="danger">删除</button>
+            </td>
+          </tr>`).join('');
+      }
+
+      function esc(s: any) {
+        return String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+      }
+
+      function splitLines(v: any) { return (v || []).join('\n'); }
+      function parseLines(v: string) { return v.split('\n').map((s) => s.trim()).filter(Boolean); }
+      function parseJson(v: string, fallback: any) {
+        if (!v.trim()) return fallback;
+        try { return JSON.parse(v); } catch { return fallback; }
+      }
+
+      function buildForm(app: any) {
+        const affOptions = ['setapp', 'macpaw', 'crossover', 'generic']
+          .map((v) => `<option value="${v}" ${app.affiliate === v ? 'selected' : ''}>${v}</option>`).join('');
+        return `
+          ${textFields.map(([key, label, type, ph]) => {
+            if (type === 'textarea') {
+              const v = Array.isArray(app[key]) ? splitLines(app[key]) : (app[key] ?? '');
+              return `<label>${label}<textarea name="${key}" rows="3" placeholder="${esc(ph)}">${esc(v)}</textarea></label>`;
+            }
+            if (type === 'select') {
+              return `<label>${label}<select name="${key}">${affOptions}</select></label>`;
+            }
+            return `<label>${label}<input name="${key}" type="text" value="${esc(app[key] ?? '')}" placeholder="${esc(ph)}" /></label>`;
+          }).join('')}
+          <label class="chk"><input name="setapp" type="checkbox" ${app.setapp ? 'checked' : ''} /> 可在 Setapp 订阅</label>
+          <details class="adv">
+            <summary>高级字段（核心功能 / 常见问题，JSON 格式，可选）</summary>
+            <label>核心功能 features（JSON）<textarea name="features" rows="6" placeholder='[{"title":"...","titleEn":"...","desc":"...","descEn":"..."}]'>${esc(JSON.stringify(app.features ?? null))}</textarea></label>
+            <label>常见问题 faqs（JSON）<textarea name="faqs" rows="6" placeholder='[{"q":"...","qEn":"...","a":"...","aEn":"..."}]'>${esc(JSON.stringify(app.faqs ?? null))}</textarea></label>
+          </details>
+        `;
+      }
+
+      function openAdd() {
+        editingIndex = -1;
+        (document.getElementById('modalTitle') as HTMLElement).textContent = '新增软件';
+        (document.getElementById('appForm') as HTMLElement).innerHTML = buildForm({
+          slug: '', name: '', nameEn: '', category: '', categoryEn: '', type: '工具', typeEn: 'Utilities',
+          tagline: '', taglineEn: '', description: '', descriptionEn: '', price: '', setapp: false,
+          affiliate: 'generic', url: '', video: '', tags: [], bestFor: '', bestForEn: '', pros: [], prosEn: [], cons: [], consEn: [],
+        });
+        modal.hidden = false;
+      }
+
+      function openEdit(i: number) {
+        editingIndex = i;
+        const app = APPS[i];
+        (document.getElementById('modalTitle') as HTMLElement).textContent = '编辑：' + app.name;
+        (document.getElementById('appForm') as HTMLElement).innerHTML = buildForm(app);
+        modal.hidden = false;
+      }
+
+      function save() {
+        const form = document.getElementById('appForm') as HTMLFormElement;
+        const fd = new FormData(form);
+        const get = (k: string) => String(fd.get(k) ?? '');
+        const obj: any = {
+          slug: get('slug').trim(),
+          name: get('name').trim(),
+          nameEn: get('nameEn').trim(),
+          category: get('category').trim(),
+          categoryEn: get('categoryEn').trim(),
+          type: get('type').trim(),
+          typeEn: get('typeEn').trim(),
+          tagline: get('tagline').trim(),
+          taglineEn: get('taglineEn').trim(),
+          description: get('description').trim(),
+          descriptionEn: get('descriptionEn').trim(),
+          price: get('price').trim(),
+          setapp: fd.get('setapp') === 'on',
+          affiliate: get('affiliate') || 'generic',
+          url: get('url').trim(),
+          video: get('video').trim() || undefined,
+          tags: parseLines(get('tags')),
+          bestFor: get('bestFor').trim() || undefined,
+          bestForEn: get('bestForEn').trim() || undefined,
+          pros: parseLines(get('pros')),
+          prosEn: parseLines(get('prosEn')),
+          cons: parseLines(get('cons')),
+          consEn: parseLines(get('consEn')),
+        };
+        const feats = parseJson(get('features'), null);
+        if (feats) obj.features = feats;
+        const faqs = parseJson(get('faqs'), null);
+        if (faqs) obj.faqs = faqs;
+        if (!obj.slug) { alert('Slug 不能为空'); return; }
+        if (!obj.name || !obj.nameEn) { alert('请填写中文名和英文名'); return; }
+
+        if (editingIndex === -1) {
+          if (APPS.some((a: any) => a.slug === obj.slug)) { alert('Slug 已存在，请换一个'); return; }
+          APPS.push(obj);
+        } else {
+          if (APPS.some((a: any, i: number) => i !== editingIndex && a.slug === obj.slug)) { alert('Slug 已存在，请换一个'); return; }
+          APPS[editingIndex] = obj;
+        }
+        modal.hidden = true;
+        render();
+      }
+
+      function generateTs(): string {
+        const iface = `export interface App {
+  slug: string;
+  name: string;
+  nameEn: string;
+  category: string;
+  categoryEn: string;
+  type: string;
+  typeEn: string;
+  tagline: string;
+  taglineEn: string;
+  description: string;
+  descriptionEn: string;
+  price: string;
+  setapp: boolean;
+  affiliate: string;
+  url: string;
+  video?: string;
+  tags: string[];
+  bestFor?: string;
+  bestForEn?: string;
+  pros?: string[];
+  prosEn?: string[];
+  cons?: string[];
+  consEn?: string[];
+  features?: { title: string; titleEn: string; desc: string; descEn: string }[];
+  faqs?: { q: string; qEn: string; a: string; aEn: string }[];
+}`;
+        const data = JSON.stringify(APPS, null, 2);
+        return `${iface}
+
+export const apps: App[] = ${data};
+
+export function getApps() {
+  return apps;
+}
+
+export function getApp(slug: string) {
+  return apps.find((a) => a.slug === slug);
+}
+`;
+      }
+
+      function download(name: string, text: string) {
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function exportTs() { download('apps.ts', generateTs()); }
+
+      async function copyTs() {
+        try {
+          await navigator.clipboard.writeText(generateTs());
+          const m = document.getElementById('copyMsg') as HTMLElement;
+          m.hidden = false;
+          setTimeout(() => { m.hidden = true; }, 2500);
+        } catch {
+          alert('复制失败，请使用「导出 apps.ts」下载文件');
+        }
+      }
+
+      // 事件绑定
+      document.getElementById('loginForm')!.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const u = (document.getElementById('username') as HTMLInputElement).value.trim();
+        const p = (document.getElementById('password') as HTMLInputElement).value;
+        const ok = u === ADMIN_USER && (await hashPassword(p)) === ADMIN_HASH;
+        if (ok) {
+          sessionStorage.setItem('macmp_admin', '1');
+          showDash();
+        } else {
+          (document.getElementById('loginErr') as HTMLElement).hidden = false;
+        }
+      });
+
+      document.getElementById('logout')!.addEventListener('click', () => {
+        sessionStorage.removeItem('macmp_admin');
+        showLogin();
+      });
+
+      document.getElementById('addBtn')!.addEventListener('click', openAdd);
+      document.getElementById('exportBtn')!.addEventListener('click', exportTs);
+      document.getElementById('copyBtn')!.addEventListener('click', copyTs);
+      document.getElementById('saveBtn')!.addEventListener('click', save);
+      document.getElementById('cancelBtn')!.addEventListener('click', () => { modal.hidden = true; });
+      document.getElementById('closeBtn')!.addEventListener('click', () => { modal.hidden = true; });
+
+      tbody.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('button');
+        if (!btn) return;
+        const i = Number(btn.dataset.i);
+        if (btn.dataset.act === 'edit') openEdit(i);
+        if (btn.dataset.act === 'del') {
+          if (confirm(`确定删除「${APPS[i].name}」吗？`)) {
+            APPS.splice(i, 1);
+            render();
+          }
+        }
+      });
+
+      function showLogin() {
+        loginEl.hidden = false;
+        dashEl.hidden = true;
+        logoutEl.hidden = true;
+      }
+      function showDash() {
+        loginEl.hidden = true;
+        dashEl.hidden = false;
+        logoutEl.hidden = false;
+        render();
+      }
+
+      if (sessionStorage.getItem('macmp_admin') === '1') showDash(); else showLogin();
+    </script>
+
+    <style>
+      :root { --blue: #0071e3; --ink: #1d1d1f; --ink-2: #6e6e73; --border: #d2d2d7; --bg-2: #f5f5f7; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f7; color: var(--ink); }
+      .adm-head { display: flex; align-items: center; gap: 16px; padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--border); }
+      .brand { color: var(--blue); font-weight: 600; text-decoration: none; }
+      .brand-sub { color: var(--ink-2); font-size: 14px; }
+      .logout { margin-left: auto; border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+      .panel { max-width: 1080px; margin: 0 auto; padding: 24px; }
+      .login-card { max-width: 360px; margin: 80px auto; background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+      .login-card h1 { font-size: 24px; margin: 0 0 6px; }
+      .login-card p { color: var(--ink-2); margin: 0 0 20px; }
+      label { display: block; margin-bottom: 14px; font-size: 14px; font-weight: 600; }
+      input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-top: 6px; font-family: inherit; }
+      textarea { resize: vertical; }
+      .btn { display: inline-block; padding: 10px 20px; border-radius: 999px; background: var(--blue); color: #fff; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+      .btn.ghost { background: #fff; color: var(--blue); border: 1px solid var(--border); }
+      .err { color: #c0392b; margin-top: 12px !important; font-size: 14px; }
+      .ok { color: #1d7a3b; font-weight: 600; }
+      .tip { color: var(--ink-2); font-size: 13px; margin-top: 18px; line-height: 1.6; }
+      .dash-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+      .dash-top h1 { margin: 0 0 4px; font-size: 26px; }
+      .dash-top p { color: var(--ink-2); margin: 0; }
+      .dash-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .table-wrap { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 640px; }
+      th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
+      th { background: #fafafa; color: var(--ink-2); font-size: 13px; }
+      .muted { color: var(--ink-2); font-size: 12px; }
+      .ops button { border: 1px solid var(--border); background: #fff; border-radius: 6px; padding: 4px 10px; margin-right: 6px; cursor: pointer; font-size: 13px; }
+      .ops .danger { color: #c0392b; }
+      .modal { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 100; overflow-y: auto; }
+      .modal-card { background: #fff; border-radius: 16px; width: 100%; max-width: 720px; padding: 24px; }
+      .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+      .modal-head h2 { margin: 0; font-size: 20px; }
+      .close { border: none; background: none; font-size: 20px; cursor: pointer; color: var(--ink-2); }
+      .form { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+      .form label { grid-column: span 1; }
+      .form label:has(textarea), .form .chk, .form .adv { grid-column: span 2; }
+      .chk { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+      .chk input { width: auto; margin: 0; }
+      .adv { border-top: 1px dashed var(--border); padding-top: 14px; margin-top: 6px; }
+      .adv summary { cursor: pointer; font-weight: 600; color: var(--blue); }
+      .modal-foot { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+      @media (max-width: 600px) { .form { grid-template-columns: 1fr; } .form label { grid-column: span 1; } }
+    </style>
+  </body>
+</html>

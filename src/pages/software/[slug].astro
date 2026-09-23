@@ -25,58 +25,177 @@ const relatedSlugs = [
   ...apps.filter((a) => a.slug !== app.slug && a.category === app.category).map((a) => a.slug),
   'setapp', 'cleanmymac-x', 'raycast', 'crossover',
 ].filter((v, i, arr) => arr.indexOf(v) === i).slice(0, 4);
+
+// 核心功能：有则用详细数据，没有则用「优点」兜底
+const features =
+  app.features && app.features.length > 0
+    ? app.features
+    : (app.pros || []).map((p, i) => ({
+        title: p,
+        titleEn: app.prosEn?.[i] || '',
+        desc: app.tagline,
+        descEn: app.taglineEn,
+      }));
+
+// 常见问题：有则用，没有则生成通用问题
+const defaultFaqs = [
+  {
+    q: `${app.name} 多少钱？怎么买？`,
+    qEn: `How much is ${app.nameEn} and how do I buy it?`,
+    a: `价格：${app.price}。建议通过上方官方/联盟链接购买，正版有保障，也不会增加你的花费。`,
+    aEn: `Price: ${app.price}. We recommend buying through the official/affiliate link above — it's genuine, and costs you nothing extra.`,
+  },
+  {
+    q: '支持 Apple Silicon（M 系列芯片）吗？',
+    qEn: 'Does it support Apple Silicon (M-series)?',
+    a: '绝大多数现代 Mac 软件均已原生支持 Apple Silicon。购买前可在官网查看系统要求，确认与你的 macOS 版本兼容。',
+    aEn: 'Most modern Mac software is natively optimized for Apple Silicon. Check the system requirements on the official site to confirm compatibility with your macOS version.',
+  },
+  {
+    q: '有免费试用吗？',
+    qEn: 'Is there a free trial?',
+    a: app.setapp
+      ? '它已收录在 Setapp 中，可以先使用 7 天免费试用再决定。'
+      : '多数软件提供免费试用或免费版，可以先到官网体验，再决定是否购买。',
+    aEn: app.setapp
+      ? 'It is included in Setapp, which offers a 7-day free trial.'
+      : 'Most apps offer a free trial or a free tier — try it on the official site before buying.',
+  },
+];
+const faqs = app.faqs && app.faqs.length > 0 ? app.faqs : defaultFaqs;
+
+const typeZh = app.type || app.category;
+const typeEn = app.typeEn || app.categoryEn;
 ---
-<BaseLayout title={`${app.name} 评测推荐 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
+<BaseLayout title={`${app.name} 评测与使用教程 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
   <div class="container">
+    <nav class="crumbs" aria-label="breadcrumb">
+      <a href="/"><span class="zh">首页</span><span class="en">Home</span></a>
+      <span class="sep">›</span>
+      <a href="/software/"><span class="zh">软件推荐</span><span class="en">Software</span></a>
+      <span class="sep">›</span>
+      <a href={`/software/?type=${encodeURIComponent(typeZh)}`}><span class="zh">{typeZh}</span><span class="en">{typeEn}</span></a>
+      <span class="sep">›</span>
+      <span class="current"><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></span>
+    </nav>
+
     <article class="article">
-      <div class="card-row">
-        <img class="app-icon-lg" src={`/images/apps/${app.slug}.png`} alt={app.name} width="72" height="72" />
-        <div style="flex:1;min-width:0">
-          <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
-          <h1 style="margin:4px 0 6px"><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></h1>
-          <div class="meta">{app.price} · {app.setapp ? <span><span class="zh">可订阅 Setapp</span><span class="en">On Setapp</span></span> : <span><span class="zh">独立购买</span><span class="en">Standalone</span></span>}</div>
+      <header class="detail-head">
+        <div class="card-row">
+          <img class="app-icon-lg" src={`/images/apps/${app.slug}.png`} alt={app.name} width="84" height="84" />
+          <div style="flex:1;min-width:0">
+            <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
+            <h1 style="margin:6px 0 8px"><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></h1>
+            <p class="detail-tagline"><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
+          </div>
         </div>
-      </div>
+        <div class="detail-meta">
+          <span class="price">{app.price}</span>
+          {app.setapp ? (
+            <span class="badge green"><span class="zh">Setapp 可订阅</span><span class="en">On Setapp</span></span>
+          ) : (
+            <span class="badge"><span class="zh">独立购买</span><span class="en">Standalone</span></span>
+          )}
+          {app.tags.map((t) => (
+            <span class="tag" key={t}>#{t}</span>
+          ))}
+        </div>
+      </header>
 
-      <p style="font-size:17px"><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
-      <p><span class="zh">{app.description}</span><span class="en">{app.descriptionEn}</span></p>
-
-      {app.bestFor && (
-        <section>
-          <h2><span class="zh">适合谁</span><span class="en">Who it's for</span></h2>
-          <p><span class="zh">{app.bestFor}</span><span class="en">{app.bestForEn}</span></p>
+      {app.video && (
+        <section class="detail-sec">
+          <h2><span class="zh">官方视频</span><span class="en">Official Video</span></h2>
+          <div class="video-wrap">
+            <iframe
+              src={app.video}
+              title={`${app.name} 官方视频`}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
         </section>
       )}
+
+      <section class="detail-sec">
+        <h2><span class="zh">软件介绍</span><span class="en">Overview</span></h2>
+        <p class="lead"><span class="zh">{app.description}</span><span class="en">{app.descriptionEn}</span></p>
+        {app.bestFor && (
+          <p class="best-for">
+            <span class="zh"><strong>适合谁：</strong>{app.bestFor}</span>
+            <span class="en"><strong>Who it's for:</strong> {app.bestForEn}</span>
+          </p>
+        )}
+      </section>
+
+      <section class="detail-sec">
+        <h2><span class="zh">核心功能</span><span class="en">Key Features</span></h2>
+        <div class="feature-grid">
+          {features.map((f) => (
+            <div class="feature" key={f.title}>
+              <h3><span class="zh">{f.title}</span><span class="en">{f.titleEn}</span></h3>
+              <p><span class="zh">{f.desc}</span><span class="en">{f.descEn}</span></p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {app.pros && app.pros.length > 0 && (
-        <section>
-          <h2><span class="zh">优点</span><span class="en">Pros</span></h2>
-          <ul>{app.pros.map((p, i) => <li><span class="zh">{p}</span><span class="en">{app.prosEn?.[i]}</span></li>)}</ul>
+        <section class="detail-sec">
+          <div class="two-col">
+            <div>
+              <h2><span class="zh">优点</span><span class="en">Pros</span></h2>
+              <ul class="pros">
+                {app.pros.map((p, i) => (
+                  <li key={p}><span class="zh">{p}</span><span class="en">{app.prosEn?.[i]}</span></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2><span class="zh">不足</span><span class="en">Cons</span></h2>
+              <ul class="cons">
+                {app.cons?.map((c, i) => (
+                  <li key={c}><span class="zh">{c}</span><span class="en">{app.consEn?.[i]}</span></li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </section>
       )}
 
-      {app.cons && app.cons.length > 0 && (
-        <section>
-          <h2><span class="zh">不足</span><span class="en">Cons</span></h2>
-          <ul>{app.cons.map((c, i) => <li><span class="zh">{c}</span><span class="en">{app.consEn?.[i]}</span></li>)}</ul>
-        </section>
-      )}
+      <section class="detail-sec">
+        <h2><span class="zh">常见问题</span><span class="en">FAQ</span></h2>
+        <div class="faq">
+          {faqs.map((f) => (
+            <details key={f.q}>
+              <summary><span class="zh">{f.q}</span><span class="en">{f.qEn}</span></summary>
+              <div class="faq-a"><span class="zh">{f.a}</span><span class="en">{f.aEn}</span></div>
+            </details>
+          ))}
+        </div>
+      </section>
 
-      <div class="affiliate-box">
-        <h3><span class="zh">获取 {app.name}</span><span class="en">Get {app.nameEn}</span></h3>
+      <section class="cta">
+        <h2><span class="zh">立即获取 {app.name}</span><span class="en">Get {app.nameEn}</span></h2>
         <p>
-          <span class="zh">通过下方链接购买不会增加你的花费，但能为我们带来佣金（{aff.commission}），帮助我们持续产出内容，感谢支持 🙏</span>
+          <span class="zh">通过下方链接购买不会增加你的花费，但可能为我们带来佣金（{aff.commission}），帮助我们持续产出内容，感谢支持 🙏</span>
           <span class="en">Purchases through the link below cost you nothing extra but may earn us a commission ({aff.commissionEn}), helping us keep creating content. Thank you!</span>
         </p>
         <p>
-          <a class="btn" href={ctaUrl} rel="nofollow sponsored" target="_blank">
+          <a class="btn btn-xl" href={ctaUrl} rel="nofollow sponsored" target="_blank">
             <span class="zh">{ctaLabelZh} →</span><span class="en">{ctaLabelEn} →</span>
           </a>
         </p>
-        <p style="font-size:13px;margin-top:8px">
-          <span class="zh">{aff.note}</span><span class="en">{aff.noteEn}</span>
-        </p>
-      </div>
+        <p class="aff-note"><span class="zh">{aff.note}</span><span class="en">{aff.noteEn}</span></p>
+      </section>
+
+      <section class="service">
+        <img src="/images/contact-qr.png" alt="客服微信二维码" width="120" height="120" loading="lazy" />
+        <div>
+          <h3><span class="zh">遇到问题？</span><span class="en">Need help?</span></h3>
+          <p><span class="zh">扫码添加客服微信，购买咨询、售后问题都可以找我们。</span><span class="en">Scan to add our support on WeChat for purchase advice or after-sales help.</span></p>
+        </div>
+      </section>
     </article>
 
     <Recommendation slugs={relatedSlugs} titleZh="相关推荐" titleEn="Related Picks" />
@@ -84,3 +203,61 @@ const relatedSlugs = [
     <Comments />
   </div>
 </BaseLayout>
+
+<style>
+  .crumbs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 22px 0 0; font-size: 13px; color: var(--ink-2); }
+  .crumbs a { color: var(--ink-2); }
+  .crumbs a:hover { color: var(--blue); }
+  .crumbs .sep { color: #c7c7cc; }
+  .crumbs .current { color: var(--ink); font-weight: 600; }
+
+  .detail-head { margin-bottom: 8px; }
+  .detail-head h1 { font-size: clamp(30px, 4vw, 40px); letter-spacing: -0.02em; margin: 6px 0 8px; }
+  .detail-tagline { margin: 0; color: var(--ink-2); font-size: 17px; }
+  .detail-meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+  .detail-meta .price { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .tag { font-size: 12px; color: var(--ink-2); background: var(--bg-2); border: 1px solid var(--border); padding: 2px 10px; border-radius: 999px; }
+
+  .detail-sec { margin-top: 34px; }
+  .detail-sec h2 { font-size: 23px; letter-spacing: -0.01em; margin: 0 0 16px; }
+  .lead { font-size: 17px; color: #333; line-height: 1.75; margin: 0 0 14px; }
+  .best-for { background: var(--bg-2); border-radius: var(--radius-md); padding: 14px 18px; font-size: 15px; color: #333; margin: 0; }
+
+  .video-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: #000; box-shadow: var(--shadow-md); }
+  .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .feature { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 20px; }
+  .feature h3 { margin: 0 0 6px; font-size: 17px; letter-spacing: -0.01em; }
+  .feature p { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.6; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .two-col h2 { font-size: 20px; }
+  .two-col ul { margin: 0; padding-left: 20px; }
+  .two-col li { margin: 8px 0; color: #333; font-size: 15px; }
+  .pros li::marker { color: #1d7a3b; }
+  .cons li::marker { color: #c0392b; }
+
+  .faq details { border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 12px; background: #fff; overflow: hidden; }
+  .faq summary { cursor: pointer; padding: 16px 20px; font-weight: 600; font-size: 16px; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; font-size: 22px; color: var(--blue); font-weight: 500; transition: transform .15s ease; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq-a { padding: 0 20px 18px; color: var(--ink-2); font-size: 15px; line-height: 1.7; }
+
+  .cta { margin-top: 34px; padding: 28px; background: #f0f7ff; border: 1px solid #cfe4ff; border-radius: var(--radius-lg); text-align: center; }
+  .cta h2 { font-size: 24px; letter-spacing: -0.01em; margin: 0 0 10px; }
+  .cta p { color: #335; margin: 0 auto 14px; max-width: 560px; }
+  .btn-xl { padding: 16px 40px; font-size: 18px; }
+  .aff-note { font-size: 13px; color: #668; margin: 12px 0 0; }
+
+  .service { margin-top: 24px; display: flex; gap: 18px; align-items: center; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+  .service img { width: 120px; height: auto; border-radius: 12px; border: 1px solid var(--border); background: #fff; }
+  .service h3 { margin: 0 0 6px; font-size: 18px; }
+  .service p { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; gap: 8px; }
+    .service { flex-direction: column; text-align: center; }
+  }
+</style>
