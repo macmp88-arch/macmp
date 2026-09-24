@@ -36,7 +36,7 @@ export const affiliates: Record<string, Affiliate> = {
     commissionEn: '35% per sale',
     note: 'Cookie 长达 180 天，单价高、转化好。',
     noteEn: '180-day cookie window, high price and great conversion.',
-    url: 'https://macpaw.com/?ref=YOUR_ID',
+    url: 'https://macpaw.audw.net/oN63rb',
   },
   crossover: {
     id: 'crossover',
