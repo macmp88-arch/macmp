@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { apps } from '../data/apps';
+import { affiliates } from '../data/affiliates';
 import Newsletter from '../components/Newsletter.astro';
 import Donate from '../components/Donate.astro';
 import Recommendation from '../components/Recommendation.astro';
@@ -72,7 +73,7 @@ const directory = apps.slice(0, 24);
       <p><span class="zh">Setapp 汇集 CleanMyMac X、Ulysses、MindNode 等精选正版应用，重度用户比单独购买更划算。</span><span class="en">Setapp brings together CleanMyMac X, Ulysses, MindNode and more — cheaper than buying each separately.</span></p>
       <div class="tile-links">
         <a href="/software/setapp/"><span class="zh">了解更多</span><span class="en">Learn more</span></a>
-        <a href="https://setapp.com/?ref=YOUR_ID" rel="nofollow sponsored" target="_blank"><span class="zh">前往试用</span><span class="en">Try it</span></a>
+        <a href={affiliates.setapp.url} rel="nofollow sponsored" target="_blank"><span class="zh">前往试用</span><span class="en">Try it</span></a>
       </div>
     </div>
   </section>
