@@ -8,13 +8,19 @@ import MemberLayout from '../../layouts/MemberLayout.astro';
         <div>
           <p class="member-eyebrow">Account</p>
           <h2>我的会员账户</h2>
-          <p>查看订阅状态、订单记录和 VIP 内容入口。</p>
+          <p>查看订阅状态、充值记录和 VIP 内容入口。</p>
         </div>
         <button class="member-btn ghost" type="button" id="logoutButton">退出登录</button>
       </div>
 
       <div class="member-message" id="accountMessage">正在读取账户信息…</div>
       <div id="accountContent" hidden>
+        <div class="member-stats">
+          <div class="member-stat"><span>累计已支付</span><strong id="statPaid">—</strong></div>
+          <div class="member-stat"><span>订单总数</span><strong id="statCount">—</strong></div>
+          <div class="member-stat"><span>支付情况</span><strong id="statRange">—</strong></div>
+        </div>
+
         <div class="member-panel">
           <h2>账户信息</h2>
           <dl class="member-kv">
@@ -24,11 +30,28 @@ import MemberLayout from '../../layouts/MemberLayout.astro';
           </dl>
           <p style="margin:20px 0 0"><a class="member-btn primary" href="/vip/content/">进入 VIP 内容</a></p>
         </div>
+
         <div class="member-card">
-          <h3>订单记录</h3>
+          <h3 style="margin-top:0">充值 / 订单记录</h3>
+          <div class="member-filters">
+            <label class="member-field">状态
+              <select class="member-input" id="orderStatusFilter"><option value="">全部</option></select>
+            </label>
+            <label class="member-field">开始日期
+              <input class="member-input" type="date" id="orderFrom" />
+            </label>
+            <label class="member-field">结束日期
+              <input class="member-input" type="date" id="orderTo" />
+            </label>
+            <div class="member-filter-actions">
+              <button class="member-btn ghost" type="button" id="orderReset">重置</button>
+              <button class="member-btn primary" type="button" id="orderExport">导出 CSV</button>
+            </div>
+          </div>
+          <div class="member-message" id="orderHint" hidden></div>
           <div class="member-table-wrap">
             <table class="member-table">
-              <thead><tr><th>订单号</th><th>套餐</th><th>金额</th><th>支付方式</th><th>状态</th><th>时间</th></tr></thead>
+              <thead><tr><th>订单号</th><th>套餐</th><th>金额</th><th>支付方式</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
               <tbody id="accountOrders"></tbody>
             </table>
           </div>
@@ -36,4 +59,18 @@ import MemberLayout from '../../layouts/MemberLayout.astro';
       </div>
     </div>
   </section>
+
+  <div class="member-modal" id="orderModal">
+    <div class="member-modal-card">
+      <div class="member-modal-head">
+        <div>
+          <p class="member-eyebrow">Order</p>
+          <h3 id="orderModalTitle" style="margin:4px 0 0">订单详情</h3>
+        </div>
+        <button class="member-close" type="button" id="orderModalClose" aria-label="关闭">×</button>
+      </div>
+      <dl class="member-kv" id="orderModalBody" style="margin-top:18px"></dl>
+      <p style="margin:18px 0 0"><button class="member-btn ghost" type="button" id="orderModalCopy">复制订单号</button></p>
+    </div>
+  </div>
 </MemberLayout>

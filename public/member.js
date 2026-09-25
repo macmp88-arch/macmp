@@ -351,6 +351,244 @@
     });
   }
 
+  const ORDER_STATUS_OPTIONS = [
+    ['pending_payment', '待支付'],
+    ['submitted', '待审核'],
+    ['paid', '已支付'],
+    ['refunded', '已退款'],
+    ['rejected', '已驳回'],
+    ['cancelled', '已取消'],
+    ['error', '异常'],
+  ];
+
+  function currencySymbol(code) {
+    return { CNY: '¥', USD: '$', EUR: '€', GBP: '£', HKD: 'HK$' }[String(code || '').toUpperCase()] || '';
+  }
+
+  function formatMoney(order) {
+    if (order?.amount == null || order?.amount === '') return '—';
+    const value = Number(order.amount);
+    const currency = String(order.currency || '').toUpperCase();
+    const num = Number.isFinite(value) ? value.toFixed(2) : String(order.amount);
+    const symbol = currencySymbol(currency);
+    return symbol ? `${symbol}${num}` : `${num} ${currency}`.trim();
+  }
+
+  function sumPaid(orders) {
+    const totals = new Map();
+    for (const order of orders) {
+      if (!['paid', 'active'].includes(String(order?.status || ''))) continue;
+      const value = Number(order?.amount);
+      if (!Number.isFinite(value)) continue;
+      const currency = String(order?.currency || '').toUpperCase();
+      totals.set(currency, (totals.get(currency) || 0) + value);
+    }
+    if (!totals.size) return '¥0.00';
+    return Array.from(totals.entries())
+      .map(([currency, value]) => {
+        const symbol = currencySymbol(currency);
+        return symbol ? `${symbol}${value.toFixed(2)}` : `${value.toFixed(2)} ${currency}`.trim();
+      })
+      .join(' + ');
+  }
+
+  function remainingLabel(expiresAt) {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (!Number.isFinite(diff)) return '';
+    if (diff <= 0) return '已到期';
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    return days > 0 ? `剩余 ${days} 天 ${hours} 小时` : `剩余 ${hours} 小时`;
+  }
+
+  function formatDateTime(value) {
+    if (!value) return '—';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('zh-CN');
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+    return new Promise((resolve, reject) => {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        document.execCommand('copy') ? resolve() : reject(new Error('复制失败'));
+      } catch (error) {
+        reject(error);
+      } finally {
+        area.remove();
+      }
+    });
+  }
+
+  function csvCell(value) {
+    return `"${String(value == null ? '' : value).replaceAll('"', '""')}"`;
+  }
+
+  function initAccountOrders(orders, hint) {
+    const tbody = qs('#accountOrders');
+    if (!tbody) return;
+    const statusFilter = qs('#orderStatusFilter');
+    const fromInput = qs('#orderFrom');
+    const toInput = qs('#orderTo');
+    const resetButton = qs('#orderReset');
+    const exportButton = qs('#orderExport');
+    const modal = qs('#orderModal');
+    const modalTitle = qs('#orderModalTitle');
+    const modalBody = qs('#orderModalBody');
+    const modalCopy = qs('#orderModalCopy');
+    let current = [];
+    let activeOrder = null;
+    let hintTimer = null;
+
+    if (statusFilter && !statusFilter.dataset.ready) {
+      statusFilter.dataset.ready = '1';
+      for (const [value, label] of ORDER_STATUS_OPTIONS) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        statusFilter.appendChild(option);
+      }
+    }
+
+    function notify(text, type = 'success') {
+      if (!hint) return;
+      hint.textContent = text;
+      hint.className = `member-message${type ? ` ${type}` : ''}`;
+      hint.hidden = false;
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => { hint.hidden = true; }, 2600);
+    }
+
+    function render() {
+      tbody.replaceChildren();
+      if (!current.length) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="7">${orders.length ? '没有符合条件的订单。' : '暂无订单。'}</td>`;
+        tbody.appendChild(row);
+        return;
+      }
+      for (const order of current) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><button class="member-order-link" type="button" data-order="${escapeHtml(order.id || order.reference_code)}">${escapeHtml(order.reference_code)}</button></td>
+          <td>${escapeHtml(order.plan_name || order.plan_slug || '—')}</td>
+          <td>${escapeHtml(formatMoney(order))}</td>
+          <td>${escapeHtml(order.provider || '—')}</td>
+          <td><span class="member-status ${escapeHtml(order.status)}">${escapeHtml(statusLabel(order.status))}</span></td>
+          <td>${escapeHtml(formatDateTime(order.created_at))}</td>
+          <td><button class="member-mini" type="button" data-copy="${escapeHtml(order.reference_code)}">复制</button></td>
+        `;
+        row.querySelector('[data-order]')?.addEventListener('click', () => openOrder(order));
+        row.querySelector('[data-copy]')?.addEventListener('click', () => {
+          copyText(order.reference_code)
+            .then(() => notify('订单号已复制。'))
+            .catch(() => notify('复制失败，请手动选择。', 'error'));
+        });
+        tbody.appendChild(row);
+      }
+    }
+
+    function applyFilter() {
+      const status = statusFilter?.value || '';
+      const from = fromInput?.value ? new Date(`${fromInput.value}T00:00:00`).getTime() : null;
+      const to = toInput?.value ? new Date(`${toInput.value}T23:59:59`).getTime() : null;
+      current = orders.filter((order) => {
+        if (status && String(order.status) !== status) return false;
+        const created = new Date(order.created_at || 0).getTime();
+        if (from && Number.isFinite(created) && created < from) return false;
+        if (to && Number.isFinite(created) && created > to) return false;
+        return true;
+      });
+      render();
+    }
+
+    function openOrder(order) {
+      activeOrder = order;
+      if (modalTitle) modalTitle.textContent = order.reference_code || '订单详情';
+      if (modalBody) {
+        const rows = [
+          ['订单号', order.reference_code],
+          ['套餐', order.plan_name || order.plan_slug || '—'],
+          ['金额', formatMoney(order)],
+          ['支付方式', order.provider || '—'],
+          ['状态', statusLabel(order.status)],
+          ['创建时间', formatDateTime(order.created_at)],
+          ['提交时间', formatDateTime(order.submitted_at)],
+          ['支付时间', formatDateTime(order.paid_at)],
+        ];
+        modalBody.replaceChildren();
+        for (const [label, value] of rows) {
+          const dt = document.createElement('dt');
+          dt.textContent = label;
+          const dd = document.createElement('dd');
+          dd.textContent = value;
+          modalBody.append(dt, dd);
+        }
+      }
+      modal?.classList.add('open');
+    }
+
+    function closeOrder() {
+      modal?.classList.remove('open');
+    }
+
+    statusFilter?.addEventListener('change', applyFilter);
+    fromInput?.addEventListener('change', applyFilter);
+    toInput?.addEventListener('change', applyFilter);
+    resetButton?.addEventListener('click', () => {
+      if (statusFilter) statusFilter.value = '';
+      if (fromInput) fromInput.value = '';
+      if (toInput) toInput.value = '';
+      applyFilter();
+    });
+    exportButton?.addEventListener('click', () => {
+      if (!current.length) {
+        notify('没有可导出的订单。', 'error');
+        return;
+      }
+      const header = ['订单号', '套餐', '金额', '币种', '支付方式', '状态', '创建时间', '提交时间', '支付时间'];
+      const body = current.map((order) => [
+        order.reference_code,
+        order.plan_name || order.plan_slug || '',
+        order.amount ?? '',
+        order.currency || '',
+        order.provider || '',
+        statusLabel(order.status),
+        formatDateTime(order.created_at),
+        formatDateTime(order.submitted_at),
+        formatDateTime(order.paid_at),
+      ]);
+      const csv = [header, ...body].map((cells) => cells.map(csvCell).join(',')).join('\r\n');
+      const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `macmp-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      notify(`已导出 ${current.length} 条订单。`);
+    });
+    qs('#orderModalClose')?.addEventListener('click', closeOrder);
+    modal?.addEventListener('click', (event) => { if (event.target === modal) closeOrder(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeOrder(); });
+    modalCopy?.addEventListener('click', () => {
+      if (!activeOrder) return;
+      copyText(activeOrder.reference_code)
+        .then(() => notify('订单号已复制。'))
+        .catch(() => notify('复制失败，请手动选择。', 'error'));
+    });
+
+    applyFilter();
+  }
+
   async function initAccountPage() {
     captureHashSession();
     const message = qs('#accountMessage');
@@ -378,38 +616,43 @@
       qs('#accountEmail').textContent = account?.email || session.user?.email || '—';
       const entitlement = account?.entitlement;
       const active = entitlement?.active === true;
-      const status = qs('#accountStatus');
-      status.textContent = active ? 'VIP 有效' : '免费用户';
-      status.className = `member-status ${active ? 'active' : ''}`;
-      qs('#accountExpiry').textContent = entitlement?.expires_at ? new Date(entitlement.expires_at).toLocaleString('zh-CN') : (active ? '终身有效' : '—');
-
-      const tbody = qs('#accountOrders');
-      tbody.replaceChildren();
-      const orders = Array.isArray(account?.orders) ? account.orders : [];
-      if (!orders.length) {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="6">暂无订单。</td>';
-        tbody.appendChild(row);
-      } else {
-        for (const order of orders) {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${escapeHtml(order.reference_code)}</td>
-            <td>${escapeHtml(order.plan_name || order.plan_slug || '—')}</td>
-            <td>${order.amount == null ? '—' : escapeHtml(String(order.amount)) + ' ' + escapeHtml(order.currency || '')}</td>
-            <td>${escapeHtml(order.provider)}</td>
-            <td><span class="member-status ${escapeHtml(order.status)}">${escapeHtml(statusLabel(order.status))}</span></td>
-            <td>${order.created_at ? new Date(order.created_at).toLocaleString('zh-CN') : '—'}</td>
-          `;
-          tbody.appendChild(row);
-        }
+      const statusEl = qs('#accountStatus');
+      if (statusEl) {
+        statusEl.textContent = active ? 'VIP 有效' : '免费用户';
+        statusEl.className = `member-status ${active ? 'active' : ''}`;
       }
+      const expiryEl = qs('#accountExpiry');
+      const expiresAt = entitlement?.expires_at || null;
+      const renderExpiry = () => {
+        if (!expiryEl) return;
+        if (expiresAt) {
+          const left = remainingLabel(expiresAt);
+          expiryEl.textContent = `${formatDateTime(expiresAt)}${left ? `（${left}）` : ''}`;
+        } else {
+          expiryEl.textContent = active ? '终身有效' : '—';
+        }
+      };
+      renderExpiry();
+      if (expiresAt) setInterval(renderExpiry, 60000);
+
+      const orders = Array.isArray(account?.orders) ? account.orders : [];
+      const paidOrders = orders.filter((order) => ['paid', 'active'].includes(String(order?.status || '')));
+      const totalEl = qs('#statPaid');
+      const countEl = qs('#statCount');
+      const rangeEl = qs('#statRange');
+      if (totalEl) totalEl.textContent = sumPaid(orders);
+      if (countEl) countEl.textContent = String(orders.length);
+      if (rangeEl) rangeEl.textContent = paidOrders.length ? `已支付 ${paidOrders.length} 笔` : '暂无成功支付';
+
+      initAccountOrders(orders, qs('#orderHint'));
+
       message.hidden = true;
       content.hidden = false;
     } catch (error) {
       setMessage(message, error.message, 'error');
     }
   }
+
 
   async function initContentPage() {
     captureHashSession();

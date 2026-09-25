@@ -109,3 +109,25 @@
   .member-kv { grid-template-columns: 1fr; gap: 3px; }
   .member-section-head { align-items: flex-start; flex-direction: column; }
 }
+
+/* 充值 / 订单记录增强 */
+.member-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.member-stat { padding: 18px 20px; border: 1px solid var(--member-line); border-radius: 18px; background: linear-gradient(160deg, #f7fbff, #fff); }
+.member-stat span { display: block; color: var(--member-muted); font-size: 13px; }
+.member-stat strong { display: block; margin-top: 6px; font-size: 23px; letter-spacing: -.02em; }
+.member-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin: 6px 0 14px; }
+.member-field { display: grid; gap: 6px; font-size: 13px; color: var(--member-muted); }
+.member-field .member-input { min-width: 168px; width: auto; flex: none; }
+.member-filter-actions { display: flex; gap: 10px; }
+.member-order-link { border: 0; background: none; padding: 0; color: var(--member-blue); font: inherit; font-weight: 600; cursor: pointer; text-align: left; }
+.member-order-link:hover { text-decoration: underline; }
+.member-mini { border: 1px solid var(--member-line); background: #fff; border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--member-ink); }
+.member-mini:hover { border-color: var(--member-blue); color: var(--member-blue); }
+.member-status.refunded, .member-status.cancelled, .member-status.pending_payment { background: #f2f4f7; color: #667085; }
+@media (max-width: 640px) {
+  .member-stats { grid-template-columns: 1fr; }
+  .member-field .member-input { min-width: 100%; }
+  .member-filters { align-items: stretch; }
+  .member-filter-actions { width: 100%; }
+  .member-filter-actions .member-btn { flex: 1; }
+}
