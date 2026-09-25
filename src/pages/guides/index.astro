@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { guides } from '../../data/guides';
+
+const title = 'Mac 使用专题与选购指南 · MacMP';
+const description = '从新 Mac 配置、视频剪辑、本地 AI 到安全备份，按真实工作流整理的 Mac 软件与效率指南。';
+const categories = Array.from(new Set(guides.map((guide) => guide.category)));
+const featured = guides.filter((guide) => guide.featured);
+---
+<BaseLayout title={title} description={description} path="/guides">
+  <section class="guides-hero">
+    <div class="container">
+      <p class="eyebrow">Mac 使用专题</p>
+      <h1>不只推荐软件，<br />更帮你搭好工作流。</h1>
+      <p>从新机配置、视频剪辑、本地 AI 到隐私备份，每篇指南都围绕一个真实任务整理，告诉你先做什么、为什么这样做，以及哪些软件值得投入。</p>
+      <div class="hero-meta">
+        <span><strong>{guides.length}</strong> 篇原创指南</span>
+        <span><strong>{categories.length}</strong> 个使用场景</span>
+        <span>持续更新</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    {featured.length > 0 && (
+      <section class="featured-guides">
+        <div class="section-head">
+          <h2>编辑精选</h2>
+          <span class="section-note">先看这几篇</span>
+        </div>
+        <div class="featured-grid">
+          {featured.map((guide) => (
+            <a class="featured-card" href={`/guides/${guide.slug}/`}>
+              <img src={guide.cover} alt="" width="1200" height="675" loading="eager" />
+              <span class="featured-body">
+                <span class="cat">{guide.category}</span>
+                <strong>{guide.title}</strong>
+                <span>{guide.summary}</span>
+                <span class="meta-line">{guide.date} · {guide.readTime}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="section">
+      <div class="section-head">
+        <h2>全部指南</h2>
+        <span class="section-note">{guides.length} 篇</span>
+      </div>
+      <div class="guide-grid">
+        {guides.map((guide) => (
+          <article class="guide-card">
+            <a class="guide-cover-link" href={`/guides/${guide.slug}/`}>
+              <img src={guide.cover} alt={`${guide.title} 封面`} width="1200" height="675" loading="lazy" />
+            </a>
+            <div class="guide-card-body">
+              <span class="cat">{guide.category}</span>
+              <h3><a href={`/guides/${guide.slug}/`}>{guide.title}</a></h3>
+              <p>{guide.summary}</p>
+              <div class="meta">
+                <span>{guide.readTime}</span>
+                <span>{guide.tags.slice(0, 2).join(' · ')}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="guide-cta">
+      <div>
+        <p class="eyebrow">不知道先选哪款软件？</p>
+        <h2>从软件目录按分类开始。</h2>
+        <p>办公、媒体、系统、开发、工具五个分类，所有链接均指向官方或透明联盟渠道。</p>
+      </div>
+      <a class="btn" href="/software/">浏览全部软件 →</a>
+    </section>
+
+    <Newsletter />
+  </div>
+</BaseLayout>
+
+<style>
+  .guides-hero { background: linear-gradient(135deg, #f4f8ff 0%, #fff 48%, #eef5ff 100%); border-bottom: 1px solid #e5e9f0; padding: 72px 0 62px; }
+  .guides-hero .eyebrow { color: var(--blue); font-size: 14px; font-weight: 700; letter-spacing: .09em; margin: 0 0 10px; }
+  .guides-hero h1 { font-size: clamp(38px, 6vw, 66px); line-height: 1.08; letter-spacing: -.035em; margin: 0 0 18px; }
+  .guides-hero > .container > p { max-width: 700px; color: var(--ink-2); font-size: 18px; line-height: 1.75; margin: 0; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 18px 28px; margin-top: 24px; color: var(--ink-2); font-size: 14px; }
+  .hero-meta strong { color: var(--ink); font-size: 17px; }
+  .featured-guides { padding-top: 44px; }
+  .section-note { color: var(--ink-2); font-size: 14px; }
+  .featured-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .featured-card { display: grid; grid-template-columns: 210px 1fr; gap: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--ink); background: #fff; transition: transform .18s ease, box-shadow .18s ease; }
+  .featured-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); text-decoration: none; }
+  .featured-card img { width: 100%; height: 100%; min-height: 210px; object-fit: cover; }
+  .featured-body { display: flex; flex-direction: column; gap: 8px; padding: 20px; }
+  .featured-body strong { font-size: 19px; line-height: 1.38; }
+  .featured-body > span:not(.cat):not(.meta-line) { color: var(--ink-2); font-size: 14px; line-height: 1.65; }
+  .featured-body .meta-line { color: var(--ink-2); font-size: 12px; margin-top: auto; }
+  .guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .guide-card { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: #fff; transition: transform .18s ease, box-shadow .18s ease; display: flex; flex-direction: column; }
+  .guide-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .guide-cover-link { display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #eef3fb; }
+  .guide-cover-link img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+  .guide-card:hover .guide-cover-link img { transform: scale(1.025); }
+  .guide-card-body { padding: 18px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+  .guide-card h3 { font-size: 19px; line-height: 1.4; margin: 0; }
+  .guide-card h3 a { color: var(--ink); }
+  .guide-card p { color: var(--ink-2); font-size: 14px; line-height: 1.65; margin: 0; flex: 1; }
+  .guide-cta { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 56px 0; padding: 30px 34px; border: 1px solid #cfe4ff; border-radius: var(--radius-lg); background: #f0f7ff; }
+  .guide-cta .eyebrow { color: var(--blue); font-size: 13px; font-weight: 700; margin: 0 0 6px; }
+  .guide-cta h2 { margin: 0 0 8px; font-size: 25px; }
+  .guide-cta p:not(.eyebrow) { color: var(--ink-2); margin: 0; }
+  @media (max-width: 900px) {
+    .featured-grid, .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .featured-card { grid-template-columns: 160px 1fr; }
+  }
+  @media (max-width: 640px) {
+    .guides-hero { padding: 52px 0 42px; }
+    .featured-grid, .guide-grid { grid-template-columns: 1fr; }
+    .featured-card { grid-template-columns: 124px 1fr; }
+    .featured-body { padding: 16px; }
+    .featured-body strong { font-size: 16px; }
+    .guide-cta { align-items: flex-start; flex-direction: column; padding: 26px 22px; }
+  }
+</style>

@@ -6,16 +6,21 @@ interface Props {
   title?: string;
   description?: string;
   path?: string;
+  image?: string;
 }
 
 const {
   title = 'MacMP · 发现好用的 Mac 软件与优惠',
-  description = 'MacMP 专注精选正版 Mac 软件、限免优惠与本地 AI 教程，帮你把 Mac 用得更好。',
+  description = 'MacMP 专注精选正版 Mac 软件、优惠情报、工作流指南与本地 AI 教程，帮你把 Mac 用得更好。',
   path = '/',
+  image = '/favicon.svg',
 } = Astro.props;
+
+const ogImage = new URL(image, Astro.site).toString();
 
 const nav = [
   { href: '/software/', zh: '软件推荐', en: 'Software', active: path.startsWith('/software') },
+  { href: '/guides/', zh: '专题指南', en: 'Guides', active: path.startsWith('/guides') },
   { href: '/deals/', zh: '优惠情报', en: 'Deals', active: path.startsWith('/deals') },
   { href: '/ai-local/', zh: '本地 AI', en: 'Local AI', active: path.startsWith('/ai-local') },
   { href: '/support/', zh: '支持我们', en: 'Support', active: path.startsWith('/support') },
@@ -33,8 +38,14 @@ const nav = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={path.startsWith('/guides/') ? 'article' : 'website'} />
     <meta property="og:url" content={new URL(path, Astro.site).toString()} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <Analytics />
     <script is:inline>
       (function(){try{var l=localStorage.getItem('lang')||'zh';document.documentElement.setAttribute('lang', l==='en'?'en':'zh-CN');}catch(e){}})();
@@ -78,6 +89,7 @@ const nav = [
             <h4><span class="zh">发现</span><span class="en">Discover</span></h4>
             <ul>
               <li><a href="/software/"><span class="zh">软件推荐</span><span class="en">Software</span></a></li>
+              <li><a href="/guides/"><span class="zh">专题指南</span><span class="en">Guides</span></a></li>
               <li><a href="/deals/"><span class="zh">优惠情报</span><span class="en">Deals</span></a></li>
               <li><a href="/ai-local/"><span class="zh">本地 AI</span><span class="en">Local AI</span></a></li>
             </ul>

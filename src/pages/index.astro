@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { apps } from '../data/apps';
+import { guides } from '../data/guides';
 import { affiliates } from '../data/affiliates';
 import Newsletter from '../components/Newsletter.astro';
 import Donate from '../components/Donate.astro';
@@ -17,6 +18,7 @@ const categories = [
 ];
 
 const directory = apps.slice(0, 24);
+const featuredGuides = guides.filter((guide) => guide.featured).slice(0, 4);
 ---
 <BaseLayout path="/">
   <section class="hero" style="padding-bottom:20px">
@@ -31,6 +33,11 @@ const directory = apps.slice(0, 24);
       <input type="search" name="q" placeholder="搜索软件… Search…" autocomplete="off" />
       <button type="submit"><span class="zh">搜索</span><span class="en">Search</span></button>
     </form>
+    <div class="hero-stats">
+      <span><strong>{apps.length}</strong> 款精选软件</span>
+      <span><strong>{guides.length}</strong> 篇原创专题</span>
+      <span><strong>16:9</strong> 工作流思维</span>
+    </div>
   </section>
 
   <!-- 分类导航 -->
@@ -60,6 +67,29 @@ const directory = apps.slice(0, 24);
           </span>
           <span class="dir-go"><span class="zh">了解 →</span><span class="en">View →</span></span>
         </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- 专题指南 -->
+  <section class="section container">
+    <div class="section-head">
+      <h2><span class="zh">专题指南</span><span class="en">Guides & Workflows</span></h2>
+      <a href="/guides/"><span class="zh">全部 {guides.length} 篇 →</span><span class="en">All {guides.length} guides →</span></a>
+    </div>
+    <div class="guide-grid">
+      {featuredGuides.map((guide) => (
+        <article class="guide-card">
+          <a class="guide-cover-link" href={`/guides/${guide.slug}/`}>
+            <img src={guide.cover} alt="" width="1200" height="675" loading="lazy" />
+          </a>
+          <div class="guide-card-body">
+            <span class="cat">{guide.category}</span>
+            <h3><a href={`/guides/${guide.slug}/`}>{guide.title}</a></h3>
+            <p>{guide.summary}</p>
+            <div class="meta"><span>{guide.readTime}</span><span>{guide.tags[0]}</span></div>
+          </div>
+        </article>
       ))}
     </div>
   </section>

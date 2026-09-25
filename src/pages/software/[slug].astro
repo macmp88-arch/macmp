@@ -3,7 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
 import Recommendation from '../../components/Recommendation.astro';
 import { apps } from '../../data/apps';
+import { guides } from '../../data/guides';
 import { affiliates } from '../../data/affiliates';
+import { getAppType, getAppTypeEn } from '../../data/appTaxonomy';
 import type { App } from '../../data/apps';
 
 export function getStaticPaths() {
@@ -64,8 +66,9 @@ const defaultFaqs = [
 ];
 const faqs = app.faqs && app.faqs.length > 0 ? app.faqs : defaultFaqs;
 
-const typeZh = app.type || app.category;
-const typeEn = app.typeEn || app.categoryEn;
+const typeZh = getAppType(app);
+const typeEn = getAppTypeEn(app);
+const relatedGuides = guides.filter((guide) => guide.relatedApps.includes(app.slug)).slice(0, 3);
 ---
 <BaseLayout title={`${app.name} 评测与使用教程 · MacMP`} description={app.tagline} path={`/software/${app.slug}`}>
   <div class="container">
@@ -175,6 +178,23 @@ const typeEn = app.typeEn || app.categoryEn;
         </div>
       </section>
 
+      {relatedGuides.length > 0 && (
+        <section class="detail-sec">
+          <h2><span class="zh">相关专题</span><span class="en">Related Guides</span></h2>
+          <div class="related-guide-list">
+            {relatedGuides.map((guide) => (
+              <a href={`/guides/${guide.slug}/`}>
+                <img src={guide.cover} alt="" width="1200" height="675" loading="lazy" />
+                <span>
+                  <strong>{guide.title}</strong>
+                  <small>{guide.category} · {guide.readTime}</small>
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section class="cta">
         <h2><span class="zh">立即获取 {app.name}</span><span class="en">Get {app.nameEn}</span></h2>
         <p>
@@ -250,6 +270,13 @@ const typeEn = app.typeEn || app.categoryEn;
   .cta p { color: #335; margin: 0 auto 14px; max-width: 560px; }
   .btn-xl { padding: 16px 40px; font-size: 18px; }
   .aff-note { font-size: 13px; color: #668; margin: 12px 0 0; }
+
+  .related-guide-list { display: grid; gap: 12px; }
+  .related-guide-list a { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; padding: 12px; border: 1px solid var(--border); border-radius: 16px; color: var(--ink); background: #fff; }
+  .related-guide-list a:hover { border-color: var(--blue); text-decoration: none; }
+  .related-guide-list img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; }
+  .related-guide-list strong { display: block; line-height: 1.45; }
+  .related-guide-list small { display: block; color: var(--ink-2); margin-top: 5px; }
 
   .service { margin-top: 24px; display: flex; gap: 18px; align-items: center; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
   .service img { width: 120px; height: auto; border-radius: 12px; border: 1px solid var(--border); background: #fff; }

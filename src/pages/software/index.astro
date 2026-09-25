@@ -2,56 +2,63 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Recommendation from '../../components/Recommendation.astro';
 import { apps } from '../../data/apps';
+import { getAppType, majorTypeEn, majorTypes } from '../../data/appTaxonomy';
 
 const title = 'Mac 软件推荐 · MacMP';
-const description = '精选正版 Mac 应用评测与推荐：办公、媒体、系统、开发、工具等。';
+const description = '精选正版 Mac 应用评测与推荐：办公、媒体、系统、开发、工具等，并按真实使用场景整理。';
 
-const typeOrder = ['办公', '媒体', '系统', '开发', '工具'];
-const typeEnMap: Record<string, string> = {
-  办公: 'Productivity', 媒体: 'Media', 系统: 'System', 开发: 'Developer', 工具: 'Utilities',
-};
-const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
+const types = majorTypes.filter((type) => apps.some((app) => getAppType(app) === type));
+const typeCount = Object.fromEntries(types.map((type) => [type, apps.filter((app) => getAppType(app) === type).length]));
 ---
 <BaseLayout title={title} description={description} path="/software">
   <div class="container" style="padding-top:40px">
-    <h1 style="font-size:34px;margin:0 0 8px"><span class="zh">Mac 软件推荐</span><span class="en">Mac Software</span></h1>
-    <p style="color:var(--ink-2);margin:0 0 24px"><span class="zh">按分类浏览正版 Mac 应用，按需筛选。</span><span class="en">Browse curated Mac apps by category.</span></p>
+    <div class="listing-head">
+      <div>
+        <p class="eyebrow">正版软件目录</p>
+        <h1><span class="zh">Mac 软件推荐</span><span class="en">Mac Software</span></h1>
+        <p><span class="zh">按分类浏览正版 Mac 应用，或者直接搜索你正在解决的问题。</span><span class="en">Browse curated Mac apps by category, or search the problem you want to solve.</span></p>
+      </div>
+      <div class="listing-count"><strong>{apps.length}</strong><span>款精选应用</span></div>
+    </div>
 
     <div class="toolbar">
       <input id="search" type="search" placeholder="搜索软件名称 / 功能 / 标签… Search…" autocomplete="off" />
       <div class="chips" id="chips">
         <button type="button" class="chip active" data-type="全部">
-          <span class="zh">全部</span><span class="en">All</span>
+          <span class="zh">全部 {apps.length}</span><span class="en">All {apps.length}</span>
         </button>
-        {types.map((t) => (
-          <button type="button" class="chip" data-type={t}>
-            <span class="zh">{t}</span><span class="en">{typeEnMap[t]}</span>
+        {types.map((type) => (
+          <button type="button" class="chip" data-type={type}>
+            <span class="zh">{type} {typeCount[type]}</span><span class="en">{majorTypeEn[type]} {typeCount[type]}</span>
           </button>
         ))}
       </div>
     </div>
 
     <div class="grid" id="grid">
-      {apps.map((app) => (
-        <article
-          class="card app-item"
-          data-type={app.type}
-          data-search={`${app.name} ${app.nameEn} ${app.tags.join(' ')} ${app.tagline} ${app.taglineEn} ${app.category} ${app.categoryEn}`}
-        >
-          <div class="card-row">
-            <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
-            <div class="card-body">
-              <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
-              <h3><a href={`/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
-              <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
-              <div class="meta">
-                <span>{app.price}</span>
-                {app.setapp && <span class="badge"><span class="zh">Setapp 可订阅</span><span class="en">On Setapp</span></span>}
+      {apps.map((app) => {
+        const appType = getAppType(app);
+        return (
+          <article
+            class="card app-item"
+            data-type={appType}
+            data-search={`${app.name} ${app.nameEn} ${app.tags.join(' ')} ${app.tagline} ${app.taglineEn} ${app.category} ${app.categoryEn} ${app.description} ${app.descriptionEn}`}
+          >
+            <div class="card-row">
+              <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
+              <div class="card-body">
+                <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
+                <h3><a href={`/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
+                <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
+                <div class="meta">
+                  <span>{app.price}</span>
+                  {app.setapp && <span class="badge"><span class="zh">Setapp 可订阅</span><span class="en">On Setapp</span></span>}
+                </div>
               </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
     <p id="empty" class="empty" hidden><span class="zh">没有找到匹配的软件，换个关键词试试。</span><span class="en">No matching apps. Try another keyword.</span></p>
 
@@ -92,7 +99,6 @@ const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
     setActive(btn.dataset.type || '全部');
   });
 
-  // 支持 ?type=办公 直达分类，?q=关键词 直达搜索
   const params = new URLSearchParams(location.search);
   const initialQ = params.get('q');
   if (initialQ) search.value = initialQ;
@@ -102,10 +108,17 @@ const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
 </script>
 
 <style>
+  .listing-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 26px; }
+  .listing-head .eyebrow { margin: 0 0 6px; color: var(--blue); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .listing-head h1 { font-size: 34px; margin: 0 0 8px; }
+  .listing-head p { color: var(--ink-2); margin: 0; max-width: 660px; }
+  .listing-count { flex: none; background: var(--bg-2); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px; text-align: center; min-width: 120px; }
+  .listing-count strong { display: block; font-size: 26px; line-height: 1; color: var(--blue); }
+  .listing-count span { font-size: 12px; color: var(--ink-2); }
   .toolbar { margin-bottom: 24px; }
   #search {
     width: 100%;
-    max-width: 420px;
+    max-width: 520px;
     padding: 12px 18px;
     font-size: 16px;
     border: 1px solid var(--border);
@@ -127,4 +140,8 @@ const types = typeOrder.filter((t) => apps.some((a) => a.type === t));
   .chip:hover { border-color: var(--blue); color: var(--blue); }
   .chip.active { background: var(--blue); border-color: var(--blue); color: #fff; }
   .empty { text-align: center; color: var(--ink-2); padding: 40px 0; }
+  @media (max-width: 640px) {
+    .listing-head { align-items: flex-start; flex-direction: column; }
+    .listing-count { display: none; }
+  }
 </style>
