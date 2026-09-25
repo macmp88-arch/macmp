@@ -388,7 +388,7 @@
       const orders = Array.isArray(account?.orders) ? account.orders : [];
       if (!orders.length) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="5">暂无订单。</td>';
+        row.innerHTML = '<td colspan="6">暂无订单。</td>';
         tbody.appendChild(row);
       } else {
         for (const order of orders) {
@@ -396,6 +396,7 @@
           row.innerHTML = `
             <td>${escapeHtml(order.reference_code)}</td>
             <td>${escapeHtml(order.plan_name || order.plan_slug || '—')}</td>
+            <td>${order.amount == null ? '—' : escapeHtml(String(order.amount)) + ' ' + escapeHtml(order.currency || '')}</td>
             <td>${escapeHtml(order.provider)}</td>
             <td><span class="member-status ${escapeHtml(order.status)}">${escapeHtml(statusLabel(order.status))}</span></td>
             <td>${order.created_at ? new Date(order.created_at).toLocaleString('zh-CN') : '—'}</td>
