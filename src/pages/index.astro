@@ -110,6 +110,28 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
     </div>
   </section>
 
+  <!-- 免费素材与工具 -->
+  <section class="section container">
+    <div class="section-head">
+      <h2><span class="zh">免费素材与工具</span><span class="en">Free Assets & Tools</span></h2>
+      <a href="/tools/"><span class="zh">全部资源 →</span><span class="en">All resources →</span></a>
+    </div>
+    <div class="asset-grid">
+      <a class="asset-card" href="https://www.ysjf.com/material" target="_blank" rel="noopener">
+        <span class="asset-tag">免费素材</span>
+        <strong><span class="zh">影视飓风 · 素材库</span><span class="en">MediaStorm · Footage Library</span></strong>
+        <span class="asset-desc"><span class="zh">航拍、空镜、特效与转场素材，可免费下载，剪辑补画面首选。</span><span class="en">Free aerial, insert, VFX and transition footage — first stop when a cut needs another shot.</span></span>
+        <span class="asset-go"><span class="zh">前往素材库 →</span><span class="en">Open library →</span></span>
+      </a>
+      <a class="asset-card" href="/tools/lut/">
+        <span class="asset-tag">本站工具</span>
+        <strong><span class="zh">在线 LUT 生成器</span><span class="en">Online LUT Generator</span></strong>
+        <span class="asset-desc"><span class="zh">上传原片截图 + 参考图，生成 DaVinci / FCPX / PR 通用的 .cube LUT。</span><span class="en">Upload a frame plus a reference and export a .cube LUT for DaVinci, FCPX or Premiere.</span></span>
+        <span class="asset-go"><span class="zh">打开工具 →</span><span class="en">Open tool →</span></span>
+      </a>
+    </div>
+  </section>
+
   <!-- Setapp 主推 -->
   <section class="container" style="padding-top:8px">
     <div class="tile" style="background: linear-gradient(145deg,#000 0%,#2b2b2e 100%); min-height:380px">
@@ -213,4 +235,24 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
   .dir-body strong { font-size: 15px; }
   .dir-tag { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .dir-go { font-size: 13px; color: var(--blue); font-weight: 600; white-space: nowrap; }
+  .asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .asset-card {
+    display: grid;
+    gap: 6px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(150deg,#f7fbff,#fff 62%,#eef5ff);
+    color: var(--ink);
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .asset-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,113,227,.10); text-decoration: none; }
+  .asset-tag { justify-self: start; padding: 3px 10px; border-radius: 999px; background: #e8f2ff; color: var(--blue); font-size: 12px; font-weight: 700; }
+  .asset-card strong { font-size: 18px; }
+  .asset-desc { font-size: 14px; line-height: 1.7; color: var(--ink-2); }
+  .asset-go { margin-top: 4px; font-size: 13.5px; font-weight: 600; color: var(--blue); }
 </style>
