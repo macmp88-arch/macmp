@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = '素材与工具导航 · 免费视频素材 / 调色工具 / LUT 生成器 · MacMP';
+const description =
+  'Mac 剪辑调色常用资源导航：影视飓风免费素材库、在线 LUT 生成器、参考图色彩匹配工具。全部为剪辑、调色、宣传片与婚礼片常用资源，持续补充。';
+
+const localTools = [
+  {
+    href: '/tools/lut/',
+    name: '在线 LUT 生成器',
+    tag: '本站工具',
+    desc: '上传原片截图 + 参考图，自动分析肤色、高光与暗部并生成色彩映射，导出 DaVinci Resolve / Premiere / Final Cut Pro 通用的 .cube 3D LUT。支持 11 款风格预设与强度控制。',
+    meta: '免费 · 无需注册 · 图片只在本地浏览器处理',
+  },
+];
+
+const freeMaterials = [
+  {
+    href: 'https://www.ysjf.com/material',
+    name: '影视飓风 · 素材库',
+    tag: '免费素材',
+    desc: '影视飓风官方素材库。航拍、空镜、特效与转场素材可免费下载，适合剪辑练习、宣传片包装和短片补镜头。',
+    meta: '使用前请阅读站内授权说明，遵守其使用范围',
+  },
+];
+
+const colorTools = [
+  {
+    href: 'https://onv13.top/',
+    name: '四时造物 · ColorMatch',
+    tag: '调色工具',
+    desc: '参考图色彩匹配 + 风格预设库，可导出 .cube；另有 DaVinci Resolve 插件 GradePilot，把参考画面的风格拆成可控的场景域调整。',
+    meta: '如需更完整的预设库与插件方案可使用',
+  },
+];
+
+const groups = [
+  { title: '本站工具', note: '免费、无需注册', items: localTools },
+  { title: '免费素材', note: '剪辑补画面用', items: freeMaterials },
+  { title: '调色与参考', note: 'LUT、仿色、风格拆解', items: colorTools },
+];
+---
+
+<BaseLayout title={title} description={description} path="/tools">
+  <section class="tools-hero">
+    <div class="container">
+      <p class="eyebrow">素材与工具</p>
+      <h1>剪辑调色常用资源<br />一处收齐。</h1>
+      <p>
+        做婚礼片、宣传片和短剧时最花时间的往往不是剪辑，而是找素材、试风格、统一颜色。这里收录我们实际在用的免费素材站和调色工具，
+        外加本站自研的小工具。
+      </p>
+      <div class="hero-meta">
+        <span><strong>{localTools.length + freeMaterials.length + colorTools.length}</strong> 个资源</span>
+        <span>持续补充</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    {groups.map((group) => (
+      <section class="tools-group">
+        <div class="tools-head">
+          <h2>{group.title}</h2>
+          <span>{group.note}</span>
+        </div>
+        <div class="tools-grid">
+          {group.items.map((item) => (
+            <a class="tools-card" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener' : undefined}>
+              <span class="tools-tag">{item.tag}</span>
+              <strong>{item.name}</strong>
+              <span class="tools-desc">{item.desc}</span>
+              <span class="tools-meta">{item.meta}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="tools-note">
+      <h2>怎么配合着用</h2>
+      <ol>
+        <li><strong>补画面</strong>：从素材库找空镜、航拍和转场，先解决「镜头不够」的问题。</li>
+        <li><strong>定风格</strong>：用参考图匹配找到方向，再决定整片的色彩倾向，不要一条片子试十种风格。</li>
+        <li><strong>固化成 LUT</strong>：把定好的方向生成 .cube，挂在一级校色之后，全线统一收口。</li>
+        <li><strong>最后校肤色</strong>：LUT 之后按镜头复核人物肤色与环境明暗对比，避免风格压过内容。</li>
+      </ol>
+      <p class="tools-tip">
+        想系统看流程，可以读我们用真实项目整理的调色专题：<a href="/guides/skin-tone-correction/">人物肤色校正</a>、
+        <a href="/guides/davinci-node-order/">达芬奇节点顺序</a>、<a href="/guides/lut-workflow-mac/">LUT 工作流</a>。
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .tools-hero { padding: 64px 0 40px; background: radial-gradient(circle at 82% 12%, rgba(0,113,227,.13), transparent 42%), linear-gradient(150deg,#f7fbff,#fff 58%,#eef5ff); border-bottom: 1px solid #e4e8f0; }
+  .tools-hero h1 { font-size: clamp(36px, 5vw, 58px); line-height: 1.1; letter-spacing: -.03em; margin: 10px 0 16px; }
+  .tools-hero p { font-size: 17px; line-height: 1.85; color: #475467; max-width: 760px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 20px; color: #667085; font-size: 14px; }
+  .tools-group { margin: 40px 0; }
+  .tools-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+  .tools-head h2 { font-size: 24px; margin: 0; letter-spacing: -.01em; }
+  .tools-head span { color: #667085; font-size: 13px; }
+  .tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .tools-card { display: grid; gap: 8px; padding: 22px; border: 1px solid #e4e8f0; border-radius: 20px; background: #fff; text-decoration: none; transition: border-color .2s, box-shadow .2s, transform .2s; }
+  .tools-card:hover { border-color: #0071e3; box-shadow: 0 16px 38px rgba(0,113,227,.11); transform: translateY(-2px); }
+  .tools-tag { justify-self: start; padding: 3px 10px; border-radius: 999px; background: #e8f2ff; color: #0071e3; font-size: 12px; font-weight: 700; }
+  .tools-card strong { color: #172033; font-size: 18px; }
+  .tools-desc { color: #475467; font-size: 14px; line-height: 1.75; }
+  .tools-meta { color: #98a2b3; font-size: 12.5px; }
+  .tools-note { margin: 46px 0; padding: 26px; border: 1px solid #e4e8f0; border-radius: 22px; background: #f9fbfe; }
+  .tools-note h2 { margin-top: 0; font-size: 22px; }
+  .tools-note ol { margin: 0; padding-left: 20px; color: #475467; font-size: 15px; line-height: 1.95; }
+  .tools-tip { margin: 16px 0 0; color: #475467; font-size: 14px; line-height: 1.8; }
+  .tools-tip a { color: #0071e3; }
+  @media (max-width: 900px) { .tools-grid { grid-template-columns: 1fr; } }
+</style>

@@ -68,7 +68,7 @@ const jsonLd = {
         {guide.sections.map((section, index) => (
           <section id={`section-${index + 1}`}>
             <h2><span class="section-index">{String(index + 1).padStart(2, '0')}</span>{section.heading}</h2>
-            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            {section.paragraphs?.map((paragraph) => <p>{paragraph}</p>)}
             {section.bullets && (
               <ul>
                 {section.bullets.map((item) => <li>{item}</li>)}

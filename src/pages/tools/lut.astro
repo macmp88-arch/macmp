@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = '在线 LUT 生成器 · 参考图色彩匹配与风格预设 · MacMP';
+const description =
+  '免费在线生成达芬奇 .cube 3D LUT：上传原片截图与参考图自动匹配肤色、高光与暗部，或套用 11 款剪辑调色风格预设，导出可直接用于 DaVinci Resolve、Premiere Pro、Final Cut Pro。';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'MacMP 在线 LUT 生成器',
+  applicationCategory: 'MultimediaApplication',
+  operatingSystem: 'Web',
+  description,
+  url: new URL('/tools/lut/', Astro.site).toString(),
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
+};
+---
+
+<BaseLayout title={title} description={description} path="/tools/lut">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <section class="lut-hero">
+    <div class="container">
+      <p class="eyebrow">调色工具</p>
+      <h1>在线 LUT 生成器</h1>
+      <p class="lede">
+        上传一张<strong>原片截图</strong>，再丢一张<strong>参考图</strong>，工具会分析两者的肤色、高光与暗部，生成一条色彩映射，
+        并导出达芬奇 / Premiere / Final Cut Pro 都能直接读取的 <code>.cube</code> 3D LUT。不想找参考图，也可以直接套风格预设。
+      </p>
+      <div class="hero-meta">
+        <span>纯本地运算，图片不上传服务器</span>
+        <span>支持 17³ / 33³ / 65³</span>
+        <span>免费，无需注册</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="lut-block" id="lutTool">
+      <div class="lut-grid">
+        <div class="lut-col">
+          <h2 class="lut-step"><b>1</b> 上传素材</h2>
+
+          <label class="lut-drop">
+            <input type="file" id="lutSourceInput" accept="image/*" />
+            <span class="lut-drop-face">
+              <strong>原片截图</strong>
+              <span>要调色的那一帧（建议带人物肤色，别用纯风景）</span>
+            </span>
+          </label>
+
+          <label class="lut-drop">
+            <input type="file" id="lutRefInput" accept="image/*" />
+            <span class="lut-drop-face">
+              <strong>参考图（可选）</strong>
+              <span>你想模仿的那张画面：电影截图、样片、喜欢的成片</span>
+            </span>
+          </label>
+
+          <label class="lut-check"><input type="checkbox" id="lutUseMatch" /> 启用参考图色彩匹配</label>
+          <label class="lut-check"><input type="checkbox" id="lutKeepLuma" checked /> 保留原片亮度（只迁移色彩倾向）</label>
+          <p class="lut-hint" id="lutMatchInfo">未启用参考图匹配，当前只应用风格预设</p>
+        </div>
+
+        <div class="lut-col">
+          <h2 class="lut-step"><b>2</b> 选风格与强度</h2>
+          <label class="lut-field">风格预设
+            <select class="lut-input" id="lutPreset"></select>
+          </label>
+          <p class="lut-hint" id="lutPresetDesc"></p>
+
+          <label class="lut-field">强度 <span id="lutStrengthValue">70%</span>
+            <input class="lut-range" type="range" id="lutStrength" min="0" max="100" value="70" step="1" />
+          </label>
+
+          <h2 class="lut-step"><b>3</b> 导出 LUT</h2>
+          <label class="lut-field">LUT 尺寸
+            <select class="lut-input" id="lutSize">
+              <option value="17">17³ — 体积最小，适合弱机器监看</option>
+              <option value="33" selected>33³ — 推荐，画质与体积平衡</option>
+              <option value="65">65³ — 最细腻，文件较大</option>
+            </select>
+          </label>
+          <label class="lut-field">文件名（可选）
+            <input class="lut-input" type="text" id="lutName" placeholder="例如：婚礼-暖调" />
+          </label>
+          <button class="lut-btn" type="button" id="lutDownload">下载 .cube</button>
+          <p class="lut-status" id="lutStatus">上传原片截图后即可导出。</p>
+        </div>
+      </div>
+
+      <div class="lut-preview">
+        <div class="lut-preview-head"><h2>预览</h2><span class="lut-hint">左：原片　右：套用后</span></div>
+        <div class="lut-preview-grid" id="lutPreviewEmpty">
+          <p class="lut-empty">还没有素材。上传原片截图后会在这里显示前后对比。</p>
+        </div>
+        <div class="lut-preview-grid">
+          <figure><canvas id="lutBefore" hidden></canvas><figcaption>原片</figcaption></figure>
+          <figure><canvas id="lutAfter" hidden></canvas><figcaption>套用后</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="lut-block">
+      <h2>怎么在剪辑软件里用这条 LUT</h2>
+      <div class="lut-usecases">
+        <article>
+          <h3>DaVinci Resolve</h3>
+          <ol>
+            <li>把 <code>.cube</code> 放到 <code>~/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT/</code></li>
+            <li>节点面板右键 → <strong>LUT → 刷新</strong></li>
+            <li>在一级校色之后的新节点上右键 → <strong>LUT → 选择该 LUT</strong></li>
+          </ol>
+          <p class="lut-hint">参考三级调色的节点顺序：一级平衡 → 二级局部 → LUT／风格 → 锐化与颗粒。</p>
+        </article>
+        <article>
+          <h3>Premiere Pro</h3>
+          <ol>
+            <li>效果面板搜索 <strong>Lumetri 颜色</strong></li>
+            <li>基本校正 → <strong>创意</strong> → Look 选择 <strong>浏览</strong> 载入 .cube</li>
+            <li>强度滑杆可以无损减弱 LUT 效果</li>
+          </ol>
+        </article>
+        <article>
+          <h3>Final Cut Pro</h3>
+          <ol>
+            <li>效果浏览器 → 颜色 → <strong>自定 LUT</strong></li>
+            <li>把 .cube 拖到效果列表的自定 LUT 目录</li>
+            <li>拖到片段上，用“混合”参数控制强度</li>
+          </ol>
+        </article>
+      </div>
+      <p class="lut-note">
+        提示：LUT 是「查表」，只能做固定映射，不能替代曝光和白平衡。正确做法是先把手动白平衡、曝光、肤色校正做干净，再用 LUT 做风格化。
+        参考图匹配的本质是统计色彩迁移，遇到极端参考图（大面积单色、强霓虹）时建议把强度压到 40–60%。
+      </p>
+    </section>
+
+    <section class="lut-block">
+      <h2>更专业的同类工具</h2>
+      <p>如果你需要更完整的参考图图库、风格预设库，或者想在达芬奇里以插件节点方式做参考仿色，可以直接用下面这个站：</p>
+      <div class="lut-links">
+        <a class="lut-link" href="https://onv13.top/" target="_blank" rel="noopener">
+          <strong>四时造物 · ColorMatch</strong>
+          <span>参考图色彩匹配 + 风格预设库，可导出 .cube；另有 DaVinci Resolve 插件 GradePilot（Resolve Studio 21.1+）</span>
+        </a>
+        <a class="lut-link" href="/guides/" >
+          <strong>MacMP 调色与剪辑指南</strong>
+          <span>节点顺序、肤色校正、Slog3 与 PP11 素材统一、LUT 工作流</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script src="/lut-tool.js" defer></script>
+
+<style>
+  .lut-hero { padding: 64px 0 36px; background: radial-gradient(circle at 80% 10%, rgba(0,113,227,.12), transparent 40%), linear-gradient(150deg,#f7fbff,#fff 60%,#eef5ff); border-bottom: 1px solid #e4e8f0; }
+  .lut-hero h1 { font-size: clamp(36px, 5vw, 56px); letter-spacing: -.03em; margin: 10px 0 14px; }
+  .lut-hero .lede { font-size: 17px; line-height: 1.85; color: #475467; max-width: 780px; }
+  .lut-hero code { background: #eef2f6; padding: 2px 6px; border-radius: 6px; font-size: 14px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 20px; color: #667085; font-size: 14px; }
+  .lut-block { margin: 42px 0; }
+  .lut-block > h2 { font-size: 26px; letter-spacing: -.01em; }
+  .lut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .lut-col { padding: 24px; border: 1px solid #e4e8f0; border-radius: 22px; background: #fff; box-shadow: 0 14px 36px rgba(22,34,56,.06); }
+  .lut-step { display: flex; align-items: center; gap: 10px; font-size: 19px; margin: 0 0 16px; }
+  .lut-step b { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #e8f2ff; color: #0071e3; font-size: 14px; }
+  .lut-step:not(:first-child) { margin-top: 26px; }
+  .lut-drop { position: relative; display: block; margin-bottom: 12px; padding: 20px; border: 1.5px dashed #c7d4e6; border-radius: 16px; background: #fafcff; cursor: pointer; transition: border-color .2s, background .2s; }
+  .lut-drop:hover { border-color: #0071e3; background: #f4f9ff; }
+  .lut-drop input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .lut-drop-face { display: grid; gap: 4px; }
+  .lut-drop-face strong { font-size: 15px; }
+  .lut-drop-face span { color: #667085; font-size: 13px; line-height: 1.6; }
+  .lut-check { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 14px; color: #344054; }
+  .lut-field { display: grid; gap: 8px; margin: 0 0 14px; font-size: 14px; color: #344054; }
+  .lut-input { width: 100%; padding: 11px 13px; border: 1px solid #e4e8f0; border-radius: 11px; font-size: 14px; background: #fff; color: #172033; }
+  .lut-input:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  .lut-range { width: 100%; accent-color: #0071e3; }
+  .lut-btn { width: 100%; padding: 13px 18px; border: 0; border-radius: 999px; background: #0071e3; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .lut-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .lut-hint { color: #667085; font-size: 13px; line-height: 1.65; margin: 6px 0 0; }
+  .lut-status { margin: 12px 0 0; font-size: 13px; color: #475467; }
+  .lut-status.success { color: #027a48; }
+  .lut-status.error { color: #b42318; }
+  .lut-preview { margin-top: 22px; padding: 24px; border: 1px solid #e4e8f0; border-radius: 22px; background: #fff; }
+  .lut-preview-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .lut-preview-head h2 { font-size: 20px; margin: 0; }
+  .lut-preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .lut-preview-grid figure { margin: 16px 0 0; }
+  .lut-preview-grid canvas { width: 100%; height: auto; border-radius: 14px; border: 1px solid #e4e8f0; display: block; background: #f2f4f7; }
+  .lut-preview-grid figcaption { margin-top: 8px; color: #667085; font-size: 13px; text-align: center; }
+  .lut-empty { grid-column: 1 / -1; color: #667085; font-size: 14px; margin: 12px 0 0; }
+  .lut-usecases { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 8px; }
+  .lut-usecases article { padding: 20px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; }
+  .lut-usecases h3 { margin: 0 0 10px; font-size: 17px; }
+  .lut-usecases ol { margin: 0; padding-left: 20px; color: #475467; font-size: 14px; line-height: 1.85; }
+  .lut-usecases code { background: #f2f4f7; padding: 1px 5px; border-radius: 5px; font-size: 12.5px; word-break: break-all; }
+  .lut-note { margin-top: 18px; padding: 18px 20px; border-radius: 16px; background: #f5f8fc; color: #475467; font-size: 14px; line-height: 1.8; }
+  .lut-links { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 14px; }
+  .lut-link { display: grid; gap: 6px; padding: 20px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; text-decoration: none; }
+  .lut-link:hover { border-color: #0071e3; box-shadow: 0 14px 34px rgba(0,113,227,.1); }
+  .lut-link strong { color: #172033; font-size: 16px; }
+  .lut-link span { color: #667085; font-size: 13.5px; line-height: 1.7; }
+  @media (max-width: 900px) {
+    .lut-grid, .lut-usecases, .lut-links { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .lut-preview-grid { grid-template-columns: 1fr; }
+  }
+</style>
