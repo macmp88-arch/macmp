@@ -1,68 +1,71 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { faqItems, faqCategories } from '../../data/faq';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { faqEnItems, faqEnCategories } from '../../../data/faqEn';
 
-const title = 'Mac 常见问题与解决方法 · 故障排查手册 · MacMP';
+const title = 'Mac Troubleshooting Guides · Free Up Space, Fix Fan Noise, Repair Time Machine · MacMP';
 const description =
-  'Mac 磁盘空间不足、发烫卡顿、连不上 Wi-Fi、时间机器备份失败、系统数据过大、应用打不开等常见问题的完整排查步骤，每条都给出可直接执行的命令与预防方法。';
+  'Step-by-step fixes for the most common Mac problems: disk full, System Data bloat, slow performance after an update, Wi-Fi failures, Time Machine errors, Gatekeeper blocks and external displays that are not detected.';
 
-const grouped = faqCategories.map((cat) => ({
+const grouped = faqEnCategories.map((cat) => ({
   ...cat,
-  items: faqItems.filter((item) => item.category === cat.key),
+  items: faqEnItems.filter((item) => item.category === cat.key),
 }));
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
-  name: 'Mac 常见问题与解决方法',
+  name: 'Mac Troubleshooting Guides',
   description,
-  url: new URL('/faq/', Astro.site).toString(),
-  hasPart: faqItems.slice(0, 12).map((item) => ({
+  url: new URL('/en/faq/', Astro.site).toString(),
+  inLanguage: 'en',
+  hasPart: faqEnItems.map((item) => ({
     '@type': 'Article',
     headline: item.title,
-    url: new URL(`/faq/${item.slug}/`, Astro.site).toString(),
+    url: new URL(`/en/faq/${item.slug}/`, Astro.site).toString(),
   })),
 };
 ---
 
-<BaseLayout title={title} description={description} path="/faq">
+<BaseLayout title={title} description={description} path="/en/faq" lang="en">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
 
   <section class="faq-hero">
     <div class="container">
-      <p class="eyebrow">Mac 问题排查</p>
-      <h1>Mac 出问题了？<br />先按顺序排查，别急着重装。</h1>
+      <p class="eyebrow">Mac Troubleshooting</p>
+      <h1>Something wrong with your Mac?<br />Work through it in order.</h1>
       <p>
-        日常使用中最容易遇到的 {faqItems.length} 类问题，每一类都按「症状 → 原因 → 快速修复 → 分步处理 → 预防」写清楚。
-        能一条命令解决的，就不让你去搜十篇文章。
+        {faqEnItems.length} of the most common Mac problems, each written as symptoms → causes → quick fix → full walkthrough → how to prevent it.
+        Where a single command does the job, you get the command — not ten articles to cross-reference.
       </p>
       <div class="faq-search">
-        <input type="search" id="faqSearch" placeholder="搜索问题，例如：磁盘满、发烫、连不上 WiFi…" autocomplete="off" />
+        <input type="search" id="faqSearch" placeholder="Search a problem, e.g. disk full, fan noise, wifi…" autocomplete="off" />
       </div>
-      <p class="lang-link">English: <a href="/en/faq/">Read the Mac troubleshooting guides in English →</a></p>
       <div class="hero-meta">
-        <span><strong>{faqItems.length}</strong> 条排查手册</span>
-        <span><strong>{faqCategories.length}</strong> 个分类</span>
-        <span>持续更新</span>
+        <span><strong>{faqEnItems.length}</strong> troubleshooting guides</span>
+        <span><strong>{faqEnCategories.length}</strong> categories</span>
+        <span>Updated regularly</span>
       </div>
+      <p class="lang-link">
+        中文版：<a href="/faq/">Mac 常见问题排查手册 →</a>
+      </p>
     </div>
   </section>
 
   <div class="container">
     <div class="faq-filters" id="faqFilters">
-      <button class="filter-chip active" data-cat="all">全部</button>
-      {faqCategories.map((cat) => (
+      <button class="filter-chip active" data-cat="all">All</button>
+      {faqEnCategories.map((cat) => (
         <button class="filter-chip" data-cat={cat.key}>{cat.icon} {cat.title}</button>
       ))}
     </div>
 
-    <p class="faq-empty" id="faqEmpty" hidden>没有匹配的问题。试试更短的关键词，比如「磁盘」「蓝牙」「摄像头」。</p>
+    <p class="faq-empty" id="faqEmpty" hidden>No matching guides. Try a shorter keyword such as “disk”, “bluetooth” or “monitor”.</p>
 
     {grouped.map((group) => (
       <section class="faq-group" data-group={group.key}>
         <div class="faq-group-head">
           <h2><span class="faq-icon">{group.icon}</span>{group.title}</h2>
-          <span class="faq-count">{group.items.length} 条</span>
+          <span class="faq-count">{group.items.length} {group.items.length === 1 ? 'guide' : 'guides'}</span>
         </div>
         <div class="faq-grid">
           {group.items.map((item) => (
@@ -71,14 +74,14 @@ const jsonLd = {
               data-search={`${item.title} ${item.question} ${item.tags.join(' ')} ${item.summary}`.toLowerCase()}
               data-cat={group.key}
             >
-              <a class="faq-card-link" href={`/faq/${item.slug}/`}>
+              <a class="faq-card-link" href={`/en/faq/${item.slug}/`}>
                 <div class="faq-card-top">
                   <span class={`sev sev-${item.severity}`}>{item.severity}</span>
                   <span class="faq-card-tags">{item.tags.slice(0, 3).join(' · ')}</span>
                 </div>
                 <h3>{item.question}</h3>
                 <p>{item.summary}</p>
-                <span class="faq-go">查看排查步骤 →</span>
+                <span class="faq-go">Read the walkthrough →</span>
               </a>
             </article>
           ))}
@@ -87,13 +90,13 @@ const jsonLd = {
     ))}
 
     <section class="faq-note">
-      <h2>排查的通用原则</h2>
+      <h2>Rules that apply to every fix</h2>
       <ol>
-        <li><strong>先备份再动手</strong>：任何涉及磁盘、系统、密码的操作之前，先确认有时间机器备份。</li>
-        <li><strong>从最简单的开始</strong>：重启、换线、忘记网络重连，这三招能解决相当一部分问题。</li>
-        <li><strong>一次只改一个变量</strong>：同时改五处设置，出问题就不知道是哪一步导致的。</li>
-        <li><strong>不要盲目全局关闭安全功能</strong>：Gatekeeper、SIP、FileVault 都是保护你的，别为了方便长期关掉。</li>
-        <li><strong>记下你做过什么</strong>：改过哪些设置、跑过哪些命令，出问题时能快速回退。</li>
+        <li><strong>Back up before you touch anything.</strong> Any operation involving disks, the system or passwords should start with a verified Time Machine backup.</li>
+        <li><strong>Start with the simplest step.</strong> Restart, swap the cable, forget and rejoin the network — those three solve a surprising amount.</li>
+        <li><strong>Change one variable at a time.</strong> If you alter five settings at once, you will not know which one caused the result.</li>
+        <li><strong>Do not disable security features globally.</strong> Gatekeeper, SIP and FileVault exist to protect you. Turning them off permanently is a bad trade.</li>
+        <li><strong>Write down what you changed.</strong> Which settings moved, which commands ran — that is what makes a problem reversible.</li>
       </ol>
     </section>
   </div>
@@ -162,9 +165,9 @@ const jsonLd = {
   .faq-card-link { display: grid; gap: 9px; padding: 20px; text-decoration: none; color: inherit; }
   .faq-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .sev { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-  .sev-常见 { background: #e8f2ff; color: #0071e3; }
-  .sev-中等 { background: #fff4e5; color: #b45309; }
-  .sev-严重 { background: #fdecec; color: #c0392b; }
+  .sev-Common { background: #e8f2ff; color: #0071e3; }
+  .sev-Moderate { background: #fff4e5; color: #b45309; }
+  .sev-Critical { background: #fdecec; color: #c0392b; }
   .faq-card-tags { color: #98a2b3; font-size: 12.5px; }
   .faq-card h3 { margin: 0; font-size: 17px; line-height: 1.5; color: #172033; }
   .faq-card p { margin: 0; color: #475467; font-size: 14px; line-height: 1.72; }

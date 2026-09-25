@@ -8,6 +8,8 @@ interface Props {
   path?: string;
   image?: string;
   noindex?: boolean;
+  /** 显式指定页面语言。传 'en' 时页面锁定英文，不受语言切换记忆影响 */
+  lang?: 'zh-CN' | 'en';
 }
 
 const {
@@ -16,7 +18,10 @@ const {
   path = '/',
   image = '/favicon.svg',
   noindex = false,
+  lang,
 } = Astro.props;
+
+const htmlLang = lang ?? 'zh-CN';
 
 const ogImage = new URL(image, Astro.site).toString();
 
@@ -33,7 +38,7 @@ const nav = [
 ];
 ---
 <!doctype html>
-<html lang="zh-CN">
+<html lang={htmlLang} data-lang-lock={lang ? '1' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,6 +52,7 @@ const nav = [
     <meta property="og:description" content={description} />
     <meta property="og:type" content={path.startsWith('/guides/') ? 'article' : 'website'} />
     <meta property="og:url" content={new URL(path, Astro.site).toString()} />
+    <meta property="og:locale" content={htmlLang === 'en' ? 'en_US' : 'zh_CN'} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:alt" content={title} />
     <meta name="twitter:card" content="summary_large_image" />
@@ -55,7 +61,7 @@ const nav = [
     <meta name="twitter:image" content={ogImage} />
     <Analytics />
     <script is:inline>
-      (function(){try{var l=localStorage.getItem('lang')||'zh';document.documentElement.setAttribute('lang', l==='en'?'en':'zh-CN');}catch(e){}})();
+      (function(){try{if(document.documentElement.getAttribute('data-lang-lock')==='1')return;var l=localStorage.getItem('lang')||'zh';document.documentElement.setAttribute('lang', l==='en'?'en':'zh-CN');}catch(e){}})();
     </script>
     <script is:inline type="text/javascript">
 (function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7823876-a1c9-450d-95ec-cbdeedd2f2851.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');
