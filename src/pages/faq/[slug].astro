@@ -1,0 +1,290 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
+import Recommendation from '../../components/Recommendation.astro';
+import { faqItems, getRelatedFaq } from '../../data/faq';
+import { guides } from '../../data/guides';
+import { apps } from '../../data/apps';
+import type { FaqItem } from '../../data/faq';
+
+export function getStaticPaths() {
+  return faqItems.map((item) => ({ params: { slug: item.slug }, props: { item } }));
+}
+
+interface Props {
+  item: FaqItem;
+}
+
+const { item } = Astro.props;
+const related = getRelatedFaq(item, 3);
+const relatedGuideItems = guides.filter((g) => item.relatedGuides.includes(g.slug)).slice(0, 3);
+const relatedAppItems = apps.filter((a) => item.relatedApps.includes(a.slug)).slice(0, 3);
+
+const sevClass = `sev-${item.severity}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'FAQPage',
+      mainEntity: item.faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+    {
+      '@type': 'HowTo',
+      name: item.title,
+      description: item.summary,
+      totalTime: 'PT15M',
+      step: item.steps.map((step, index) => ({
+        '@type': 'HowToStep',
+        position: index + 1,
+        name: step.title,
+        text: step.detail,
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: new URL('/', Astro.site).toString() },
+        { '@type': 'ListItem', position: 2, name: 'Mac 问题排查', item: new URL('/faq/', Astro.site).toString() },
+        { '@type': 'ListItem', position: 3, name: item.question, item: new URL(`/faq/${item.slug}/`, Astro.site).toString() },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout title={`${item.title} · MacMP`} description={item.summary} path={`/faq/${item.slug}`}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <div class="container">
+    <nav class="crumbs" aria-label="breadcrumb">
+      <a href="/">首页</a><span class="sep">›</span>
+      <a href="/faq/">Mac 问题排查</a><span class="sep">›</span>
+      <span class="current">{item.category}</span>
+    </nav>
+
+    <article class="faq-article">
+      <header class="faq-head">
+        <div class="faq-head-meta">
+          <span class={`sev ${sevClass}`}>{item.severity}</span>
+          <span class="faq-cat">{item.category}</span>
+          <span class="faq-updated">更新于 {item.updatedAt}</span>
+        </div>
+        <h1>{item.title}</h1>
+        <p class="faq-question">“{item.question}”</p>
+        <p class="faq-summary">{item.summary}</p>
+      </header>
+
+      <div class="quick-fix">
+        <div class="quick-fix-label">⚡ 先试这一步</div>
+        <p>{item.quickFix}</p>
+      </div>
+
+      <div class="faq-two-col">
+        <section class="faq-box">
+          <h2>你会看到这些现象</h2>
+          <ul>{item.symptoms.map((s) => <li>{s}</li>)}</ul>
+        </section>
+        <section class="faq-box">
+          <h2>常见原因</h2>
+          <ul>{item.causes.map((c) => <li>{c}</li>)}</ul>
+        </section>
+      </div>
+
+      <section class="faq-steps">
+        <h2>完整排查步骤</h2>
+        <ol>
+          {item.steps.map((step, index) => (
+            <li class="faq-step">
+              <div class="step-head">
+                <span class="step-num">{String(index + 1).padStart(2, '0')}</span>
+                <h3>{step.title}</h3>
+              </div>
+              <p>{step.detail}</p>
+              {step.terminal && (
+                <div class="term">
+                  <div class="term-bar">
+                    <span class="term-dots"><i></i><i></i><i></i></span>
+                    <span class="term-label">终端</span>
+                    <button class="term-copy" type="button" data-copy={step.terminal}>复制</button>
+                  </div>
+                  <pre><code>{step.terminal}</code></pre>
+                </div>
+              )}
+              {step.warning && <div class="warn"><strong>⚠️ 注意</strong>{step.warning}</div>}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="faq-prevent">
+        <h2>怎么避免再犯</h2>
+        <ul>{item.prevention.map((p) => <li>{p}</li>)}</ul>
+      </section>
+
+      {item.faqs.length > 0 && (
+        <section class="faq-more">
+          <h2>常见追问</h2>
+          <div class="faq-accordion">
+            {item.faqs.map((f) => (
+              <details>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {relatedAppItems.length > 0 && (
+        <section class="faq-apps">
+          <h2>相关工具</h2>
+          <div class="app-row">
+            {relatedAppItems.map((app) => (
+              <a class="app-chip" href={`/software/${app.slug}/`}>
+                <img src={`/images/apps/${app.slug}.png`} alt={app.name} width="36" height="36" loading="lazy" />
+                <span>
+                  <strong>{app.name}</strong>
+                  <em>{app.category} · {app.price}</em>
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {relatedGuideItems.length > 0 && (
+        <section class="faq-guides">
+          <h2>相关专题</h2>
+          <div class="guide-row">
+            {relatedGuideItems.map((g) => (
+              <a class="guide-chip" href={`/guides/${g.slug}/`}>
+                <strong>{g.title}</strong>
+                <em>{g.readTime}</em>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </article>
+
+    {related.length > 0 && (
+      <section class="related-faq">
+        <h2>同类问题</h2>
+        <div class="related-grid">
+          {related.map((r) => (
+            <a class="related-card" href={`/faq/${r.slug}/`}>
+              <span class={`sev ${`sev-${r.severity}`}`}>{r.severity}</span>
+              <strong>{r.question}</strong>
+              <span>{r.summary}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <Recommendation />
+    <Comments />
+  </div>
+
+  <script>
+    document.querySelectorAll<HTMLButtonElement>('.term-copy').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const text = btn.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        const original = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .crumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 26px 0 0; font-size: 13.5px; color: #667085; }
+  .crumbs a { color: #667085; text-decoration: none; }
+  .crumbs a:hover { color: #0071e3; }
+  .crumbs .sep { color: #cbd5e1; }
+  .crumbs .current { color: #344054; font-weight: 600; }
+  .faq-head { padding: 22px 0 6px; max-width: 900px; }
+  .faq-head-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .sev { padding: 3px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .sev-常见 { background: #e8f2ff; color: #0071e3; }
+  .sev-中等 { background: #fff4e5; color: #b45309; }
+  .sev-严重 { background: #fdecec; color: #c0392b; }
+  .faq-cat { color: #667085; font-size: 13.5px; font-weight: 600; }
+  .faq-updated { color: #98a2b3; font-size: 13px; }
+  .faq-head h1 { font-size: clamp(28px, 3.6vw, 42px); line-height: 1.22; letter-spacing: -.02em; margin: 0 0 12px; }
+  .faq-question { font-size: 17px; color: #667085; margin: 0 0 12px; font-style: italic; }
+  .faq-summary { font-size: 17.5px; line-height: 1.85; color: #344054; margin: 0; }
+  .quick-fix { margin: 26px 0; padding: 20px 24px; border-radius: 16px; background: linear-gradient(135deg,#eef7ff,#f7fbff); border: 1px solid #cfe6ff; }
+  .quick-fix-label { font-size: 13px; font-weight: 800; color: #0071e3; letter-spacing: .04em; margin-bottom: 8px; }
+  .quick-fix p { margin: 0; font-size: 16px; line-height: 1.8; color: #1d2939; }
+  .faq-two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 26px 0; }
+  .faq-box { padding: 22px 24px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; }
+  .faq-box h2 { margin: 0 0 12px; font-size: 18px; }
+  .faq-box ul { margin: 0; padding-left: 20px; color: #475467; font-size: 15px; line-height: 1.9; }
+  .faq-steps { margin: 34px 0; }
+  .faq-steps > h2 { font-size: 24px; margin: 0 0 18px; }
+  .faq-steps ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+  .faq-step { padding: 22px 24px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; }
+  .step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .step-num { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #e8f2ff; color: #0071e3; font-size: 13px; font-weight: 800; }
+  .step-head h3 { margin: 0; font-size: 18px; }
+  .faq-step > p { margin: 0; color: #475467; font-size: 15.5px; line-height: 1.85; }
+  .term { margin: 16px 0 0; border-radius: 12px; overflow: hidden; border: 1px solid #24303f; background: #0f1720; }
+  .term-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: #1a2432; }
+  .term-dots { display: flex; gap: 5px; }
+  .term-dots i { width: 9px; height: 9px; border-radius: 50%; background: #46536b; }
+  .term-dots i:first-child { background: #ff5f57; }
+  .term-dots i:nth-child(2) { background: #febc2e; }
+  .term-dots i:nth-child(3) { background: #28c840; }
+  .term-label { color: #8b9bb4; font-size: 12px; font-weight: 600; }
+  .term-copy { margin-left: auto; padding: 4px 12px; border: 1px solid #35425a; border-radius: 7px; background: transparent; color: #cdd8ea; font-size: 12px; cursor: pointer; }
+  .term-copy:hover { border-color: #0071e3; color: #6cb2ff; }
+  .term pre { margin: 0; padding: 14px 16px; overflow-x: auto; }
+  .term code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: 13.5px; color: #7ee787; white-space: pre-wrap; word-break: break-all; }
+  .warn { margin: 14px 0 0; padding: 13px 16px; border-radius: 12px; background: #fff8e6; border: 1px solid #ffe1a8; color: #8a5a00; font-size: 14.5px; line-height: 1.75; }
+  .warn strong { display: block; margin-bottom: 4px; color: #b45309; }
+  .faq-prevent { margin: 34px 0; padding: 24px 26px; border-radius: 18px; background: #f4faf6; border: 1px solid #cde9d8; }
+  .faq-prevent h2 { margin: 0 0 12px; font-size: 21px; }
+  .faq-prevent ul { margin: 0; padding-left: 20px; color: #345445; font-size: 15.5px; line-height: 1.9; }
+  .faq-more { margin: 34px 0; }
+  .faq-more h2 { font-size: 22px; margin: 0 0 14px; }
+  .faq-accordion details { border: 1px solid #e4e8f0; border-radius: 13px; padding: 14px 18px; margin-bottom: 10px; background: #fff; }
+  .faq-accordion summary { cursor: pointer; font-weight: 650; font-size: 15.5px; color: #172033; }
+  .faq-accordion p { margin: 10px 0 0; color: #475467; font-size: 15px; line-height: 1.8; }
+  .faq-apps, .faq-guides { margin: 30px 0; }
+  .faq-apps h2, .faq-guides h2 { font-size: 21px; margin: 0 0 14px; }
+  .app-row, .guide-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .app-chip { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #e4e8f0; border-radius: 14px; background: #fff; text-decoration: none; color: inherit; }
+  .app-chip:hover { border-color: #0071e3; }
+  .app-chip span { display: grid; }
+  .app-chip strong { font-size: 14.5px; }
+  .app-chip em { font-style: normal; font-size: 12.5px; color: #98a2b3; }
+  .guide-chip { display: grid; gap: 4px; padding: 14px 18px; border: 1px solid #e4e8f0; border-radius: 14px; background: #fff; text-decoration: none; color: inherit; max-width: 380px; }
+  .guide-chip:hover { border-color: #0071e3; }
+  .guide-chip strong { font-size: 15px; line-height: 1.5; }
+  .guide-chip em { font-style: normal; font-size: 12.5px; color: #98a2b3; }
+  .related-faq { margin: 46px 0 20px; }
+  .related-faq h2 { font-size: 23px; margin: 0 0 16px; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .related-card { display: grid; gap: 8px; padding: 20px; border: 1px solid #e4e8f0; border-radius: 16px; background: #fff; text-decoration: none; color: inherit; transition: border-color .18s, transform .18s; }
+  .related-card:hover { border-color: #0071e3; transform: translateY(-2px); }
+  .related-card strong { font-size: 16px; line-height: 1.5; color: #172033; }
+  .related-card span:last-child { font-size: 14px; color: #475467; line-height: 1.7; }
+  .related-card .sev { justify-self: start; }
+</style>

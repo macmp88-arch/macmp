@@ -1,77 +1,120 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { materialGroups, materialTotal, freeMaterialTotal } from '../../data/materials';
+import { faqItems } from '../../data/faq';
 
-const title = '素材与工具导航 · 免费视频素材 / 调色工具 / LUT 生成器 · MacMP';
+const title = '免费素材库导航 · 视频 / 音乐 / 音效 / 图片 / 字体 / LUT · MacMP';
 const description =
-  'Mac 剪辑调色常用资源导航：影视飓风免费素材库、在线 LUT 生成器、参考图色彩匹配工具。全部为剪辑、调色、宣传片与婚礼片常用资源，持续补充。';
+  '剪辑与设计常用的免费素材站合集：影视飓风、Pexels、Pixabay、Mixkit、Freesound、Unsplash、Google Fonts 等，逐个标注授权范围（可否商用、是否需要署名），另有本站自研在线 LUT 生成器。';
 
-const localTools = [
-  {
-    href: '/tools/lut/',
-    name: '在线 LUT 生成器',
-    tag: '本站工具',
-    desc: '上传原片截图 + 参考图，自动分析肤色、高光与暗部并生成色彩映射，导出 DaVinci Resolve / Premiere / Final Cut Pro 通用的 .cube 3D LUT。支持 11 款风格预设与强度控制。',
-    meta: '免费 · 无需注册 · 图片只在本地浏览器处理',
-  },
-];
+const localTool = {
+  href: '/tools/lut/',
+  name: '在线 LUT 生成器',
+  desc: '上传原片截图 + 参考图，自动做色彩迁移并导出 .cube，DaVinci Resolve / Premiere / Final Cut Pro 通用。支持 11 款风格预设与强度控制。',
+  meta: '免费 · 无需注册 · 图片只在本地浏览器处理',
+};
 
-const freeMaterials = [
-  {
-    href: 'https://www.ysjf.com/material',
-    name: '影视飓风 · 素材库',
-    tag: '免费素材',
-    desc: '影视飓风官方素材库。航拍、空镜、特效与转场素材可免费下载，适合剪辑练习、宣传片包装和短片补镜头。',
-    meta: '使用前请阅读站内授权说明，遵守其使用范围',
-  },
-];
+const licenseStyles: Record<string, string> = {
+  可商用: 'lic-ok',
+  有条件免费: 'lic-mid',
+  需署名: 'lic-credit',
+  仅限学习: 'lic-study',
+};
 
-const colorTools = [
-  {
-    href: 'https://onv13.top/',
-    name: '四时造物 · ColorMatch',
-    tag: '调色工具',
-    desc: '参考图色彩匹配 + 风格预设库，可导出 .cube；另有 DaVinci Resolve 插件 GradePilot，把参考画面的风格拆成可控的场景域调整。',
-    meta: '如需更完整的预设库与插件方案可使用',
-  },
-];
+const recommendCount = materialGroups.reduce(
+  (sum, group) => sum + group.items.filter((item) => item.recommended).length,
+  0,
+);
 
-const groups = [
-  { title: '本站工具', note: '免费、无需注册', items: localTools },
-  { title: '免费素材', note: '剪辑补画面用', items: freeMaterials },
-  { title: '调色与参考', note: 'LUT、仿色、风格拆解', items: colorTools },
-];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '免费素材库导航',
+  description,
+  numberOfItems: materialTotal,
+  itemListElement: materialGroups.flatMap((group) => group.items).map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    url: item.url.startsWith('http') ? item.url : new URL(item.url, Astro.site).toString(),
+  })),
+};
 ---
 
 <BaseLayout title={title} description={description} path="/tools">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
   <section class="tools-hero">
     <div class="container">
       <p class="eyebrow">素材与工具</p>
-      <h1>剪辑调色常用资源<br />一处收齐。</h1>
+      <h1>免费素材库<br />一次收齐，标明授权。</h1>
       <p>
-        做婚礼片、宣传片和短剧时最花时间的往往不是剪辑，而是找素材、试风格、统一颜色。这里收录我们实际在用的免费素材站和调色工具，
-        外加本站自研的小工具。
+        做婚礼片、宣传片和短剧时最花时间的往往不是剪辑，而是找素材、试风格、统一颜色。
+        这里收录 {materialTotal} 个实际在用的素材站，每个都标注了能不能商用、要不要署名——用之前先看清楚，比事后补救划算。
       </p>
       <div class="hero-meta">
-        <span><strong>{localTools.length + freeMaterials.length + colorTools.length}</strong> 个资源</span>
-        <span>持续补充</span>
+        <span><strong>{materialTotal}</strong> 个素材站</span>
+        <span><strong>{freeMaterialTotal}</strong> 个可直接商用</span>
+        <span><strong>{recommendCount}</strong> 个重点推荐</span>
+      </div>
+      <div class="hero-actions">
+        <a class="hero-btn primary" href="https://www.ysjf.com/material" target="_blank" rel="noopener">影视飓风素材库 →</a>
+        <a class="hero-btn" href="/tools/lut/">在线 LUT 生成器 →</a>
       </div>
     </div>
   </section>
 
   <div class="container">
-    {groups.map((group) => (
+    <div class="lic-legend">
+      <span class="lic lic-ok">可商用</span><em>免责署名，直接用于商单</em>
+      <span class="lic lic-mid">有条件免费</span><em>免费但有范围限制，逐条看说明</em>
+      <span class="lic lic-credit">需署名</span><em>可免费用，但必须标注来源</em>
+    </div>
+
+    <section class="tools-group tools-own">
+      <div class="tools-head">
+        <h2><span class="tool-icon">🛠️</span>本站工具</h2>
+        <span>免费、无需注册</span>
+      </div>
+      <div class="tools-grid">
+        <a class="tools-card own" href={localTool.href}>
+          <span class="tools-tag">本站工具</span>
+          <strong>{localTool.name}</strong>
+          <span class="tools-desc">{localTool.desc}</span>
+          <span class="tools-meta">{localTool.meta}</span>
+        </a>
+      </div>
+    </section>
+
+    {materialGroups.map((group) => (
       <section class="tools-group">
         <div class="tools-head">
-          <h2>{group.title}</h2>
+          <h2><span class="tool-icon">{group.key === 'video' ? '🎬' : group.key === 'audio' ? '🎵' : group.key === 'image' ? '🖼️' : group.key === 'font' ? '🔤' : group.key === 'lut' ? '🎨' : '✨'}</span>{group.title}</h2>
           <span>{group.note}</span>
         </div>
         <div class="tools-grid">
           {group.items.map((item) => (
-            <a class="tools-card" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener' : undefined}>
-              <span class="tools-tag">{item.tag}</span>
+            <a
+              class="tools-card"
+              href={item.url}
+              target={item.url.startsWith('http') ? '_blank' : undefined}
+              rel={item.url.startsWith('http') ? 'noopener' : undefined}
+            >
+              <span class="card-top">
+                <span class={`lic ${licenseStyles[item.license] || 'lic-mid'}`}>{item.license}</span>
+                {item.recommended && <span class="reco">推荐</span>}
+                <span class="region">{item.region}</span>
+              </span>
               <strong>{item.name}</strong>
               <span class="tools-desc">{item.desc}</span>
-              <span class="tools-meta">{item.meta}</span>
+              <span class="tools-meta">
+                {item.licenseEn}
+                {item.needsAccount ? ' · 需注册' : ''}
+                {item.hasPaid ? ' · 含付费内容' : ''}
+              </span>
+              <span class="use-tags">
+                {item.use.map((u) => <em>{u}</em>)}
+              </span>
             </a>
           ))}
         </div>
@@ -81,39 +124,84 @@ const groups = [
     <section class="tools-note">
       <h2>怎么配合着用</h2>
       <ol>
-        <li><strong>补画面</strong>：从素材库找空镜、航拍和转场，先解决「镜头不够」的问题。</li>
+        <li><strong>补画面</strong>：从素材库找空镜、航拍和转场，先解决「镜头不够」的问题。优先用标注「可商用」的站点，省掉后面确认授权的麻烦。</li>
         <li><strong>定风格</strong>：用参考图匹配找到方向，再决定整片的色彩倾向，不要一条片子试十种风格。</li>
         <li><strong>固化成 LUT</strong>：把定好的方向生成 .cube，挂在一级校色之后，全线统一收口。</li>
         <li><strong>最后校肤色</strong>：LUT 之后按镜头复核人物肤色与环境明暗对比，避免风格压过内容。</li>
       </ol>
+      <div class="lic-warning">
+        <strong>关于授权的重要提醒</strong>
+        <p>
+          「免费下载」不等于「可以随便商用」。不同站点、甚至同一站点的不同素材，授权范围都可能不一样。
+          接商单前请逐条核对：是否允许商用、是否需要署名、是否限制分发方式、是否禁止用于某些敏感内容。
+          标注为「有条件免费」的，务必点进素材详情页看它自己的授权说明。
+        </p>
+      </div>
       <p class="tools-tip">
-        想系统看流程，可以读我们用真实项目整理的调色专题：<a href="/guides/skin-tone-correction/">人物肤色校正</a>、
+        想系统看流程，可以读我们用真实项目整理的专题：<a href="/guides/skin-tone-correction/">人物肤色校正</a>、
         <a href="/guides/davinci-node-order/">达芬奇节点顺序</a>、<a href="/guides/lut-workflow-mac/">LUT 工作流</a>。
+        遇到 Mac 本身的问题，去 <a href="/faq/">Mac 问题排查手册</a>。
       </p>
+    </section>
+
+    <section class="tools-faq-link">
+      <div>
+        <h2>素材准备好了，电脑不给力？</h2>
+        <p>磁盘满了、风扇狂转、备份失败——{faqItems.length} 条 Mac 常见问题的完整排查步骤都在这里。</p>
+      </div>
+      <a href="/faq/">打开 Mac 问题排查 →</a>
     </section>
   </div>
 </BaseLayout>
 
 <style>
   .tools-hero { padding: 64px 0 40px; background: radial-gradient(circle at 82% 12%, rgba(0,113,227,.13), transparent 42%), linear-gradient(150deg,#f7fbff,#fff 58%,#eef5ff); border-bottom: 1px solid #e4e8f0; }
-  .tools-hero h1 { font-size: clamp(36px, 5vw, 58px); line-height: 1.1; letter-spacing: -.03em; margin: 10px 0 16px; }
-  .tools-hero p { font-size: 17px; line-height: 1.85; color: #475467; max-width: 760px; }
+  .tools-hero h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.1; letter-spacing: -.03em; margin: 10px 0 16px; }
+  .tools-hero p { font-size: 17px; line-height: 1.85; color: #475467; max-width: 780px; }
   .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 20px; color: #667085; font-size: 14px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .hero-btn { padding: 12px 22px; border: 1px solid #d7dde8; border-radius: 999px; background: #fff; color: #172033; font-size: 15px; font-weight: 650; text-decoration: none; }
+  .hero-btn:hover { border-color: #0071e3; color: #0071e3; }
+  .hero-btn.primary { background: #0071e3; border-color: #0071e3; color: #fff; }
+  .hero-btn.primary:hover { background: #0062c4; color: #fff; }
+  .lic-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 32px 0 0; padding: 16px 20px; border: 1px solid #e4e8f0; border-radius: 16px; background: #f9fbfe; }
+  .lic-legend em { font-style: normal; font-size: 13.5px; color: #667085; }
+  .lic { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .lic-ok { background: #e6f4ea; color: #1d7a3b; }
+  .lic-mid { background: #fff4e5; color: #b45309; }
+  .lic-credit { background: #eef0ff; color: #4f46e5; }
+  .lic-study { background: #f2f4f7; color: #667085; }
   .tools-group { margin: 40px 0; }
-  .tools-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-  .tools-head h2 { font-size: 24px; margin: 0; letter-spacing: -.01em; }
-  .tools-head span { color: #667085; font-size: 13px; }
-  .tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .tools-card { display: grid; gap: 8px; padding: 22px; border: 1px solid #e4e8f0; border-radius: 20px; background: #fff; text-decoration: none; transition: border-color .2s, box-shadow .2s, transform .2s; }
+  .tools-own { margin-top: 34px; }
+  .tools-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tools-head h2 { display: flex; align-items: center; gap: 9px; font-size: 24px; margin: 0; letter-spacing: -.01em; }
+  .tool-icon { font-size: 21px; }
+  .tools-head > span { color: #667085; font-size: 13px; }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .tools-card { display: grid; gap: 8px; padding: 22px; border: 1px solid #e4e8f0; border-radius: 20px; background: #fff; text-decoration: none; color: inherit; transition: border-color .2s, box-shadow .2s, transform .2s; }
   .tools-card:hover { border-color: #0071e3; box-shadow: 0 16px 38px rgba(0,113,227,.11); transform: translateY(-2px); }
+  .tools-card.own { background: linear-gradient(150deg,#f7fbff,#fff 62%,#eef5ff); }
+  .card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .reco { padding: 3px 9px; border-radius: 999px; background: #e8f2ff; color: #0071e3; font-size: 12px; font-weight: 700; }
+  .region { margin-left: auto; color: #98a2b3; font-size: 12px; }
   .tools-tag { justify-self: start; padding: 3px 10px; border-radius: 999px; background: #e8f2ff; color: #0071e3; font-size: 12px; font-weight: 700; }
   .tools-card strong { color: #172033; font-size: 18px; }
   .tools-desc { color: #475467; font-size: 14px; line-height: 1.75; }
-  .tools-meta { color: #98a2b3; font-size: 12.5px; }
+  .tools-meta { color: #98a2b3; font-size: 12.5px; line-height: 1.6; }
+  .use-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .use-tags em { font-style: normal; padding: 2px 9px; border-radius: 7px; background: #f2f4f7; color: #667085; font-size: 11.5px; }
   .tools-note { margin: 46px 0; padding: 26px; border: 1px solid #e4e8f0; border-radius: 22px; background: #f9fbfe; }
   .tools-note h2 { margin-top: 0; font-size: 22px; }
   .tools-note ol { margin: 0; padding-left: 20px; color: #475467; font-size: 15px; line-height: 1.95; }
-  .tools-tip { margin: 16px 0 0; color: #475467; font-size: 14px; line-height: 1.8; }
+  .lic-warning { margin: 20px 0 0; padding: 16px 20px; border-radius: 14px; background: #fff8e6; border: 1px solid #ffe1a8; }
+  .lic-warning strong { display: block; margin-bottom: 6px; color: #b45309; font-size: 14.5px; }
+  .lic-warning p { margin: 0; color: #8a5a00; font-size: 14px; line-height: 1.8; }
+  .tools-tip { margin: 18px 0 0; color: #475467; font-size: 14px; line-height: 1.8; }
   .tools-tip a { color: #0071e3; }
+  .tools-faq-link { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 56px; padding: 26px 28px; border-radius: 22px; background: linear-gradient(135deg,#071a33 0%,#0b66c3 62%,#56b4ff 100%); color: #fff; }
+  .tools-faq-link h2 { margin: 0 0 6px; font-size: 22px; color: #fff; }
+  .tools-faq-link p { margin: 0; font-size: 14.5px; color: rgba(255,255,255,.85); max-width: 560px; line-height: 1.7; }
+  .tools-faq-link a { flex: none; padding: 12px 22px; border-radius: 999px; background: #fff; color: #0b66c3; font-size: 15px; font-weight: 700; text-decoration: none; }
+  .tools-faq-link a:hover { background: #eaf3ff; }
   @media (max-width: 900px) { .tools-grid { grid-template-columns: 1fr; } }
 </style>

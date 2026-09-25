@@ -2,47 +2,97 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Recommendation from '../components/Recommendation.astro';
 
-const title = 'Mac 软件优惠情报 · MacMP';
-const description = 'Mac 软件限免、官方试用与高性价比推荐，帮你用更低价格入手正版应用。';
+const title = 'Mac 软件优惠情报 · 免费 / 试用 / 一次性买断 · MacMP';
+const description =
+  'Mac 软件免费与优惠情报：完全免费工具、官方免费试用、一次性买断授权、Bundle 打包订阅与学生教育优惠。按付费方式分类，帮你选到真正划算的那一档。';
 
 const free: any[] = [
-  { slug: 'iina', zh: 'IINA', en: 'IINA', dZh: '现代、简洁的开源视频播放器，格式兼容好。', dEn: 'A modern, clean open-source video player with great format support.', price: '免费', badge: 'free' },
-  { slug: 'rectangle', zh: 'Rectangle', en: 'Rectangle', dZh: '免费开源的窗口分屏工具，快捷键高效。', dEn: 'Free open-source window snapping with efficient shortcuts.', price: '免费', badge: 'free' },
+  { slug: 'iina', zh: 'IINA', en: 'IINA', dZh: '现代、简洁的开源视频播放器，格式兼容好。', dEn: 'A modern, clean open-source video player with great format support.', price: '免费开源', badge: 'free' },
+  { slug: 'rectangle', zh: 'Rectangle', en: 'Rectangle', dZh: '免费开源的窗口分屏工具，快捷键高效。', dEn: 'Free open-source window snapping with efficient shortcuts.', price: '免费开源', badge: 'free' },
   { slug: 'appcleaner', zh: 'AppCleaner', en: 'AppCleaner', dZh: '彻底卸载应用，自动清理残留文件。', dEn: 'Uninstall apps completely and remove leftover files.', price: '免费', badge: 'free' },
-  { slug: 'homebrew', zh: 'Homebrew', en: 'Homebrew', dZh: 'Mac 必备的命令行软件包管理器。', dEn: 'The essential command-line package manager for Mac.', price: '免费', badge: 'free' },
+  { slug: 'homebrew', zh: 'Homebrew', en: 'Homebrew', dZh: 'Mac 必备的命令行软件包管理器。', dEn: 'The essential command-line package manager for Mac.', price: '免费开源', badge: 'free' },
   { slug: 'raycast', zh: 'Raycast', en: 'Raycast', dZh: '极速启动器与命令面板，免费版已很强大。', dEn: 'A blazing-fast launcher; the free tier is already powerful.', price: '免费 + Pro', badge: 'free' },
   { slug: 'bear', zh: 'Bear', en: 'Bear', dZh: '精美简洁的 Markdown 笔记应用。', dEn: 'A beautiful, minimal Markdown notes app.', price: '免费 + Pro', badge: 'free' },
 ];
 
 const trial: any[] = [
-  { slug: 'setapp', zh: 'Setapp', en: 'Setapp', dZh: '7 天免费试用，一个订阅畅用 240+ 款应用。', dEn: '7-day free trial; 240+ apps in one subscription.', price: '$9.99/月起', badge: 'trial', url: 'https://setapp.com' },
-  { slug: 'cleanmymac-x', zh: 'CleanMyMac X', en: 'CleanMyMac X', dZh: '清理、提速、卸载，Mac 维护首选。', dEn: 'Cleanup, speed boost and uninstaller — the top Mac maintenance tool.', price: '$39.95/年起', badge: 'trial', url: 'https://macpaw.com/cleanmymac' },
+  { slug: 'setapp', zh: 'Setapp', en: 'Setapp', dZh: '7 天免费试用，一个订阅畅用 240+ 款精选应用。', dEn: '7-day free trial — 240+ curated apps in one subscription.', price: '$9.99/月', badge: 'trial', url: 'https://setapp.com' },
   { slug: 'parallels-desktop', zh: 'Parallels Desktop', en: 'Parallels Desktop', dZh: '14 天免费试用，在 Mac 上运行 Windows/Linux。', dEn: '14-day free trial; run Windows and Linux on your Mac.', price: '$99.99/年', badge: 'trial', url: 'https://www.parallels.com' },
   { slug: '1password', zh: '1Password', en: '1Password', dZh: '14 天免费试用，安全存储并自动填充密码。', dEn: '14-day free trial; store and autofill all your passwords.', price: '$2.99/月', badge: 'trial', url: 'https://1password.com' },
 ];
 
-const value: any[] = [
-  { slug: 'daisydisk', zh: 'DaisyDisk', en: 'DaisyDisk', dZh: '可视化揪出占满磁盘的大文件。', dEn: 'Visualize and delete the large files eating your disk.', price: '$9.99', badge: 'value', url: 'https://daisydiskapp.com' },
-  { slug: 'magnet', zh: 'Magnet', en: 'Magnet', dZh: '拖拽即可窗口分屏，经典便宜好用。', dEn: 'Drag to snap windows — classic, cheap and reliable.', price: '$4.99', badge: 'value', url: 'https://magnet.crowdcafe.com' },
-  { slug: 'mindnode', zh: 'MindNode', en: 'MindNode', dZh: '优雅的思维导图，梳理思路。', dEn: 'An elegant mind-mapping tool for organizing ideas.', price: '$19.99', badge: 'value', url: 'https://www.mindnode.com' },
+const onetime: any[] = [
+  { slug: 'daisydisk', zh: 'DaisyDisk', en: 'DaisyDisk', dZh: '可视化揪出占满磁盘的大文件，买断制，无订阅。', dEn: 'Visualize and delete the large files eating your disk — one-time purchase.', price: '$9.99 买断', badge: 'onetime', url: 'https://daisydiskapp.com' },
+  { slug: 'magnet', zh: 'Magnet', en: 'Magnet', dZh: '拖拽即可窗口分屏，经典便宜好用，一次付费永久使用。', dEn: 'Drag to snap windows — classic, cheap, and pay once.', price: '$4.99 买断', badge: 'onetime', url: 'https://magnet.crowdcafe.com' },
+  { slug: 'cleanshot-x', zh: 'CleanShot X', en: 'CleanShot X', dZh: '截图、标注、录屏一体，Mac 上最顺手的截图工具。', dEn: 'Screenshots, annotation and screen recording in one polished tool.', price: '$29 起买断', badge: 'onetime', url: 'https://cleanshot.com' },
+  { slug: 'things-3', zh: 'Things 3', en: 'Things 3', dZh: '设计感极强的待办管理，买断制，跨设备一次性付费。', dEn: 'Beautifully designed task manager with a buy-once model per platform.', price: '$49.99 买断', badge: 'onetime', url: 'https://culturedcode.com/things/' },
+  { slug: 'mindnode', zh: 'MindNode', en: 'MindNode', dZh: '优雅的思维导图，梳理思路、做大纲都合适。', dEn: 'An elegant mind-mapping tool for organizing ideas and outlines.', price: '$19.99 起', badge: 'onetime', url: 'https://www.mindnode.com' },
+  { slug: 'final-cut-pro', zh: 'Final Cut Pro', en: 'Final Cut Pro', dZh: 'Apple 官方剪辑软件，一次买断，无订阅，后续大版本免费升级。', dEn: 'Apple\u2019s pro editor — buy once, no subscription, free major updates.', price: '$299.99 买断', badge: 'onetime', url: 'https://www.apple.com/final-cut-pro/' },
+];
+
+const bundle: any[] = [
+  { slug: 'setapp', zh: 'Setapp', en: 'Setapp', dZh: '一份订阅覆盖 240+ 款应用，重度用户比逐个买断更省。', dEn: 'One subscription covering 240+ apps — cheaper than buying them individually.', price: '$9.99/月起', badge: 'bundle', url: 'https://setapp.com' },
+  { slug: 'ulysses', zh: 'Ulysses', en: 'Ulysses', dZh: '专业写作工具，订阅制可跨 Mac / iPad / iPhone 同步。', dEn: 'Professional writing app with a subscription across Mac, iPad and iPhone.', price: '$5.99/月', badge: 'bundle', url: 'https://ulysses.app' },
+  { slug: '1password', zh: '1Password', en: '1Password', dZh: '家庭方案最多 5 人共享，人均成本比个人版低不少。', dEn: 'Family plan shares with up to five people, lowering the per-person cost.', price: '$4.99/月（家庭）', badge: 'bundle', url: 'https://1password.com' },
+];
+
+const student: any[] = [
+  { slug: 'notion', zh: 'Notion', en: 'Notion', dZh: '学生与教师用校园邮箱可免费使用个人 Pro 版。', dEn: 'Free Personal Pro plan for students and teachers with a school email.', price: '教育免费', badge: 'student', url: 'https://www.notion.so/product/notion-for-education' },
+  { slug: 'setapp', zh: 'Setapp', en: 'Setapp', dZh: '不定期提供学生优惠，符合条件可按折扣价订阅。', dEn: 'Periodic student discounts for eligible learners.', price: '学生折扣', badge: 'student', url: 'https://setapp.com' },
+  { slug: 'parallels-desktop', zh: 'Parallels Desktop', en: 'Parallels Desktop', dZh: '面向在校学生与教职员工提供教育版价格。', dEn: 'Education pricing for enrolled students and staff.', price: '教育优惠', badge: 'student', url: 'https://www.parallels.com' },
 ];
 
 const sections = [
   { key: 'free', zh: '免费软件', en: 'Free Apps', descZh: '完全免费，放心用。', descEn: 'Completely free — use with confidence.' },
-  { key: 'trial', zh: '官方试用', en: 'Free Trials', descZh: '官方试用，先试后买。', descEn: 'Official free trials — try before you buy.' },
-  { key: 'value', zh: '高性价比', en: 'Best Value', descZh: '便宜好用的一次性买断。', descEn: 'Affordable one-time purchases.' },
+  { key: 'trial', zh: '官方试用', en: 'Free Trials', descZh: '先试后买，到期前可退。', descEn: 'Try before you buy — cancel anytime before it ends.' },
+  { key: 'onetime', zh: '一次性买断', en: 'One-Time Purchase', descZh: '付一次，永久用，没有续费焦虑。', descEn: 'Pay once, own it forever — no renewal anxiety.' },
+  { key: 'bundle', zh: '打包订阅', en: 'Bundles & Subscriptions', descZh: '多款软件打包，重度用户更划算。', descEn: 'Multiple apps in one plan — better value for heavy users.' },
+  { key: 'student', zh: '学生与教育', en: 'Students & Education', descZh: '在校学生和教师的专属优惠。', descEn: 'Discounts for students and teachers.' },
 ];
 
-const badgeZh: Record<string, string> = { free: '免费', trial: '试用', value: '性价比' };
-const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', value: 'Value' };
+const badgeZh: Record<string, string> = { free: '免费', trial: '试用', onetime: '买断', bundle: '打包', student: '教育' };
+const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', onetime: 'One-time', bundle: 'Bundle', student: 'Student' };
+
+const priceModels = [
+  {
+    tag: '订阅 Subscription',
+    tone: 'sub',
+    title: '按时间付费，随时可停',
+    good: '前期门槛低，跨设备同步和新功能更新通常包含在内。',
+    watch: '长期算下来总成本最高。记得看清续费价格，首年优惠往往不等于长期价格。',
+  },
+  {
+    tag: '买断 One-time',
+    tone: 'buy',
+    title: '付一次，永久使用',
+    good: '总成本可控，没有续费压力。美国用户对这类授权接受度明显最高。',
+    watch: '大版本升级有时需要再付费，购买前确认升级政策。',
+  },
+  {
+    tag: '打包 Bundle',
+    tone: 'bundle',
+    title: '多款应用一份钱',
+    good: '如果你本来就需要其中两三款，打包价通常比单买划算很多。',
+    watch: '只为「看起来划算」而订阅，最后常用的还是那一两款。',
+  },
+];
 ---
+
 <BaseLayout title={title} description={description} path="/deals">
   <div class="container" style="padding-top:40px">
     <h1 style="font-size:34px;margin:0 0 8px"><span class="zh">优惠情报</span><span class="en">Deals</span></h1>
-    <p style="color:var(--ink-2);margin:0 0 28px;max-width:640px">
-      <span class="zh">精选免费软件、官方试用与高性价比工具，链接均为官方渠道。</span>
-      <span class="en">Free apps, official trials and best-value tools — all links go to official channels.</span>
+    <p style="color:var(--ink-2);margin:0 0 22px;max-width:700px">
+      <span class="zh">精选免费软件、官方试用、一次性买断与打包订阅，按付费方式分类，链接均为官方渠道。</span>
+      <span class="en">Free apps, official trials, one-time purchases and bundles — grouped by how you pay. All links go to official channels.</span>
     </p>
+
+    <div class="notice">
+      <strong>💡 为什么按「怎么付钱」来分类</strong>
+      <p>
+        订阅还是买断，直接决定你三年后为这款软件花了多少钱。美国用户对「一次性买断」的接受度远高于长期订阅，
+        所以这里把买断授权单独拎出来，方便你一眼看到哪些是付一次就能一直用的。
+      </p>
+    </div>
 
     {sections.map((sec) => (
       <section class="deal-section">
@@ -51,7 +101,7 @@ const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', value: '
           <span style="font-size:13px;color:var(--ink-2)"><span class="zh">{sec.descZh}</span><span class="en">{sec.descEn}</span></span>
         </div>
         <div class="grid">
-          {(sec.key === 'free' ? free : sec.key === 'trial' ? trial : value).map((d: any) => (
+          {(sec.key === 'free' ? free : sec.key === 'trial' ? trial : sec.key === 'onetime' ? onetime : sec.key === 'bundle' ? bundle : student).map((d: any) => (
             <a class="card deal-card" href={d.url || '#'} target="_blank" rel="nofollow sponsored">
               <div class="card-row">
                 <img class="app-icon" src={`/images/apps/${d.slug}.png`} alt={d.zh} width="48" height="48" loading="lazy" />
@@ -73,6 +123,21 @@ const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', value: '
       </section>
     ))}
 
+    <section class="price-guide">
+      <h2>三种付费方式，怎么选</h2>
+      <p class="price-guide-sub">买之前先问自己一句：这款软件我三年后还会用吗？会，就优先买断；不确定，就先试用。</p>
+      <div class="price-grid">
+        {priceModels.map((model) => (
+          <article class={`price-card ${model.tone}`}>
+            <span class="price-tag">{model.tag}</span>
+            <h3>{model.title}</h3>
+            <p class="price-good"><strong>优点</strong>{model.good}</p>
+            <p class="price-watch"><strong>注意</strong>{model.watch}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
     <section class="deal-note">
       <p>
         <span class="zh">💡 优惠信息会不定期更新；价格以官方页面为准。部分链接为联盟链接，购买不会增加你的花费，但可能为我们带来佣金。</span>
@@ -85,13 +150,33 @@ const badgeEn: Record<string, string> = { free: 'Free', trial: 'Trial', value: '
 </BaseLayout>
 
 <style>
+  .notice { margin: 0 0 26px; padding: 18px 22px; border: 1px solid #cfe6ff; border-radius: 16px; background: linear-gradient(135deg,#eef7ff,#f7fbff); }
+  .notice strong { display: block; margin-bottom: 6px; color: #0b66c3; font-size: 15px; }
+  .notice p { margin: 0; color: #344054; font-size: 14.5px; line-height: 1.8; }
   .deal-section { margin: 28px 0; }
   .deal-card { text-decoration: none; color: inherit; }
   .deal-card:hover { border-color: var(--blue); }
   .badge.free { background: #e6f4ea; color: #1d7a3b; }
   .badge.trial { background: #e8f0fe; color: #0066cc; }
-  .badge.value { background: #fff1e0; color: #b45309; }
+  .badge.onetime { background: #fff1e0; color: #b45309; }
+  .badge.bundle { background: #eef0ff; color: #4f46e5; }
+  .badge.student { background: #f0e9ff; color: #7c3aed; }
   .deal-go { color: var(--blue); font-weight: 600; }
+  .price-guide { margin: 40px 0 28px; padding: 26px; border: 1px solid #e4e8f0; border-radius: 22px; background: #f9fbfe; }
+  .price-guide h2 { margin: 0 0 8px; font-size: 23px; }
+  .price-guide-sub { margin: 0 0 20px; color: #475467; font-size: 14.5px; line-height: 1.8; }
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .price-card { padding: 20px; border-radius: 16px; background: #fff; border: 1px solid #e4e8f0; }
+  .price-card h3 { margin: 10px 0 12px; font-size: 17px; }
+  .price-tag { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .price-card.sub .price-tag { background: #e8f0fe; color: #0066cc; }
+  .price-card.buy .price-tag { background: #fff1e0; color: #b45309; }
+  .price-card.bundle .price-tag { background: #eef0ff; color: #4f46e5; }
+  .price-card p { margin: 0 0 10px; font-size: 14px; line-height: 1.75; color: #475467; }
+  .price-card p:last-child { margin-bottom: 0; }
+  .price-card strong { display: block; margin-bottom: 3px; font-size: 13px; color: #172033; }
+  .price-card .price-good strong { color: #1d7a3b; }
+  .price-card .price-watch strong { color: #b45309; }
   .deal-note {
     margin: 28px 0;
     padding: 16px 20px;
