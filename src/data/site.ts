@@ -8,7 +8,7 @@ export const site = {
   url: 'https://www.macmp.com',
   title: 'MacMP',
   description: '发现好用的 Mac 软件与优惠。',
-  contact: 'hello@macmp.com',
+  contact: 'macmp@qq.com',
 
   // 统计：Google Analytics (gtag) 与百度统计，填了 ID 才会注入脚本
   googleAnalyticsId: '', // 例：'G-XXXXXXXXXX'

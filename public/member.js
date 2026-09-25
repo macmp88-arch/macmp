@@ -546,7 +546,7 @@
     }
     const paypalOrderId = new URLSearchParams(location.search).get('token');
     if (!paypalOrderId) {
-      setMessage(message, '没有找到 PayPal 订单号。如果已经付款，请联系 hello@macmp.com。', 'error');
+      setMessage(message, '没有找到 PayPal 订单号。如果已经付款，请联系 macmp@qq.com。', 'error');
       return;
     }
     try {

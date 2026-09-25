@@ -50,5 +50,5 @@ export const membershipPlans: MembershipPlan[] = [
 export const membershipAssets = {
   wechatQr: '/images/pay-wechat.jpg',
   alipayQr: '/images/pay-alipay.jpg',
-  supportEmail: 'hello@macmp.com',
+  supportEmail: 'macmp@qq.com',
 };
