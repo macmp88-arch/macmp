@@ -1,0 +1,20 @@
+---
+import MemberLayout from '../../layouts/MemberLayout.astro';
+---
+<MemberLayout title="VIP 内容库" path="/vip/content" page="content">
+  <section class="member-section">
+    <div class="container">
+      <div class="member-section-head">
+        <div>
+          <p class="member-eyebrow">VIP Library</p>
+          <h2>VIP 内容库</h2>
+          <p>模板、工程文件、软件工作流和深度实战内容。</p>
+        </div>
+        <a class="member-btn ghost" href="/vip/account/">我的账户</a>
+      </div>
+      <div class="member-message" id="contentMessage">正在验证会员权限…</div>
+      <div class="content-list" id="contentList" hidden></div>
+      <article class="vip-content" id="vipPost" hidden></article>
+    </div>
+  </section>
+</MemberLayout>

@@ -1,0 +1,28 @@
+name: Process membership email queue
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger email queue
+        env:
+          MEMBERSHIP_EMAIL_URL: ${{ vars.MEMBERSHIP_EMAIL_URL }}
+          MEMBERSHIP_CRON_SECRET: ${{ secrets.MEMBERSHIP_CRON_SECRET }}
+        run: |
+          if [ -z "$MEMBERSHIP_EMAIL_URL" ] || [ -z "$MEMBERSHIP_CRON_SECRET" ]; then
+            echo "Membership email queue is not configured; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --retry 3 \
+            -X POST "$MEMBERSHIP_EMAIL_URL" \
+            -H "x-cron-secret: $MEMBERSHIP_CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --data '{}'

@@ -29,6 +29,10 @@ macmp/
 
 ## 上线前必做（重要）
 
+会员系统部署、Supabase、PayPal、Resend 和邮件队列配置见
+[`docs/membership-setup.md`](docs/membership-setup.md)。未配置前请保持
+`PUBLIC_MEMBER_ENABLED=false`，主站不会显示会员入口。
+
 1. **替换联盟 ID**：编辑 `src/data/affiliates.ts`，把 `YOUR_ID` 换成你注册到的真实联盟 ID。
    - Setapp：https://setapp.com/affiliate-program （20% 长期分成，优先）
    - MacPaw：https://macpaw.com/affiliate （35% CPS，Cookie 180 天）

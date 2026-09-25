@@ -19,6 +19,7 @@ const categories = [
 
 const directory = apps.slice(0, 24);
 const featuredGuides = guides.filter((guide) => guide.featured).slice(0, 4);
+const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
 ---
 <BaseLayout path="/">
   <section class="hero" style="padding-bottom:20px">
@@ -28,6 +29,7 @@ const featuredGuides = guides.filter((guide) => guide.featured).slice(0, 4);
     <div class="hero-links">
       <a href="/software/"><span class="zh">浏览全部软件</span><span class="en">Browse all software</span></a>
       <a href="/deals/"><span class="zh">查看优惠情报</span><span class="en">View deals</span></a>
+      {memberEnabled && <a href="/vip/"><span class="zh">加入 VIP 会员</span><span class="en">Join VIP</span></a>}
     </div>
     <form class="hero-search" action="/software/" method="get">
       <input type="search" name="q" placeholder="搜索软件… Search…" autocomplete="off" />
@@ -70,6 +72,20 @@ const featuredGuides = guides.filter((guide) => guide.featured).slice(0, 4);
       ))}
     </div>
   </section>
+
+  <!-- VIP 会员 -->
+  {memberEnabled && (
+    <section class="container" style="padding-top:42px">
+      <div class="tile vip-tile" style="background: linear-gradient(135deg,#071a33 0%,#0b66c3 58%,#56b4ff 100%); min-height:310px">
+        <p class="tile-eyebrow"><span class="zh">MacMP VIP</span><span class="en">MacMP VIP</span></p>
+        <h3><span class="zh">把内容变成可下载、可复用的工作流。</span><span class="en">Turn guides into reusable workflows.</span></h3>
+        <p><span class="zh">邮箱注册后，可选择国内扫码支付或 PayPal 美元支付，获取模板、工程文件、软件优惠情报和后续新增资料。</span><span class="en">Register by email, pay with WeChat/Alipay or PayPal, and unlock templates, project files and ongoing resources.</span></p>
+        <div class="tile-links">
+          <a href="/vip/"><span class="zh">查看会员方案</span><span class="en">View membership</span></a>
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- 专题指南 -->
   <section class="section container">

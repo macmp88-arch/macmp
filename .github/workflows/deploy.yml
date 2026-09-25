@@ -31,6 +31,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Build
+        env:
+          PUBLIC_MEMBER_ENABLED: ${{ vars.PUBLIC_MEMBER_ENABLED }}
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ vars.PUBLIC_SUPABASE_ANON_KEY }}
+          PUBLIC_SUPABASE_FUNCTIONS_URL: ${{ vars.PUBLIC_SUPABASE_FUNCTIONS_URL }}
+          PUBLIC_PAYPAL_CLIENT_ID: ${{ vars.PUBLIC_PAYPAL_CLIENT_ID }}
         run: pnpm build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

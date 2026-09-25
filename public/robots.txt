@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /vip/
 
 Sitemap: https://www.macmp.com/sitemap-index.xml

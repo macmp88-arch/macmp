@@ -1,0 +1,16 @@
+---
+import MemberLayout from '../../../layouts/MemberLayout.astro';
+---
+<MemberLayout title="PayPal 支付确认" path="/vip/paypal/return" page="paypal-return">
+  <section class="member-section">
+    <div class="container" style="max-width:760px">
+      <div class="member-panel">
+        <p class="member-eyebrow">PayPal</p>
+        <h1 style="font-size:36px;margin:10px 0">正在确认支付</h1>
+        <p>请不要关闭页面。系统正在向 PayPal 服务端确认订单并开通会员。</p>
+        <div class="member-message" id="paypalMessage">正在处理…</div>
+        <p style="margin-top:20px"><a class="member-btn primary" href="/vip/account/">返回我的账户</a></p>
+      </div>
+    </div>
+  </section>
+</MemberLayout>

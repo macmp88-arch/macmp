@@ -1,0 +1,85 @@
+---
+import MemberLayout from '../../layouts/MemberLayout.astro';
+import { membershipPlans } from '../../data/membership';
+
+const pageTitle = 'MacMP VIP 会员';
+const pageDescription = '邮箱注册后，选择国内扫码支付或 PayPal 美元支付，解锁 Mac 软件工作流、模板和深度指南。';
+---
+<MemberLayout title={pageTitle} description={pageDescription} path="/vip" page="home">
+  <section class="member-hero">
+    <div class="container member-hero-grid">
+      <div>
+        <p class="member-eyebrow">MacMP Membership</p>
+        <h1>把零散软件，变成能长期使用的工作流。</h1>
+        <p>邮箱注册后，可使用微信或支付宝扫码支付，也可以用 PayPal 美元支付。VIP 内容包括深度指南、模板、工程文件、软件优惠情报和后续新增资料。</p>
+        <div class="member-proof">
+          <span><strong>邮箱登录</strong> · 无需记住复杂密码</span>
+          <span><strong>国内支付</strong> · 微信 / 支付宝</span>
+          <span><strong>海外支付</strong> · PayPal USD</span>
+        </div>
+      </div>
+      <aside class="member-panel">
+        <h2>开通流程</h2>
+        <div class="member-steps">
+          <div class="member-step"><b>1</b><span>填写邮箱，收到安全登录链接。</span></div>
+          <div class="member-step"><b>2</b><span>选择套餐和支付方式。</span></div>
+          <div class="member-step"><b>3</b><span>国内扫码支付后提交订单；PayPal 支付成功后自动开通。</span></div>
+          <div class="member-step"><b>4</b><span>从会员中心访问 VIP 内容和后续资料。</span></div>
+        </div>
+        <p style="margin:20px 0 0"><a class="member-btn primary" href="/vip/login/">邮箱注册 / 登录</a></p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="member-section">
+    <div class="container">
+      <div class="member-section-head">
+        <div>
+          <h2>选择会员方案</h2>
+          <p>国内用户扫码支付；海外用户使用 PayPal 美元结算。</p>
+        </div>
+        <span class="member-note" style="max-width:340px">价格和权益可在 Supabase 与源码中调整。年付不会自动续费，到期前会邮件提醒。</span>
+      </div>
+
+      <div class="plan-grid">
+        {membershipPlans.map((plan) => (
+          <article class={`plan-card${plan.featured ? ' featured' : ''}`}>
+            {plan.badge && <span class="plan-badge">{plan.badge}</span>}
+            <h3>{plan.name}</h3>
+            <p>{plan.description}</p>
+            <div class="plan-price">
+              <strong>¥{plan.priceCny}</strong>
+              <span>/ ${plan.priceUsd} · {plan.durationDays ? `${plan.durationDays} 天` : '终身'}</span>
+            </div>
+            <ul class="plan-features">
+              {plan.features.map((feature) => <li>{feature}</li>)}
+            </ul>
+            <div class="plan-actions">
+              <button class="member-btn primary" type="button" data-plan={plan.slug} data-provider="wechat">微信支付</button>
+              <button class="member-btn ghost" type="button" data-plan={plan.slug} data-provider="alipay">支付宝</button>
+              <button class="member-btn ghost" type="button" data-plan={plan.slug} data-provider="paypal">PayPal USD</button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="member-note" style="margin-top:20px">
+        <strong>支付说明：</strong>国内静态二维码无法自动收到支付回调，因此第一版采用“订单号 + 人工审核”。付款时请填写页面生成的订单号。支付完成后点击“我已完成支付”，管理员确认后系统会自动开通 VIP。PayPal 支付通过服务端校验并自动开通。
+      </div>
+    </div>
+  </section>
+
+  <div class="member-modal" id="paymentModal" aria-hidden="true">
+    <div class="member-modal-card">
+      <div class="member-modal-head">
+        <div>
+          <p class="member-eyebrow">Payment</p>
+          <h2 id="paymentTitle" style="margin-bottom:0">完成支付</h2>
+        </div>
+        <button class="member-close" type="button" data-close-modal aria-label="关闭">×</button>
+      </div>
+      <div id="paymentMessage" class="member-message" hidden></div>
+      <div id="paymentBody"></div>
+    </div>
+  </div>
+</MemberLayout>

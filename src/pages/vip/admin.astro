@@ -1,0 +1,24 @@
+---
+import MemberLayout from '../../layouts/MemberLayout.astro';
+---
+<MemberLayout title="VIP 订单管理" path="/vip/admin" page="admin">
+  <section class="member-section">
+    <div class="container">
+      <div class="member-section-head">
+        <div>
+          <p class="member-eyebrow">Admin</p>
+          <h2>订单审核后台</h2>
+          <p>核对国内扫码订单，批准后自动开通 VIP。</p>
+        </div>
+        <button class="member-btn ghost" type="button" id="adminRefresh">刷新订单</button>
+      </div>
+      <div class="member-message" id="adminMessage">正在读取待审核订单…</div>
+      <div class="member-table-wrap member-card">
+        <table class="member-table">
+          <thead><tr><th>订单号</th><th>用户</th><th>套餐</th><th>金额</th><th>支付方式</th><th>提交时间</th><th>操作</th></tr></thead>
+          <tbody id="adminOrders"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</MemberLayout>

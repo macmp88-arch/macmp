@@ -7,6 +7,7 @@ interface Props {
   description?: string;
   path?: string;
   image?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -14,16 +15,19 @@ const {
   description = 'MacMP 专注精选正版 Mac 软件、优惠情报、工作流指南与本地 AI 教程，帮你把 Mac 用得更好。',
   path = '/',
   image = '/favicon.svg',
+  noindex = false,
 } = Astro.props;
 
 const ogImage = new URL(image, Astro.site).toString();
 
+const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
 const nav = [
   { href: '/software/', zh: '软件推荐', en: 'Software', active: path.startsWith('/software') },
   { href: '/guides/', zh: '专题指南', en: 'Guides', active: path.startsWith('/guides') },
   { href: '/deals/', zh: '优惠情报', en: 'Deals', active: path.startsWith('/deals') },
   { href: '/ai-local/', zh: '本地 AI', en: 'Local AI', active: path.startsWith('/ai-local') },
   { href: '/support/', zh: '支持我们', en: 'Support', active: path.startsWith('/support') },
+  ...(memberEnabled ? [{ href: '/vip/', zh: 'VIP 会员', en: 'VIP', active: path.startsWith('/vip') }] : []),
 ];
 ---
 <!doctype html>
@@ -34,6 +38,7 @@ const nav = [
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
     <meta name="impact-site-verification" value="4eb0a404-6f68-49ea-afa3-39b9198ef236" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={title} />
@@ -92,6 +97,7 @@ const nav = [
               <li><a href="/guides/"><span class="zh">专题指南</span><span class="en">Guides</span></a></li>
               <li><a href="/deals/"><span class="zh">优惠情报</span><span class="en">Deals</span></a></li>
               <li><a href="/ai-local/"><span class="zh">本地 AI</span><span class="en">Local AI</span></a></li>
+              {memberEnabled && <li><a href="/vip/"><span class="zh">VIP 会员</span><span class="en">VIP Membership</span></a></li>}
             </ul>
           </div>
           <div>

@@ -1,0 +1,92 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '../styles/member.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  path: string;
+  page: 'home' | 'login' | 'account' | 'content' | 'admin' | 'paypal-return';
+}
+
+const {
+  title,
+  description = 'MacMP VIP 会员中心：Mac 软件、工作流模板与深度指南。',
+  path,
+  page,
+} = Astro.props;
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
+const paypalClientId = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID || '';
+const functionsUrl = import.meta.env.PUBLIC_SUPABASE_FUNCTIONS_URL || (supabaseUrl ? `${supabaseUrl}/functions/v1` : '');
+const enabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true' && Boolean(supabaseUrl && supabaseAnonKey);
+
+const memberConfig = {
+  enabled,
+  supabaseUrl,
+  supabaseAnonKey,
+  functionsUrl,
+  paypalClientId,
+  siteUrl: Astro.site?.toString() || 'https://www.macmp.com',
+};
+
+const nav = [
+  { href: '/vip/', label: '会员首页' },
+  { href: '/vip/account/', label: '我的账户' },
+  { href: '/vip/content/', label: 'VIP 内容' },
+];
+const activeHref = nav.find((item) => path === item.href.replace(/\/$/, ''))?.href;
+---
+<BaseLayout title={`${title} · MacMP`} description={description} path={path} noindex>
+  <div class="member-shell" data-member-page={page}>
+    <header class="member-subnav">
+      <div class="container member-subnav-inner">
+        <a class="member-subnav-brand" href="/vip/">
+          <span>MacMP</span><strong>VIP</strong>
+        </a>
+        <nav>
+          {nav.map((item) => <a href={item.href} class={item.href === activeHref ? 'active' : ''}>{item.label}</a>)}
+          <a href="/">返回主站</a>
+        </nav>
+      </div>
+    </header>
+
+    {!enabled && (
+      <div class="container" style="padding-top:22px">
+        <div class="member-message error">
+          会员系统前端已就绪，但 Supabase 环境变量尚未配置。配置 <code>PUBLIC_MEMBER_ENABLED</code>、<code>PUBLIC_SUPABASE_URL</code> 和 <code>PUBLIC_SUPABASE_ANON_KEY</code> 后即可启用邮箱登录与支付流程。
+        </div>
+      </div>
+    )}
+
+    <slot />
+
+    <footer class="member-footer-note">
+      <div class="container">
+        <p>MacMP VIP 仅提供原创教程、模板与原文件下载。请勿传播、转售或用于侵权用途。</p>
+        <p><a href="/about/">关于与联盟披露</a> · <a href="mailto:hello@macmp.com">hello@macmp.com</a></p>
+      </div>
+    </footer>
+  </div>
+
+  <script define:vars={{ memberConfig }}>
+    window.__MACMP_MEMBER_CONFIG__ = memberConfig;
+  </script>
+  <script src="/member.js" defer></script>
+</BaseLayout>
+
+<style>
+  .member-subnav { border-bottom: 1px solid #e4e8f0; background: rgba(255,255,255,.92); backdrop-filter: blur(16px); position: sticky; top: 52px; z-index: 40; }
+  .member-subnav-inner { height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .member-subnav-brand { display: inline-flex; align-items: center; gap: 4px; color: #172033; font-weight: 800; }
+  .member-subnav-brand strong { color: #0071e3; }
+  .member-subnav nav { display: flex; gap: 20px; align-items: center; font-size: 14px; }
+  .member-subnav nav a { color: #667085; }
+  .member-subnav nav a.active, .member-subnav nav a:hover { color: #0071e3; text-decoration: none; }
+  @media (max-width: 640px) {
+    .member-subnav { top: 0; }
+    .member-subnav-inner { height: auto; padding-top: 10px; padding-bottom: 10px; align-items: flex-start; }
+    .member-subnav nav { flex-wrap: wrap; justify-content: flex-end; gap: 10px 14px; }
+  }
+</style>
