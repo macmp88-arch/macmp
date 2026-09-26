@@ -83,11 +83,11 @@ const factors = [
 const faqs = [
   {
     q: '这里的伦敦金 K 线是实时行情吗？',
-    a: '页面使用 TradingView 组件，默认显示 5 分钟 K 线，并可切换 15 分钟、1 小时、4 小时、日线和月线。实际延迟和是否实时取决于 TradingView、OANDA 的数据授权、地区和账户权限；K线周期不等于数据延迟。正式交易请以持牌机构数据为准。',
+    a: '页面使用 TradingView Lightweight Charts 绘图组件，数据来自东方财富公开行情接口。默认显示 5 分钟 K 线，并可切换 15 分钟、1 小时、4 小时、日线和月线。公开接口可能存在延迟；K线周期不等于数据延迟。正式交易请以持牌机构数据为准。',
   },
   {
     q: '能做到严格 5 分钟延迟吗？',
-    a: '可以设定 5 分钟 K 线周期，但“数据延迟不超过 5 分钟”属于行情授权问题。免费 TradingView 组件不能承诺；要严格做到，需要接入提供 5 分钟延迟或实时授权的数据商、经纪商行情，并确认商用再分发许可。',
+    a: '可以设定 5 分钟 K 线周期，但“数据延迟不超过 5 分钟”属于行情授权与数据源问题。当前免费方案只展示公开行情，不能承诺严格 5 分钟延迟；要严格做到，需要接入提供 5 分钟延迟或实时授权的数据商、经纪商行情，并确认商用再分发许可。',
   },
   {
     q: 'VIP 能看到主力资金买入和卖出吗？',
@@ -95,7 +95,7 @@ const faqs = [
   },
   {
     q: '这里会提供买卖建议吗？',
-    a: '不会。页面只做行情入口、官方来源导航和宏观背景说明，不提供个性化投资建议、跟单信号或收益承诺。',
+    a: '不会。页面只做行情入口、官方来源导航和宏观背景说明，不提供个性化投资建议、跟单信号或收益承诺。公开行情可能延迟，任何交易决策都应以持牌机构数据为准。',
   },
   {
     q: '为什么只链接官方新闻源？',
@@ -167,9 +167,9 @@ const faqJsonLd = {
             <span class="tag">行情图表</span>
             <h2>XAU/USD · 伦敦金</h2>
           </div>
-          <a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank" rel="noopener">打开完整行情 →</a>
+          <a href="https://quote.eastmoney.com/q/122.XAU.html" target="_blank" rel="noopener">打开完整行情 →</a>
         </div>
-        <p class="chart-note">默认 5 分钟；上方可切换 15 分钟、1 小时、4 小时、日线、月线。是否实时、延迟多少取决于 TradingView / OANDA 的数据授权与地区。</p>
+        <p class="chart-note">默认 5 分钟；上方可切换 15 分钟、1 小时、4 小时、日线、月线。优先读取东方财富伦敦金公开行情；接口受限时自动切换为 PAXG/USD 黄金参考 K 线。</p>
         <div class="timeframe-bar" role="group" aria-label="K线周期">
           <button type="button" class="tf-btn active" data-tf="5" aria-pressed="true">5 分钟</button>
           <button type="button" class="tf-btn" data-tf="15" aria-pressed="false">15 分钟</button>
@@ -180,16 +180,83 @@ const faqJsonLd = {
           <span class="pro-tools">可添加：MA / EMA / 成交量 / RSI / MACD / 布林带</span>
         </div>
         <div id="tv-gold-chart" class="gold-chart" aria-label="伦敦金 K 线图"></div>
-        <p class="chart-fallback">如果图表未加载，请直接打开 TradingView 查看完整行情。</p>
-        <script src="https://s3.tradingview.com/tv.js" is:inline></script>
+        <p class="chart-fallback" id="goldChartStatus">正在连接伦敦金公开行情…</p>
+        <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js" is:inline></script>
         <script is:inline>
           (function () {
             var container = document.getElementById('tv-gold-chart');
-            if (!container || !window.TradingView) return;
+            var status = document.getElementById('goldChartStatus');
             var buttons = Array.prototype.slice.call(document.querySelectorAll('.tf-btn[data-tf]'));
-            var widget = null;
-            var ready = false;
-            var pending = '5';
+            if (!container || !window.LightweightCharts) {
+              if (status) status.textContent = '图表组件加载失败，请刷新页面后重试。';
+              return;
+            }
+
+            var presets = {
+              '5': { klt: '5', lmt: 260, seconds: 300, days: 1, label: '5 分钟' },
+              '15': { klt: '15', lmt: 260, seconds: 900, days: 2, label: '15 分钟' },
+              '60': { klt: '60', lmt: 320, seconds: 3600, days: 14, label: '1 小时' },
+              '240': { klt: '60', lmt: 640, aggregate: 4, seconds: 14400, days: 30, label: '4 小时' },
+              '1D': { klt: '101', lmt: 260, seconds: 86400, days: 365, label: '日线' },
+              '1M': { klt: '103', lmt: 120, monthly: true, days: 365, label: '月线' }
+            };
+            var current = '5';
+            var loading = false;
+            var refreshTimer = null;
+            var chart = window.LightweightCharts.createChart(container, {
+              width: container.clientWidth,
+              height: container.clientHeight,
+              layout: { background: { color: '#ffffff' }, textColor: '#667085' },
+              grid: {
+                vertLines: { color: '#f0f2f5' },
+                horzLines: { color: '#f0f2f5' }
+              },
+              crosshair: { mode: window.LightweightCharts.CrosshairMode.Normal },
+              rightPriceScale: { borderColor: '#e4e8f0', scaleMargins: { top: 0.08, bottom: 0.22 } },
+              timeScale: {
+                borderColor: '#e4e8f0',
+                timeVisible: true,
+                secondsVisible: false,
+                rightOffset: 4,
+                barSpacing: 8
+              },
+              localization: {
+                locale: 'zh-CN',
+                priceFormatter: function (price) { return price.toFixed(2); }
+              },
+              handleScroll: true,
+              handleScale: true
+            });
+            var candleSeries = chart.addCandlestickSeries({
+              upColor: '#e55353',
+              downColor: '#1f9d68',
+              borderUpColor: '#e55353',
+              borderDownColor: '#1f9d68',
+              wickUpColor: '#e55353',
+              wickDownColor: '#1f9d68',
+              priceLineVisible: true,
+              lastValueVisible: true
+            });
+            var volumeSeries = chart.addHistogramSeries({
+              priceFormat: { type: 'volume' },
+              priceScaleId: '',
+              scaleMargins: { top: 0.82, bottom: 0 }
+            });
+            volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+            var maConfigs = [
+              { period: 5, color: '#0b66c3' },
+              { period: 10, color: '#d69e2e' },
+              { period: 20, color: '#7c3aed' }
+            ];
+            var maSeries = maConfigs.map(function (item) {
+              return chart.addLineSeries({ color: item.color, lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+            });
+
+            function setStatus(text, isError) {
+              if (!status) return;
+              status.textContent = text;
+              status.classList.toggle('is-error', !!isError);
+            }
 
             function setActive(tf) {
               buttons.forEach(function (button) {
@@ -199,62 +266,170 @@ const faqJsonLd = {
               });
             }
 
-            function chartApi() {
-              if (!widget) return null;
-              if (typeof widget.chart === 'function') return widget.chart();
-              if (typeof widget.activeChart === 'function') return widget.activeChart();
-              return null;
+            function parseKlines(rows) {
+              return rows.map(function (row) {
+                var parts = row.split(',');
+                var stamp = Date.parse(parts[0].replace(' ', 'T') + '+08:00');
+                return {
+                  time: Math.floor(stamp / 1000),
+                  open: Number(parts[1]),
+                  close: Number(parts[2]),
+                  high: Number(parts[3]),
+                  low: Number(parts[4]),
+                  volume: Number(parts[5]) || 0
+                };
+              }).filter(function (item) {
+                return Number.isFinite(item.time) && Number.isFinite(item.open) && Number.isFinite(item.close);
+              }).sort(function (a, b) { return a.time - b.time; });
             }
 
-            function applyResolution(tf) {
-              pending = tf;
-              if (!ready) return;
-              var chart = chartApi();
-              if (!chart || typeof chart.setResolution !== 'function') return;
-              var attempts = tf === '1D' ? ['1D', 'D'] : tf === '1M' ? ['1M', 'M'] : [tf];
-              for (var i = 0; i < attempts.length; i += 1) {
-                try {
-                  chart.setResolution(attempts[i]);
-                  return;
-                } catch (error) {
-                  if (i === attempts.length - 1) console.warn('无法切换 K 线周期', error);
+            function aggregate(data, size) {
+              if (size <= 1) return data;
+              var result = [];
+              var bucket = null;
+              data.forEach(function (item) {
+                var slot = Math.floor(item.time / (size * 3600)) * size * 3600;
+                if (!bucket || bucket.time !== slot) {
+                  if (bucket) result.push(bucket);
+                  bucket = { time: slot, open: item.open, close: item.close, high: item.high, low: item.low, volume: item.volume };
+                } else {
+                  bucket.close = item.close;
+                  bucket.high = Math.max(bucket.high, item.high);
+                  bucket.low = Math.min(bucket.low, item.low);
+                  bucket.volume += item.volume;
                 }
+              });
+              if (bucket) result.push(bucket);
+              return result;
+            }
+
+            function movingAverage(data, period) {
+              var result = [];
+              var sum = 0;
+              for (var i = 0; i < data.length; i += 1) {
+                sum += data[i].close;
+                if (i >= period) sum -= data[i - period].close;
+                if (i >= period - 1) result.push({ time: data[i].time, value: sum / period });
+              }
+              return result;
+            }
+
+            function render(data) {
+              if (!data.length) throw new Error('empty data');
+              candleSeries.setData(data);
+              var hasVolume = data.some(function (item) { return item.volume > 0; });
+              volumeSeries.setData(hasVolume ? data.map(function (item) {
+                return {
+                  time: item.time,
+                  value: item.volume,
+                  color: item.close >= item.open ? 'rgba(229,83,83,.34)' : 'rgba(31,157,104,.34)'
+                };
+              }) : []);
+              chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.08, bottom: hasVolume ? 0.22 : 0.04 } });
+              maConfigs.forEach(function (item, index) {
+                maSeries[index].setData(movingAverage(data, item.period));
+              });
+              chart.timeScale().fitContent();
+            }
+
+            function aggregatePrices(points, preset) {
+              var result = [];
+              var bucket = null;
+              points.forEach(function (point) {
+                var time = Math.floor(point[0] / 1000);
+                var price = Number(point[1]);
+                if (!Number.isFinite(time) || !Number.isFinite(price)) return;
+                var slot;
+                if (preset.monthly) {
+                  var date = new Date(time);
+                  slot = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1) / 1000;
+                } else {
+                  slot = Math.floor(time / preset.seconds) * preset.seconds;
+                }
+                if (!bucket || bucket.time !== slot) {
+                  if (bucket) result.push(bucket);
+                  bucket = { time: slot, open: price, close: price, high: price, low: price, volume: 0 };
+                } else {
+                  bucket.close = price;
+                  bucket.high = Math.max(bucket.high, price);
+                  bucket.low = Math.min(bucket.low, price);
+                }
+              });
+              if (bucket) result.push(bucket);
+              return result;
+            }
+
+            async function loadEastmoney(preset) {
+              var params = new URLSearchParams({
+                secid: '122.XAU',
+                fields1: 'f1,f2,f3,f4,f5,f6',
+                fields2: 'f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61',
+                klt: preset.klt,
+                fqt: '1',
+                beg: '0',
+                end: '20500101',
+                lmt: String(preset.lmt)
+              });
+              var response = await fetch('https://push2his.eastmoney.com/api/qt/stock/kline/get?' + params.toString(), { cache: 'no-store' });
+              if (!response.ok) throw new Error('eastmoney http ' + response.status);
+              var payload = await response.json();
+              var rows = payload && payload.data && payload.data.klines;
+              if (!rows || !rows.length) throw new Error('eastmoney empty');
+              return aggregate(parseKlines(rows), preset.aggregate || 1);
+            }
+
+            async function loadPaxg(preset) {
+              var url = 'https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=usd&days=' + preset.days;
+              var response = await fetch(url, { cache: 'no-store' });
+              if (!response.ok) throw new Error('paxg http ' + response.status);
+              var payload = await response.json();
+              if (!payload || !payload.prices || !payload.prices.length) throw new Error('paxg empty');
+              return aggregatePrices(payload.prices, preset);
+            }
+
+            async function load(tf, silent) {
+              if (loading) return;
+              var preset = presets[tf] || presets['5'];
+              loading = true;
+              if (!silent) setStatus('正在加载 ' + preset.label + ' 行情…');
+              try {
+                var liveData = await loadEastmoney(preset);
+                render(liveData.slice(-240));
+                var updated = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                setStatus('东方财富 · 伦敦金公开行情 · ' + preset.label + ' · 更新于 ' + updated + ' · 可能存在延迟');
+              } catch (primaryError) {
+                try {
+                  var fallbackData = await loadPaxg(preset);
+                  render(fallbackData.slice(-240));
+                  setStatus('PAXG/USD 黄金参考 K 线 · 数据来自 CoinGecko · 非伦敦金现货，仅用于趋势参考', false);
+                } catch (fallbackError) {
+                  setStatus('行情加载失败，请直接打开东方财富查看完整行情。', true);
+                }
+              } finally {
+                loading = false;
               }
             }
 
             buttons.forEach(function (button) {
               button.addEventListener('click', function () {
                 var tf = button.getAttribute('data-tf') || '5';
+                current = tf;
                 setActive(tf);
-                applyResolution(tf);
+                load(tf, false);
               });
             });
 
-            widget = new window.TradingView.widget({
-              container_id: 'tv-gold-chart',
-              autosize: true,
-              symbol: 'OANDA:XAUUSD',
-              interval: '5',
-              timezone: 'Asia/Shanghai',
-              theme: 'light',
-              style: '1',
-              locale: 'zh_CN',
-              toolbar_bg: '#f1f3f6',
-              enable_publishing: false,
-              allow_symbol_change: false,
-              withdateranges: true,
-              hide_side_toolbar: false,
-              hide_top_toolbar: false,
-              details: true,
-              save_image: false,
-              studies: ['Volume@tv-basicstudies', 'MASimple@tv-basicstudies'],
-              support_host: 'https://www.tradingview.com'
-            });
+            function resize() {
+              chart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
+            }
+            if (window.ResizeObserver) {
+              new ResizeObserver(resize).observe(container);
+            } else {
+              window.addEventListener('resize', resize);
+            }
 
-            widget.onChartReady(function () {
-              ready = true;
-              applyResolution(pending);
-            });
+            load(current, false);
+            refreshTimer = window.setInterval(function () { load(current, true); }, 60000);
           })();
         </script>
       </div>
@@ -497,8 +672,8 @@ const faqJsonLd = {
     font-size: 12px;
   }
   .gold-chart {
-    height: 620px;
-    min-height: 480px;
+    height: 520px;
+    min-height: 420px;
     overflow: hidden;
     border: 1px solid #eceef2;
     border-radius: 14px;

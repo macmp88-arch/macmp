@@ -44,8 +44,8 @@ const faqs = [
     a: '这两个平台有大量不同作者和不同许可证，同一网站上会同时存在 CC0、CC BY、CC BY-NC 等资源。必须进入单个音频页面查看作者标注的许可证。',
   },
   {
-    q: '本站原创合成音效可以商用吗？',
-    a: '可以用于个人或商业视频项目，也可以下载 WAV 使用；但不得把原始音频单独转售、重新打包成素材库，或作为竞品音效站的核心内容分发。',
+    q: '这一页的婚礼音乐能直接用于商单吗？',
+    a: '这些试听来自 Mixkit 官方免版税音乐库，适合婚礼片、宣传片和商业视频项目。本站只做官方试听与下载入口，不重新托管音频；使用前仍应在单曲下载页确认最新 Mixkit Stock Music Free License。',
   },
   {
     q: '婚礼片和短剧最推荐先看哪里？',
@@ -98,8 +98,8 @@ const faqJsonLd = {
       <p class="eyebrow">免费音效与音乐</p>
       <h1>找声音，不要再翻十个网站。</h1>
       <p class="hero-lead">
-        按剪辑用途整理转场、环境音、婚礼、短剧、玄幻、宣传片、UI 和 Foley。
-        每个来源都标注授权边界，下载直达原始页面，不二次托管别人的音频。
+        精选适合婚礼正片的钢琴、弦乐、竖琴与回忆氛围音乐。
+        在线试听、按段落使用，下载直达 Mixkit 官方授权页面，不二次托管音频。
       </p>
       <div class="hero-actions">
         <a class="hero-btn primary" href="#categories">按用途找音效 →</a>
@@ -110,7 +110,7 @@ const faqJsonLd = {
         <span><strong>{soundCategoryCount}</strong> 个剪辑用途分类</span>
         <span><strong>{soundSourceCount}</strong> 个免费来源</span>
         <span><strong>{soundFreeCommercialCount}</strong> 个标注可商用</span>
-        <span><strong>{soundPreviews.length}</strong> 个原创试听</span>
+        <span><strong>{soundPreviews.length}</strong> 首婚礼配乐</span>
       </div>
     </div>
   </section>
@@ -142,10 +142,10 @@ const faqJsonLd = {
     <section class="sfx-section" id="previews">
       <div class="section-head-sfx">
         <div>
-          <span class="section-tag">原创合成预览</span>
-          <h2>像素材库一样试听和下载</h2>
+          <span class="section-tag">婚礼配乐试听</span>
+          <h2>先听情绪，再回官方下载</h2>
         </div>
-        <p>这组音频由本站合成，避免第三方版权问题。可直接试听、下载 WAV，适合剪辑测试和项目补音。</p>
+        <p>Mixkit 官方免版税曲目，覆盖仪式、誓言、回忆、弟弟线和结尾拥抱等婚礼段落。</p>
       </div>
 
       <div class="preview-grid" id="sfxPreviewGrid">
@@ -174,17 +174,16 @@ const faqJsonLd = {
               <div class="sound-title-row">
                 <div>
                   <h3>{preview.title}</h3>
-                  <span class="sound-title-zh">{preview.titleZh}</span>
+                  <span class="sound-title-zh">{preview.titleZh} · {preview.artist}</span>
                 </div>
                 <span class="sound-duration">{preview.duration}</span>
               </div>
               <div class="tag-row">
-                <span>{preview.category}</span>
-                {preview.tags.map((tag) => <span>{tag}</span>)}
+                {preview.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}
               </div>
               <div class="sound-footer">
-                <span class="sound-license">原创合成 · 可下载 WAV</span>
-                <a class="sound-download" href={preview.file} download aria-label={`下载 ${preview.titleZh}`}>↓</a>
+                <span class="sound-license">{preview.source} · 官方试听</span>
+                <a class="sound-download" href={preview.downloadUrl} target="_blank" rel="noopener" aria-label={`前往 ${preview.source} 下载 ${preview.titleZh}`}>官方下载 ↗</a>
               </div>
             </div>
           </article>
@@ -442,7 +441,7 @@ const faqJsonLd = {
 
 <style>
   .sfx-hero {
-    padding: 70px 0 46px;
+    padding: 44px 0 30px;
     background:
       radial-gradient(circle at 88% 10%, rgba(0, 113, 227, .16), transparent 40%),
       radial-gradient(circle at 10% 90%, rgba(124, 58, 237, .12), transparent 36%),
@@ -450,56 +449,56 @@ const faqJsonLd = {
     border-bottom: 1px solid #e4e8f0;
   }
   .sfx-hero h1 {
-    max-width: 860px;
-    margin: 10px 0 16px;
-    font-size: clamp(38px, 6vw, 66px);
-    line-height: 1.06;
+    max-width: 720px;
+    margin: 6px 0 10px;
+    font-size: clamp(30px, 4.4vw, 46px);
+    line-height: 1.08;
     letter-spacing: -.04em;
   }
   .hero-lead {
-    max-width: 800px;
+    max-width: 720px;
     margin: 0;
     color: #475467;
-    font-size: 17px;
-    line-height: 1.9;
+    font-size: 15px;
+    line-height: 1.75;
   }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
   .hero-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 22px;
+    padding: 9px 16px;
     border: 1px solid #d7dde8;
     border-radius: 999px;
     background: #fff;
     color: #172033;
-    font-size: 15px;
+    font-size: 13.5px;
     font-weight: 650;
     text-decoration: none;
   }
   .hero-btn:hover { border-color: #0071e3; color: #0071e3; text-decoration: none; }
   .hero-btn.primary { border-color: #0071e3; background: #0071e3; color: #fff; }
   .hero-btn.primary:hover { background: #0062c4; color: #fff; }
-  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 22px; color: #667085; font-size: 13.5px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 7px 18px; margin-top: 16px; color: #667085; font-size: 12.5px; }
   .hero-meta strong { color: #0071e3; }
-  .sfx-shell { padding-top: 30px; padding-bottom: 72px; }
+  .sfx-shell { padding-top: 22px; padding-bottom: 56px; }
   .notice {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 14px;
     align-items: start;
-    padding: 18px 20px;
+    padding: 14px 16px;
     border: 1px solid #cfe4ff;
-    border-radius: 18px;
+    border-radius: 14px;
     background: #f4f9ff;
   }
-  .notice strong { color: #0066cc; white-space: nowrap; }
-  .notice p { margin: 0; color: #3b5f82; font-size: 14px; line-height: 1.8; }
+  .notice strong { color: #0066cc; white-space: nowrap; font-size: 13.5px; }
+  .notice p { margin: 0; color: #3b5f82; font-size: 13px; line-height: 1.7; }
   .search-panel {
-    margin-top: 22px;
-    padding: 18px;
+    margin-top: 16px;
+    padding: 14px;
     border: 1px solid #e4e8f0;
-    border-radius: 20px;
+    border-radius: 16px;
     background: #fff;
     box-shadow: 0 10px 32px rgba(18, 31, 53, .05);
   }
@@ -507,24 +506,24 @@ const faqJsonLd = {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 14px;
+    padding: 0 12px;
     border: 1px solid #d7dde8;
-    border-radius: 14px;
+    border-radius: 12px;
     background: #fbfcfe;
   }
   .search-box input {
     width: 100%;
-    padding: 13px 0;
+    padding: 10px 0;
     border: 0;
     outline: 0;
     background: transparent;
     font: inherit;
-    font-size: 15px;
+    font-size: 14px;
     color: #172033;
   }
-  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
   .filter-chip {
-    padding: 7px 13px;
+    padding: 6px 11px;
     border: 1px solid #e0e2e7;
     border-radius: 999px;
     background: #fff;
@@ -537,16 +536,16 @@ const faqJsonLd = {
   .filter-chip:hover { border-color: #0071e3; color: #0071e3; }
   .filter-chip.active { border-color: #1d1d1f; background: #1d1d1f; color: #fff; }
   .result-count { margin-left: auto; color: #98a2b3; font-size: 12.5px; }
-  .sfx-section { margin-top: 54px; }
+  .sfx-section { margin-top: 40px; }
   .section-head-sfx {
     display: flex;
     justify-content: space-between;
     align-items: end;
-    gap: 24px;
-    margin-bottom: 18px;
+    gap: 20px;
+    margin-bottom: 14px;
   }
-  .section-head-sfx h2 { margin: 8px 0 0; font-size: 28px; letter-spacing: -.025em; }
-  .section-head-sfx > p { max-width: 430px; margin: 0; color: #77777d; font-size: 13.5px; line-height: 1.7; }
+  .section-head-sfx h2 { margin: 7px 0 0; font-size: 23px; letter-spacing: -.025em; }
+  .section-head-sfx > p { max-width: 430px; margin: 0; color: #77777d; font-size: 13px; line-height: 1.65; }
   .section-tag {
     display: inline-block;
     padding: 4px 10px;
@@ -556,20 +555,20 @@ const faqJsonLd = {
     font-size: 12px;
     font-weight: 750;
   }
-  .preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .sound-card {
     position: relative;
     overflow: visible;
     border: 1px solid #e4e8f0;
-    border-radius: 18px;
+    border-radius: 14px;
     background: #fff;
-    box-shadow: 0 10px 32px rgba(18, 31, 53, .06);
+    box-shadow: 0 7px 22px rgba(18, 31, 53, .05);
   }
   .sound-wave {
     position: relative;
-    height: 154px;
+    height: 82px;
     overflow: hidden;
-    border-radius: 18px 18px 0 0;
+    border-radius: 14px 14px 0 0;
     background: linear-gradient(180deg, #f5f9ff, #edf5ff);
   }
   .wave-bars {
@@ -577,13 +576,13 @@ const faqJsonLd = {
     inset: 0;
     display: flex;
     align-items: center;
-    gap: 2px;
-    padding: 22px 24px;
+    gap: 1.5px;
+    padding: 14px 16px;
   }
   .wave-bars span {
     flex: 1;
     min-width: 1px;
-    max-width: 5px;
+    max-width: 3px;
     border-radius: 2px;
     background: #859ab5;
     opacity: .74;
@@ -598,53 +597,57 @@ const faqJsonLd = {
   }
   .sound-play {
     position: absolute;
-    right: 20px;
-    bottom: -25px;
+    right: 14px;
+    bottom: -18px;
     z-index: 2;
     display: grid;
     place-items: center;
-    width: 56px;
-    height: 56px;
-    padding-left: 3px;
+    width: 38px;
+    height: 38px;
+    padding-left: 2px;
     border: 0;
     border-radius: 50%;
     background: #1d1d1f;
     color: #fff;
     box-shadow: 0 8px 22px rgba(18, 31, 53, .22);
-    font-size: 23px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
   }
   .sound-play:hover { background: #0071e3; }
   .sound-card.playing .sound-play { background: #0071e3; }
-  .sound-body { padding: 34px 20px 18px; }
-  .sound-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
-  .sound-title-row h3 { margin: 0; font-size: 17px; line-height: 1.25; letter-spacing: -.01em; }
-  .sound-title-zh { display: block; margin-top: 4px; color: #98a2b3; font-size: 12.5px; }
-  .sound-duration { flex: none; color: #475467; font-size: 13px; font-variant-numeric: tabular-nums; }
-  .sound-body .tag-row { margin-top: 14px; }
-  .sound-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
-  .sound-license { color: #98a2b3; font-size: 11.5px; }
+  .sound-body { padding: 25px 15px 13px; }
+  .sound-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .sound-title-row h3 { margin: 0; font-size: 14.5px; line-height: 1.25; letter-spacing: -.01em; }
+  .sound-title-zh { display: block; margin-top: 3px; color: #98a2b3; font-size: 11px; line-height: 1.4; }
+  .sound-duration { flex: none; color: #475467; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+  .sound-body .tag-row { margin-top: 10px; }
+  .sound-body .tag-row span { padding: 2px 7px; font-size: 10.5px; }
+  .sound-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
+  .sound-license { color: #98a2b3; font-size: 10.5px; }
   .sound-download {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #1d1d1f;
-    color: #fff;
-    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 9px;
+    border: 1px solid #dce3ee;
+    border-radius: 999px;
+    background: #fff;
+    color: #344054;
+    font-size: 10.5px;
+    font-weight: 700;
+    white-space: nowrap;
     text-decoration: none;
   }
-  .sound-download:hover { background: #0071e3; color: #fff; text-decoration: none; }
+  .sound-download:hover { border-color: #0071e3; background: #0071e3; color: #fff; text-decoration: none; }
   #sfxAudio { display: none; }
-  .category-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
   .category-card {
     display: grid;
-    gap: 12px;
-    padding: 24px;
+    gap: 10px;
+    padding: 18px;
     border: 1px solid #e4e8f0;
-    border-radius: 22px;
+    border-radius: 17px;
     background: #fff;
     box-shadow: 0 10px 32px rgba(18, 31, 53, .04);
   }
@@ -652,15 +655,15 @@ const faqJsonLd = {
   .category-icon {
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
     background: #f2f7ff;
-    font-size: 22px;
+    font-size: 18px;
   }
-  .category-card h3 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
-  .category-en { color: #98a2b3; font-size: 12px; }
-  .category-card > p { margin: 0; color: #667085; font-size: 14px; line-height: 1.75; }
+  .category-card h3 { margin: 0; font-size: 16.5px; letter-spacing: -.02em; }
+  .category-en { color: #98a2b3; font-size: 11px; }
+  .category-card > p { margin: 0; color: #667085; font-size: 12.5px; line-height: 1.65; }
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .tag-row span { padding: 3px 9px; border-radius: 7px; background: #f2f4f7; color: #667085; font-size: 11.5px; }
   .source-links { display: grid; gap: 8px; margin-top: 2px; }
@@ -669,9 +672,9 @@ const faqJsonLd = {
     grid-template-columns: auto 1fr;
     gap: 4px 9px;
     align-items: center;
-    padding: 11px 12px;
+    padding: 9px 10px;
     border: 1px solid #eceef2;
-    border-radius: 13px;
+    border-radius: 11px;
     background: #fbfcfe;
     color: #172033;
     text-decoration: none;
@@ -684,13 +687,13 @@ const faqJsonLd = {
   .lic-mid { background: #fff4e5; color: #b45309; }
   .lic-credit { background: #eef0ff; color: #4f46e5; }
   .lic-study { background: #f2f4f7; color: #667085; }
-  .source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 12px; }
   .source-card {
     display: grid;
-    gap: 7px;
-    padding: 20px;
+    gap: 6px;
+    padding: 16px;
     border: 1px solid #e4e8f0;
-    border-radius: 18px;
+    border-radius: 15px;
     background: #fff;
     color: #172033;
     text-decoration: none;
@@ -700,14 +703,14 @@ const faqJsonLd = {
   .source-top { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
   .reco { padding: 3px 9px; border-radius: 999px; background: #e8f2ff; color: #0071e3; font-size: 11.5px; font-weight: 750; }
   .region { margin-left: auto; color: #98a2b3; font-size: 11.5px; }
-  .source-card > strong { font-size: 17px; }
+  .source-card > strong { font-size: 15.5px; }
   .source-en { color: #98a2b3; font-size: 11.5px; }
-  .source-desc { color: #667085; font-size: 13.5px; line-height: 1.7; }
+  .source-desc { color: #667085; font-size: 12.5px; line-height: 1.65; }
   .source-license { color: #7c5a15; font-size: 12px; line-height: 1.65; }
   .source-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 3px; color: #98a2b3; font-size: 11.5px; }
   .source-arrow { color: #0071e3; font-size: 16px; }
   .steps-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-  .steps-grid article { padding: 22px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; }
+  .steps-grid article { padding: 17px; border: 1px solid #e4e8f0; border-radius: 15px; background: #fff; }
   .steps-grid strong { color: #0071e3; font-size: 13px; letter-spacing: .08em; }
   .steps-grid h3 { margin: 10px 0 7px; font-size: 17px; }
   .steps-grid p { margin: 0; color: #667085; font-size: 13.5px; line-height: 1.75; }
@@ -722,9 +725,9 @@ const faqJsonLd = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
-    margin-top: 54px;
-    padding: 28px;
+    gap: 20px;
+    margin-top: 40px;
+    padding: 22px;
     border: 1px solid #d7e6ff;
     border-radius: 22px;
     background: linear-gradient(135deg, #f7fbff, #fff 58%, #f7f5ff);
@@ -734,14 +737,16 @@ const faqJsonLd = {
   .cta-links { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
   .empty-state { margin: 18px 0 0; padding: 16px 18px; border-radius: 14px; background: #f8fafc; color: #667085; font-size: 13.5px; }
   @media (max-width: 900px) {
-    .preview-grid { grid-template-columns: 1fr; }
-    .category-grid { grid-template-columns: 1fr; }
+    .preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sfx-cta { display: block; }
     .cta-links { margin-top: 18px; }
   }
   @media (max-width: 640px) {
-    .sfx-hero { padding-top: 52px; }
+    .sfx-hero { padding-top: 38px; }
+    .preview-grid,
+    .category-grid { grid-template-columns: 1fr; }
     .notice { grid-template-columns: 1fr; gap: 6px; }
     .section-head-sfx { display: block; }
     .section-head-sfx > p { margin-top: 10px; }
