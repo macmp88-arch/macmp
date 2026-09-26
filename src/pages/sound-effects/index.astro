@@ -1,0 +1,542 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  soundCategories,
+  soundSources,
+  soundCategoryCount,
+  soundSourceCount,
+  soundFreeCommercialCount,
+} from '../../data/soundEffects';
+
+const title = '免费音效与音乐库导航 · 可商用音效 / 婚礼音乐 / 短剧配乐 · MacMP';
+const description =
+  '按用途整理的免费音效与免版税音乐导航：转场、环境音、婚礼、短剧、玄幻、宣传片、UI、Foley 等，标注可商用、需署名或逐条确认，直达原始下载页面。';
+const path = '/sound-effects';
+
+const licenseStyles: Record<string, string> = {
+  可商用: 'lic-ok',
+  需署名: 'lic-credit',
+  逐条确认: 'lic-mid',
+  仅限个人学习: 'lic-study',
+};
+
+const filters = ['全部', '音效', '音乐', '氛围', '短剧', '婚礼'];
+
+const faqs = [
+  {
+    q: '为什么不能直接把音频抓到本站提供下载？',
+    a: '免费不等于可以重新托管。很多素材站允许你在作品中商用，但不允许把音频文件本身转载、打包或做成竞品素材库。本站采用“来源导航 + 原始下载页”的方式，规避二次分发风险。',
+  },
+  {
+    q: '标注“可商用”就可以完全放心使用吗？',
+    a: '不代表完全没有限制。通常仍可能禁止单独转售、禁止用于竞品素材库、禁止用 AI 训练等。使用前要看具体站点的最新许可证，重大商单建议保留授权页面截图。',
+  },
+  {
+    q: 'Freesound 和 Free Music Archive 为什么写“逐条确认”？',
+    a: '这两个平台有大量不同作者和不同许可证，同一网站上会同时存在 CC0、CC BY、CC BY-NC 等资源。必须进入单个音频页面查看作者标注的许可证。',
+  },
+  {
+    q: '婚礼片和短剧最推荐先看哪里？',
+    a: '婚礼音乐优先看 Pixabay Music、Mixkit Music、Uppbeat；音效优先看 Mixkit、Pixabay、Freesound；需要大批量建立本地库时，再看 Sonniss GDC 年度音频包。',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '免费音效与音乐库导航',
+  description,
+  numberOfItems: soundSourceCount + soundCategoryCount,
+  itemListElement: [
+    ...soundCategories.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.title,
+      description: item.desc,
+    })),
+    ...soundSources.map((item, index) => ({
+      '@type': 'ListItem',
+      position: soundCategories.length + index + 1,
+      name: item.name,
+      url: item.url,
+    })),
+  ],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} path={path}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+
+  <section class="sfx-hero">
+    <div class="container">
+      <p class="eyebrow">免费音效与音乐</p>
+      <h1>找声音，不要再翻十个网站。</h1>
+      <p class="hero-lead">
+        按剪辑用途整理转场、环境音、婚礼、短剧、玄幻、宣传片、UI 和 Foley。
+        每个来源都标注授权边界，下载直达原始页面，不二次托管别人的音频。
+      </p>
+      <div class="hero-actions">
+        <a class="hero-btn primary" href="#categories">按用途找音效 →</a>
+        <a class="hero-btn" href="#sources">看免版税来源 →</a>
+        <a class="hero-btn" href="https://mixkit.co/free-sound-effects/" target="_blank" rel="noopener">打开 Mixkit →</a>
+      </div>
+      <div class="hero-meta">
+        <span><strong>{soundCategoryCount}</strong> 个剪辑用途分类</span>
+        <span><strong>{soundSourceCount}</strong> 个免费来源</span>
+        <span><strong>{soundFreeCommercialCount}</strong> 个标注可商用</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container sfx-shell">
+    <div class="notice">
+      <strong>本站不重新托管音频</strong>
+      <p>
+        “免费下载”指跳转到 Mixkit、Pixabay、Freesound 等原始授权页面下载。
+        不要因为一首歌写着 Free 就直接拿去做商单，先确认是 CC0、CC BY、平台免费许可，还是仅限个人学习。
+      </p>
+    </div>
+
+    <section class="search-panel" aria-label="搜索音效">
+      <div class="search-box">
+        <span aria-hidden="true">🔎</span>
+        <input id="sfxSearch" type="search" placeholder="搜索：转场、婚礼、雨声、短剧、Foley、魔法…" autocomplete="off" />
+      </div>
+      <div class="filter-row" id="sfxFilters">
+        {filters.map((filter, index) => (
+          <button type="button" class={`filter-chip${index === 0 ? ' active' : ''}`} data-filter={filter} aria-pressed={index === 0 ? 'true' : 'false'}>
+            {filter}
+          </button>
+        ))}
+        <span class="result-count" id="sfxCount">当前显示 {soundCategoryCount + soundSourceCount} 个结果</span>
+      </div>
+    </section>
+
+    <section class="sfx-section" id="categories">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">按用途找</span>
+          <h2>先确定情绪和动作，再去找声音</h2>
+        </div>
+        <p>每个分类都给出多个来源，不同站点授权和检索方式不一样。</p>
+      </div>
+
+      <div class="category-grid" id="sfxCategoryGrid">
+        {soundCategories.map((category) => (
+          <article
+            class="category-card"
+            data-search-card
+            data-search={`${category.title} ${category.titleEn} ${category.desc} ${category.tags.join(' ')}`}
+            data-audience={category.audience.join(',')}
+          >
+            <div class="category-top">
+              <span class="category-icon" aria-hidden="true">{category.icon}</span>
+              <div>
+                <h3>{category.title}</h3>
+                <span class="category-en">{category.titleEn}</span>
+              </div>
+            </div>
+            <p>{category.desc}</p>
+            <div class="tag-row">
+              {category.tags.slice(0, 4).map((tag) => <span>{tag}</span>)}
+            </div>
+            <div class="source-links">
+              {category.sources.map((source) => (
+                <a href={source.url} target="_blank" rel="noopener" class="source-pill">
+                  <span class={`lic ${licenseStyles[source.license] || 'lic-mid'}`}>{source.license}</span>
+                  <strong>{source.name}</strong>
+                  <small>{source.note}</small>
+                </a>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="empty-state" id="sfxCategoryEmpty" hidden>没有匹配的分类，试试“转场”“婚礼”“雨声”或“魔法”。</p>
+    </section>
+
+    <section class="sfx-section" id="sources">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">免版税来源</span>
+          <h2>优先使用的免费素材站</h2>
+        </div>
+        <p>按“可商用 / 需署名 / 逐条确认”标注，交付前再看一次授权页面。</p>
+      </div>
+
+      <div class="source-grid" id="sfxSourceGrid">
+        {soundSources.map((source) => (
+          <a
+            class="source-card"
+            href={source.url}
+            target="_blank"
+            rel="noopener"
+            data-search-card
+            data-search={`${source.name} ${source.nameEn} ${source.desc} ${source.tags.join(' ')}`}
+            data-audience={source.tags.join(',')}
+          >
+            <span class="source-top">
+              <span class={`lic ${licenseStyles[source.license] || 'lic-mid'}`}>{source.license}</span>
+              {source.recommended && <span class="reco">推荐</span>}
+              <span class="region">{source.region}</span>
+            </span>
+            <strong>{source.name}</strong>
+            <span class="source-en">{source.nameEn}</span>
+            <span class="source-desc">{source.desc}</span>
+            <span class="source-license">{source.licenseNote}</span>
+            <span class="source-meta">
+              {source.needsAccount ? '需要免费注册' : '通常无需注册'}
+              {source.hasPaid ? ' · 含付费内容' : ''}
+              <span class="source-arrow">↗</span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="empty-state" id="sfxSourceEmpty" hidden>没有匹配的来源，换个关键词试试。</p>
+    </section>
+
+    <section class="sfx-section">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">下载前必看</span>
+          <h2>授权检查四步法</h2>
+        </div>
+        <p>免费素材最容易踩的坑，不是找不到，而是没有确认授权。</p>
+      </div>
+      <div class="steps-grid">
+        <article><strong>01</strong><h3>看许可证类型</h3><p>CC0 最省心，CC BY 要署名，CC BY-NC 通常不能商用。</p></article>
+        <article><strong>02</strong><h3>看用途限制</h3><p>确认是否允许商业项目、客户交付、YouTube 变现和付费广告。</p></article>
+        <article><strong>03</strong><h3>看再分发限制</h3><p>不要把音频本身上传到网盘、素材站或作为独立文件出售。</p></article>
+        <article><strong>04</strong><h3>保存授权证据</h3><p>商单建议截图许可证页面，保存来源链接和下载日期。</p></article>
+      </div>
+      <div class="license-warning">
+        <strong>特别注意</strong>
+        <p>
+          “免版税”不等于“无版权”，也不等于“可以随便转载”。如果客户要求独家授权、AI 训练授权或大规模广告投放，优先找 paid royalty-free 或直接联系作者购买扩展授权。
+        </p>
+      </div>
+    </section>
+
+    <section class="sfx-section">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">常见问题</span>
+          <h2>免费下载前先搞清楚</h2>
+        </div>
+      </div>
+      <div class="faq-list">
+        {faqs.map((item) => (
+          <details class="faq-item">
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="sfx-cta">
+      <div>
+        <span class="section-tag">给婚礼剪辑用</span>
+        <h2>音乐负责情绪，音效负责真实。</h2>
+        <p>婚礼片先找钢琴、弦乐和心跳氛围，再用脚步、开门、风声、环境底噪补真实感。短剧则优先做转场、impact、riser 和 Foley。</p>
+      </div>
+      <div class="cta-links">
+        <a class="hero-btn primary" href="/tools/">查看全部素材工具 →</a>
+        <a class="hero-btn" href="/gold/">黄金与宏观资讯 →</a>
+      </div>
+    </section>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var search = document.getElementById('sfxSearch');
+      var count = document.getElementById('sfxCount');
+      var chips = Array.prototype.slice.call(document.querySelectorAll('.filter-chip[data-filter]'));
+      var cards = Array.prototype.slice.call(document.querySelectorAll('[data-search-card]'));
+      var emptyCategory = document.getElementById('sfxCategoryEmpty');
+      var emptySource = document.getElementById('sfxSourceEmpty');
+      var activeFilter = '全部';
+
+      function applyFilter() {
+        var query = (search && search.value ? search.value : '').trim().toLowerCase();
+        var visible = 0;
+        var categoryVisible = 0;
+        var sourceVisible = 0;
+
+        cards.forEach(function (card) {
+          var text = (card.getAttribute('data-search') || '').toLowerCase();
+          var audience = (card.getAttribute('data-audience') || '').split(',').map(function (item) { return item.trim(); });
+          var matchesQuery = !query || text.indexOf(query) !== -1;
+          var matchesFilter = activeFilter === '全部' || audience.indexOf(activeFilter) !== -1;
+          var show = matchesQuery && matchesFilter;
+          card.hidden = !show;
+          if (show) {
+            visible += 1;
+            if (card.classList.contains('category-card')) categoryVisible += 1;
+            if (card.classList.contains('source-card')) sourceVisible += 1;
+          }
+        });
+
+        if (count) count.textContent = '当前显示 ' + visible + ' 个结果';
+        if (emptyCategory) emptyCategory.hidden = categoryVisible !== 0;
+        if (emptySource) emptySource.hidden = sourceVisible !== 0;
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          activeFilter = chip.getAttribute('data-filter') || '全部';
+          chips.forEach(function (item) {
+            var active = item === chip;
+            item.classList.toggle('active', active);
+            item.setAttribute('aria-pressed', active ? 'true' : 'false');
+          });
+          applyFilter();
+        });
+      });
+
+      if (search) search.addEventListener('input', applyFilter);
+    })();
+  </script>
+</BaseLayout>
+
+<style>
+  .sfx-hero {
+    padding: 70px 0 46px;
+    background:
+      radial-gradient(circle at 88% 10%, rgba(0, 113, 227, .16), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(124, 58, 237, .12), transparent 36%),
+      linear-gradient(150deg, #f7fbff, #fff 58%, #f7f5ff);
+    border-bottom: 1px solid #e4e8f0;
+  }
+  .sfx-hero h1 {
+    max-width: 860px;
+    margin: 10px 0 16px;
+    font-size: clamp(38px, 6vw, 66px);
+    line-height: 1.06;
+    letter-spacing: -.04em;
+  }
+  .hero-lead {
+    max-width: 800px;
+    margin: 0;
+    color: #475467;
+    font-size: 17px;
+    line-height: 1.9;
+  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    border: 1px solid #d7dde8;
+    border-radius: 999px;
+    background: #fff;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .hero-btn:hover { border-color: #0071e3; color: #0071e3; text-decoration: none; }
+  .hero-btn.primary { border-color: #0071e3; background: #0071e3; color: #fff; }
+  .hero-btn.primary:hover { background: #0062c4; color: #fff; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 22px; color: #667085; font-size: 13.5px; }
+  .hero-meta strong { color: #0071e3; }
+  .sfx-shell { padding-top: 30px; padding-bottom: 72px; }
+  .notice {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 18px 20px;
+    border: 1px solid #cfe4ff;
+    border-radius: 18px;
+    background: #f4f9ff;
+  }
+  .notice strong { color: #0066cc; white-space: nowrap; }
+  .notice p { margin: 0; color: #3b5f82; font-size: 14px; line-height: 1.8; }
+  .search-panel {
+    margin-top: 22px;
+    padding: 18px;
+    border: 1px solid #e4e8f0;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(18, 31, 53, .05);
+  }
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 1px solid #d7dde8;
+    border-radius: 14px;
+    background: #fbfcfe;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 13px 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 15px;
+    color: #172033;
+  }
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .filter-chip {
+    padding: 7px 13px;
+    border: 1px solid #e0e2e7;
+    border-radius: 999px;
+    background: #fff;
+    color: #52525b;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .filter-chip:hover { border-color: #0071e3; color: #0071e3; }
+  .filter-chip.active { border-color: #1d1d1f; background: #1d1d1f; color: #fff; }
+  .result-count { margin-left: auto; color: #98a2b3; font-size: 12.5px; }
+  .sfx-section { margin-top: 54px; }
+  .section-head-sfx {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 18px;
+  }
+  .section-head-sfx h2 { margin: 8px 0 0; font-size: 28px; letter-spacing: -.025em; }
+  .section-head-sfx > p { max-width: 430px; margin: 0; color: #77777d; font-size: 13.5px; line-height: 1.7; }
+  .section-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e8f2ff;
+    color: #0071e3;
+    font-size: 12px;
+    font-weight: 750;
+  }
+  .category-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .category-card {
+    display: grid;
+    gap: 12px;
+    padding: 24px;
+    border: 1px solid #e4e8f0;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(18, 31, 53, .04);
+  }
+  .category-top { display: flex; align-items: center; gap: 12px; }
+  .category-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #f2f7ff;
+    font-size: 22px;
+  }
+  .category-card h3 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
+  .category-en { color: #98a2b3; font-size: 12px; }
+  .category-card > p { margin: 0; color: #667085; font-size: 14px; line-height: 1.75; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-row span { padding: 3px 9px; border-radius: 7px; background: #f2f4f7; color: #667085; font-size: 11.5px; }
+  .source-links { display: grid; gap: 8px; margin-top: 2px; }
+  .source-pill {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 9px;
+    align-items: center;
+    padding: 11px 12px;
+    border: 1px solid #eceef2;
+    border-radius: 13px;
+    background: #fbfcfe;
+    color: #172033;
+    text-decoration: none;
+  }
+  .source-pill:hover { border-color: #0071e3; text-decoration: none; }
+  .source-pill strong { font-size: 13.5px; }
+  .source-pill small { grid-column: 2; color: #98a2b3; font-size: 11.5px; line-height: 1.5; }
+  .lic { padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 750; white-space: nowrap; }
+  .lic-ok { background: #e6f4ea; color: #1d7a3b; }
+  .lic-mid { background: #fff4e5; color: #b45309; }
+  .lic-credit { background: #eef0ff; color: #4f46e5; }
+  .lic-study { background: #f2f4f7; color: #667085; }
+  .source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .source-card {
+    display: grid;
+    gap: 7px;
+    padding: 20px;
+    border: 1px solid #e4e8f0;
+    border-radius: 18px;
+    background: #fff;
+    color: #172033;
+    text-decoration: none;
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .source-card:hover { border-color: #0071e3; box-shadow: 0 14px 32px rgba(0, 113, 227, .10); transform: translateY(-2px); text-decoration: none; }
+  .source-top { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+  .reco { padding: 3px 9px; border-radius: 999px; background: #e8f2ff; color: #0071e3; font-size: 11.5px; font-weight: 750; }
+  .region { margin-left: auto; color: #98a2b3; font-size: 11.5px; }
+  .source-card > strong { font-size: 17px; }
+  .source-en { color: #98a2b3; font-size: 11.5px; }
+  .source-desc { color: #667085; font-size: 13.5px; line-height: 1.7; }
+  .source-license { color: #7c5a15; font-size: 12px; line-height: 1.65; }
+  .source-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 3px; color: #98a2b3; font-size: 11.5px; }
+  .source-arrow { color: #0071e3; font-size: 16px; }
+  .steps-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .steps-grid article { padding: 22px; border: 1px solid #e4e8f0; border-radius: 18px; background: #fff; }
+  .steps-grid strong { color: #0071e3; font-size: 13px; letter-spacing: .08em; }
+  .steps-grid h3 { margin: 10px 0 7px; font-size: 17px; }
+  .steps-grid p { margin: 0; color: #667085; font-size: 13.5px; line-height: 1.75; }
+  .license-warning { margin-top: 14px; padding: 18px 20px; border: 1px solid #ffe1a8; border-radius: 16px; background: #fff8e6; }
+  .license-warning strong { display: block; margin-bottom: 6px; color: #b45309; font-size: 14.5px; }
+  .license-warning p { margin: 0; color: #8a5a00; font-size: 13.5px; line-height: 1.8; }
+  .faq-list { display: grid; gap: 10px; }
+  .faq-item { border: 1px solid #e4e8f0; border-radius: 16px; background: #fff; padding: 0 20px; }
+  .faq-item summary { cursor: pointer; padding: 17px 0; font-size: 15px; font-weight: 650; color: #172033; }
+  .faq-item p { margin: 0 0 18px; color: #667085; font-size: 14px; line-height: 1.85; }
+  .sfx-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-top: 54px;
+    padding: 28px;
+    border: 1px solid #d7e6ff;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #f7fbff, #fff 58%, #f7f5ff);
+  }
+  .sfx-cta h2 { margin: 9px 0 8px; font-size: 25px; letter-spacing: -.02em; }
+  .sfx-cta p { max-width: 700px; margin: 0; color: #667085; font-size: 14px; line-height: 1.8; }
+  .cta-links { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
+  .empty-state { margin: 18px 0 0; padding: 16px 18px; border-radius: 14px; background: #f8fafc; color: #667085; font-size: 13.5px; }
+  @media (max-width: 900px) {
+    .category-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sfx-cta { display: block; }
+    .cta-links { margin-top: 18px; }
+  }
+  @media (max-width: 640px) {
+    .sfx-hero { padding-top: 52px; }
+    .notice { grid-template-columns: 1fr; gap: 6px; }
+    .section-head-sfx { display: block; }
+    .section-head-sfx > p { margin-top: 10px; }
+    .result-count { flex-basis: 100%; margin-left: 0; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .source-grid { grid-template-columns: 1fr; }
+  }
+</style>
