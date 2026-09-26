@@ -1,45 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title">
-  <title>隐私安全清单</title>
+  <title>Mac 隐私安全清单 · 安全隐私</title>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4c3fd6"/>
-      <stop offset="1" stop-color="#b794f6"/>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FAFBFD"/>
+      <stop offset="1" stop-color="#F1F4F8"/>
     </linearGradient>
-    <radialGradient id="glow" cx="72%" cy="18%" r="70%">
-      <stop offset="0" stop-color="#ffffff" stop-opacity=".70"/>
-      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    <radialGradient id="halo" cx="84%" cy="8%" r="72%">
+      <stop stop-color="#00A67E" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#00A67E" stop-opacity="0"/>
     </radialGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#001b3d" flood-opacity=".20"/>
+    <linearGradient id="accentWash" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#00A67E" stop-opacity=".13"/>
+      <stop offset="1" stop-color="#00A67E" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="mediaGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#00A67E"/>
+      <stop offset=".52" stop-color="#7B5CFF"/>
+      <stop offset="1" stop-color="#00D2C8"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-20%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#182033" flood-opacity=".16"/>
     </filter>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#172033" fill-opacity=".07"/>
+    </pattern>
+    <clipPath id="windowClip"><rect x="626" y="76" width="514" height="510" rx="30"/></clipPath>
   </defs>
-  <rect width="1200" height="675" rx="28" fill="url(#bg)"/>
-  <rect width="1200" height="675" rx="28" fill="url(#glow)"/>
-  <g opacity=".16" fill="none" stroke="#fff" stroke-width="2">
-    <circle cx="950" cy="120" r="150"/><circle cx="950" cy="120" r="220"/><circle cx="950" cy="120" r="290"/>
+  <rect width="1200" height="675" rx="32" fill="url(#page)"/>
+  <rect width="1200" height="675" rx="32" fill="url(#dots)"/>
+  <rect width="1200" height="675" rx="32" fill="url(#halo)"/>
+  <path d="M0 596 C228 530 393 632 617 567 C823 507 1017 561 1200 507 V675 H0Z" fill="url(#accentWash)"/>
+  <g transform="translate(64 58)">
+    <g>
+      <circle cx="20" cy="20" r="20" fill="#00A67E" fill-opacity=".13"/>
+      <path d="M20 9 L20 31 M9 20 L31 20" stroke="#00A67E" stroke-width="2.2" stroke-linecap="round" opacity=".75"/>
+    </g>
+    <text x="52" y="26" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="13" font-weight="800" fill="#111318" letter-spacing=".2">MACMP</text>
+    <text x="119" y="26" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="10" font-weight="700" fill="#9AA3B1" letter-spacing="1.2">EDITORIAL GUIDE</text>
+    <rect x="0" y="63" width="92" height="30" rx="15" fill="#00A67E" fill-opacity=".12"/>
+    <text x="46" y="83" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="12" font-weight="750" fill="#00A67E" text-anchor="middle">安全隐私</text>
+    <text x="0" y="164" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="48" font-weight="850" fill="#111318" letter-spacing="-1.7">Mac 隐私安全清单</text>
+    <text x="2" y="209" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="20" font-weight="550" fill="#596474">密码、备份、账号恢复</text>
+    <line x1="0" y1="253" x2="486" y2="253" stroke="#DDE2EA" stroke-width="1"/>
+    <text x="0" y="289" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="10" font-weight="750" fill="#8C95A3" letter-spacing="1">GUIDE NO. 04</text>
+    <text x="0" y="530" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="15" font-weight="650" fill="#354052">把复杂工作流，讲成能执行的步骤。</text>
+    <text x="0" y="563" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="10" font-weight="700" fill="#9AA3B1" letter-spacing=".9">DESKTOP · CREATOR · WORKFLOW</text>
   </g>
-  <g opacity=".20" fill="#fff">
-    <rect x="82" y="92" width="336" height="22" rx="11"/>
-    <rect x="82" y="130" width="248" height="12" rx="6"/>
-  </g>
-  <g filter="url(#shadow)" transform="translate(82 190)">
-    <rect width="580" height="306" rx="22" fill="#fff" fill-opacity=".96"/>
-    <rect x="28" y="28" width="86" height="16" rx="8" fill="#4c3fd6" opacity=".92"/>
-    <rect x="28" y="70" width="430" height="22" rx="11" fill="#18212f" opacity=".84"/>
-    <rect x="28" y="108" width="360" height="14" rx="7" fill="#8a95a8" opacity=".84"/>
-    <rect x="28" y="136" width="400" height="14" rx="7" fill="#8a95a8" opacity=".55"/>
-    <rect x="28" y="185" width="128" height="54" rx="14" fill="#4c3fd6" opacity=".16"/>
-    <rect x="172" y="185" width="128" height="54" rx="14" fill="#b794f6" opacity=".30"/>
-    <rect x="316" y="185" width="128" height="54" rx="14" fill="#4c3fd6" opacity=".10"/>
-    <rect x="28" y="260" width="238" height="14" rx="7" fill="#8a95a8" opacity=".52"/>
-  </g>
-  <g transform="translate(740 218)" fill="#fff">
-    <text x="0" y="0" font-family="PingFang SC,Hiragino Sans GB,sans-serif" font-size="34" font-weight="600" opacity=".82">04 / MACMP</text>
-    <text x="0" y="92" font-family="PingFang SC,Hiragino Sans GB,sans-serif" font-size="68" font-weight="700">隐私安全清单</text>
-    <text x="0" y="152" font-family="PingFang SC,Hiragino Sans GB,sans-serif" font-size="25" opacity=".88">密码 · 备份 · 恢复</text>
-  </g>
-  <g transform="translate(740 480)">
-    <rect width="250" height="48" rx="24" fill="#fff" fill-opacity=".18" stroke="#fff" stroke-opacity=".44"/>
-    <text x="28" y="31" font-family="PingFang SC,Hiragino Sans GB,sans-serif" font-size="17" fill="#fff">MacMP 专题指南</text>
-  </g>
+  <g filter="url(#shadow)">
+      <rect x="626" y="76" width="514" height="510" rx="30" fill="#0B0F16" stroke="#2A3444" stroke-width="1.2"/>
+      <path d="M626 106 Q626 76 656 76 H1110 Q1140 76 1140 106 V123 H626 Z" fill="#111722"/>
+      <circle cx="657" cy="100" r="5" fill="#FF5F57" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/><circle cx="673" cy="100" r="5" fill="#FEBC2E" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/><circle cx="689" cy="100" r="5" fill="#28C840" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/>
+      <text x="710" y="104" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">Security Center</text>
+      <text x="1115" y="104" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="9" font-weight="700" fill="#8994A5" text-anchor="end">VAULT  /  RECOVERY  /  BACKUP</text>
+      <g clip-path="url(#windowClip)">
+        <rect x="626" y="123" width="514" height="463" fill="#0B0F16"/>
+        <rect x="626" y="123" width="514" height="463" fill="#00A67E" fill-opacity=".025"/>
+<rect x="644" y="142" width="478" height="417" rx="20" fill="#0D1420" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/><rect x="662" y="160" width="205" height="198" rx="20" fill="#101D2C" fill-opacity="1" stroke="#00A67E" stroke-opacity="0.32" stroke-width="1"/><circle cx="764" cy="237" r="51" fill="#00A67E" fill-opacity="0.12" stroke="#00A67E" stroke-opacity="0.65" stroke-width="1.2"/><path d="M764 204 l31 12v24c0 24-13 35-31 43-18-8-31-19-31-43v-24z" fill="#00A67E" fill-opacity=".20" stroke="#00A67E" stroke-width="2"/><path d="M754 250 v-8a10 10 0 0 1 20 0v8" fill="none" stroke="#00A67E" stroke-width="2.5"/><rect x="748" y="249" width="32" height="25" rx="7" fill="#00A67E" fill-opacity="0.92" stroke="none" stroke-opacity="1" stroke-width="1"/><text x="764" y="266" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="15" font-weight="900" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">•</text><text x="682" y="337" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="11" font-weight="650" fill="#8F9CAF" fill-opacity="1" text-anchor="start">安全评分</text><text x="681" y="371" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="31" font-weight="850" fill="#FFFFFF" fill-opacity="1" text-anchor="start">92</text><text x="713" y="371" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="11" font-weight="650" fill="#7C8A9D" fill-opacity="1" text-anchor="start">/100</text><rect x="682" y="389" width="160" height="7" rx="4" fill="#233244" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/><rect x="682" y="389" width="147" height="7" rx="4" fill="#00A67E" fill-opacity="1" stroke="none" stroke-opacity="1" stroke-width="1"/><rect x="884" y="160" width="220" height="198" rx="20" fill="#101722" fill-opacity="1" stroke="#273449" stroke-opacity="1" stroke-width="1"/><text x="904" y="190" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="13" font-weight="750" fill="#F2F5F8" fill-opacity="1" text-anchor="start">登录与密码</text><circle cx="911" cy="222" r="5" fill="#00A67E" fill-opacity="0.95" stroke="none" stroke-opacity="1" stroke-width="1"/><text x="927" y="226" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="11" font-weight="600" fill="#C5CEDB" fill-opacity="1" text-anchor="start">iCloud 双重认证</text><text x="1084" y="226" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="10" font-weight="650" fill="#7F8CA0" fill-opacity="1" text-anchor="end">已开启</text><circle cx="911" cy="265" r="5" fill="#00A67E" fill-opacity="0.95" stroke="none" stroke-opacity="1" stroke-width="1"/><text x="927" y="269" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="11" font-weight="600" fill="#C5CEDB" fill-opacity="1" text-anchor="start">恢复密钥</text><text x="1084" y="269" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="10" font-weight="650" fill="#7F8CA0" fill-opacity="1" text-anchor="end">已保存</text><circle cx="911" cy="308" r="5" fill="#00A67E" fill-opacity="0.95" stroke="none" stroke-opacity="1" stroke-width="1"/><text x="927" y="312" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="11" font-weight="600" fill="#C5CEDB" fill-opacity="1" text-anchor="start">受信任设备</text><text x="1084" y="312" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="10" font-weight="650" fill="#7F8CA0" fill-opacity="1" text-anchor="end">3 台</text><rect x="662" y="381" width="442" height="160" rx="20" fill="#0F1A27" fill-opacity="1" stroke="#26364B" stroke-opacity="1" stroke-width="1"/><text x="682" y="411" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="10" font-weight="750" fill="#7F8EA2" fill-opacity="1" text-anchor="start" letter-spacing="0.7">RECOVERY KIT</text><text x="682" y="442" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Helvetica Neue',sans-serif" font-size="12" font-weight="650" fill="#E6ECF4" fill-opacity="1" text-anchor="start">把恢复信息放在离线安全位置</text><rect x="682" y="466" width="86" height="44" rx="10" fill="#142235" fill-opacity="1" stroke="#2A3D54" stroke-opacity="1" stroke-width="1"/><text x="725" y="493" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="13" font-weight="800" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">4K7Q</text><rect x="781" y="466" width="86" height="44" rx="10" fill="#142235" fill-opacity="1" stroke="#2A3D54" stroke-opacity="1" stroke-width="1"/><text x="824" y="493" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="13" font-weight="800" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">M9PX</text><rect x="880" y="466" width="86" height="44" rx="10" fill="#142235" fill-opacity="1" stroke="#2A3D54" stroke-opacity="1" stroke-width="1"/><text x="923" y="493" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="13" font-weight="800" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">2D8R</text><rect x="979" y="466" width="86" height="44" rx="10" fill="#142235" fill-opacity="1" stroke="#2A3D54" stroke-opacity="1" stroke-width="1"/><text x="1022" y="493" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="13" font-weight="800" fill="#FFFFFF" fill-opacity="1" text-anchor="middle">L6VC</text><text x="682" y="528" font-family="'SFMono-Regular',Menlo,Monaco,monospace" font-size="9" font-weight="700" fill="#00A67E" fill-opacity="1" text-anchor="start">打印一份 · 留给未来的自己</text></g></g>
 </svg>
