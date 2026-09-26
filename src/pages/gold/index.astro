@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const title = '黄金行情与宏观资讯 · MacMP';
 const description =
-  '伦敦金 5 分钟 K 线、美联储与白宫官方来源、黄金相关宏观事件说明。行情延迟取决于数据源，仅提供信息参考，不构成投资建议。';
+  '伦敦金多周期 K 线（5 分钟 / 15 分钟 / 1 小时 / 4 小时 / 日线 / 月线）、美联储与白宫官方来源、黄金相关宏观事件说明。行情延迟取决于数据源，仅提供信息参考，不构成投资建议。';
 const path = '/gold';
 
 const sources = [
@@ -83,7 +83,7 @@ const factors = [
 const faqs = [
   {
     q: '这里的伦敦金 K 线是实时行情吗？',
-    a: '页面使用 TradingView 组件，默认显示 5 分钟 K 线。实际延迟和是否实时取决于 TradingView、OANDA 的数据授权、地区和账户权限；5 分钟只是K线周期，不等于数据延迟一定不超过 5 分钟。正式交易请以持牌机构数据为准。',
+    a: '页面使用 TradingView 组件，默认显示 5 分钟 K 线，并可切换 15 分钟、1 小时、4 小时、日线和月线。实际延迟和是否实时取决于 TradingView、OANDA 的数据授权、地区和账户权限；K线周期不等于数据延迟。正式交易请以持牌机构数据为准。',
   },
   {
     q: '能做到严格 5 分钟延迟吗？',
@@ -137,7 +137,7 @@ const faqJsonLd = {
       <p class="eyebrow">MacMP · 财经信息</p>
       <h1>伦敦金行情<br />与宏观资讯</h1>
       <p class="hero-lead">
-        一个克制的黄金信息入口：看 5 分钟 K 线、查美联储和白宫官方来源、理解会影响金价的宏观变量。
+        一个克制的黄金信息入口：看 5 分钟、15 分钟、1 小时、4 小时、日线和月线 K 线，查美联储和白宫官方来源，理解会影响金价的宏观变量。
         不喊单、不承诺收益，也不把场外市场包装成“主力资金内幕”。
       </p>
       <div class="hero-actions">
@@ -145,7 +145,7 @@ const faqJsonLd = {
         <a class="btn" href="#sources">官方来源 →</a>
       </div>
       <div class="hero-meta">
-        <span><strong>XAU/USD</strong> 伦敦金参考</span>
+        <span><strong>6</strong> 个 K 线周期</span>
         <span><strong>8</strong> 个官方来源入口</span>
         <span><strong>0</strong> 买卖建议</span>
       </div>
@@ -169,33 +169,94 @@ const faqJsonLd = {
           </div>
           <a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank" rel="noopener">打开完整行情 →</a>
         </div>
-        <p class="chart-note">默认显示 5 分钟 K 线。是否实时、延迟多少取决于 TradingView / OANDA 的数据授权与地区；以图表数据状态为准。</p>
-        <div class="tradingview-widget-container gold-chart">
-          <div class="tradingview-widget-container__widget"></div>
-          <script
-            type="text/javascript"
-            src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
-            async
-            is:inline
-          >
-            {
-              "autosize": true,
-              "symbol": "OANDA:XAUUSD",
-              "interval": "5",
-              "timezone": "Asia/Shanghai",
-              "theme": "light",
-              "style": "1",
-              "locale": "zh_CN",
-              "backgroundColor": "rgba(255, 255, 255, 1)",
-              "gridColor": "rgba(240, 243, 250, 1)",
-              "hide_side_toolbar": false,
-              "allow_symbol_change": true,
-              "calendar": false,
-              "support_host": "https://www.tradingview.com"
-            }
-          </script>
+        <p class="chart-note">默认 5 分钟；上方可切换 15 分钟、1 小时、4 小时、日线、月线。是否实时、延迟多少取决于 TradingView / OANDA 的数据授权与地区。</p>
+        <div class="timeframe-bar" role="group" aria-label="K线周期">
+          <button type="button" class="tf-btn active" data-tf="5" aria-pressed="true">5 分钟</button>
+          <button type="button" class="tf-btn" data-tf="15" aria-pressed="false">15 分钟</button>
+          <button type="button" class="tf-btn" data-tf="60" aria-pressed="false">1 小时</button>
+          <button type="button" class="tf-btn" data-tf="240" aria-pressed="false">4 小时</button>
+          <button type="button" class="tf-btn" data-tf="1D" aria-pressed="false">日线</button>
+          <button type="button" class="tf-btn" data-tf="1M" aria-pressed="false">月线</button>
+          <span class="pro-tools">可添加：MA / EMA / 成交量 / RSI / MACD / 布林带</span>
         </div>
+        <div id="tv-gold-chart" class="gold-chart" aria-label="伦敦金 K 线图"></div>
         <p class="chart-fallback">如果图表未加载，请直接打开 TradingView 查看完整行情。</p>
+        <script src="https://s3.tradingview.com/tv.js" is:inline></script>
+        <script is:inline>
+          (function () {
+            var container = document.getElementById('tv-gold-chart');
+            if (!container || !window.TradingView) return;
+            var buttons = Array.prototype.slice.call(document.querySelectorAll('.tf-btn[data-tf]'));
+            var widget = null;
+            var ready = false;
+            var pending = '5';
+
+            function setActive(tf) {
+              buttons.forEach(function (button) {
+                var active = button.getAttribute('data-tf') === tf;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+              });
+            }
+
+            function chartApi() {
+              if (!widget) return null;
+              if (typeof widget.chart === 'function') return widget.chart();
+              if (typeof widget.activeChart === 'function') return widget.activeChart();
+              return null;
+            }
+
+            function applyResolution(tf) {
+              pending = tf;
+              if (!ready) return;
+              var chart = chartApi();
+              if (!chart || typeof chart.setResolution !== 'function') return;
+              var attempts = tf === '1D' ? ['1D', 'D'] : tf === '1M' ? ['1M', 'M'] : [tf];
+              for (var i = 0; i < attempts.length; i += 1) {
+                try {
+                  chart.setResolution(attempts[i]);
+                  return;
+                } catch (error) {
+                  if (i === attempts.length - 1) console.warn('无法切换 K 线周期', error);
+                }
+              }
+            }
+
+            buttons.forEach(function (button) {
+              button.addEventListener('click', function () {
+                var tf = button.getAttribute('data-tf') || '5';
+                setActive(tf);
+                applyResolution(tf);
+              });
+            });
+
+            widget = new window.TradingView.widget({
+              container_id: 'tv-gold-chart',
+              autosize: true,
+              symbol: 'OANDA:XAUUSD',
+              interval: '5',
+              timezone: 'Asia/Shanghai',
+              theme: 'light',
+              style: '1',
+              locale: 'zh_CN',
+              toolbar_bg: '#f1f3f6',
+              enable_publishing: false,
+              allow_symbol_change: false,
+              withdateranges: true,
+              hide_side_toolbar: false,
+              hide_top_toolbar: false,
+              details: true,
+              save_image: false,
+              studies: ['Volume@tv-basicstudies', 'MASimple@tv-basicstudies'],
+              support_host: 'https://www.tradingview.com'
+            });
+
+            widget.onChartReady(function () {
+              ready = true;
+              applyResolution(pending);
+            });
+          })();
+        </script>
       </div>
 
       <aside class="side-stack">
@@ -410,9 +471,34 @@ const faqJsonLd = {
   }
   .chart-note { margin: 12px 0; }
   .chart-fallback { margin: 10px 0 0; }
+  .timeframe-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .tf-btn {
+    padding: 7px 12px;
+    border: 1px solid #e0e2e7;
+    border-radius: 999px;
+    background: #fff;
+    color: #52525b;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  .tf-btn:hover { border-color: #d69e2e; color: #9a6700; }
+  .tf-btn.active { border-color: #1d1d1f; background: #1d1d1f; color: #fff; }
+  .pro-tools {
+    margin-left: auto;
+    color: #85858b;
+    font-size: 12px;
+  }
   .gold-chart {
-    height: 560px;
-    min-height: 420px;
+    height: 620px;
+    min-height: 480px;
     overflow: hidden;
     border: 1px solid #eceef2;
     border-radius: 14px;
@@ -515,6 +601,7 @@ const faqJsonLd = {
   }
   @media (max-width: 680px) {
     .gold-hero { padding-top: 52px; }
+    .pro-tools { flex-basis: 100%; margin-left: 0; }
     .risk-banner { grid-template-columns: 1fr; gap: 6px; }
     .section-title, .next-card { display: block; }
     .section-title > p { margin-top: 10px; }
