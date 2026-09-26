@@ -132,6 +132,28 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
     </div>
   </section>
 
+  <!-- 黄金与宏观资讯 -->
+  <section class="section container">
+    <div class="section-head">
+      <h2><span class="zh">黄金与宏观资讯</span><span class="en">Gold & Macro</span></h2>
+      <a href="/gold/"><span class="zh">进入栏目 →</span><span class="en">Open page →</span></a>
+    </div>
+    <div class="asset-grid">
+      <a class="asset-card gold-card" href="/gold/#market">
+        <span class="asset-tag gold-tag">5 分钟 K 线</span>
+        <strong><span class="zh">伦敦金行情入口</span><span class="en">XAU/USD Market</span></strong>
+        <span class="asset-desc"><span class="zh">查看 5 分钟 K 线、利率与宏观事件入口。行情是否实时取决于数据源，不构成投资建议。</span><span class="en">View 5-minute XAU/USD charts and macro sources. Data latency depends on the provider; not investment advice.</span></span>
+        <span class="asset-go"><span class="zh">查看行情 →</span><span class="en">View market →</span></span>
+      </a>
+      <a class="asset-card gold-card" href="/gold/#sources">
+        <span class="asset-tag gold-tag">官方来源</span>
+        <strong><span class="zh">美联储与白宫资讯</span><span class="en">Fed & White House</span></strong>
+        <span class="asset-desc"><span class="zh">直达美联储、白宫、财政部、BLS、CFTC、LBMA 和黄金 ETF 原始页面。</span><span class="en">Direct links to the Fed, White House, Treasury, BLS, CFTC, LBMA and gold ETF sources.</span></span>
+        <span class="asset-go"><span class="zh">打开来源 →</span><span class="en">Open sources →</span></span>
+      </a>
+    </div>
+  </section>
+
   <!-- Setapp 主推 -->
   <section class="container" style="padding-top:8px">
     <div class="tile" style="background: linear-gradient(145deg,#000 0%,#2b2b2e 100%); min-height:380px">
@@ -255,4 +277,7 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
   .asset-card strong { font-size: 18px; }
   .asset-desc { font-size: 14px; line-height: 1.7; color: var(--ink-2); }
   .asset-go { margin-top: 4px; font-size: 13.5px; font-weight: 600; color: var(--blue); }
+  .asset-card.gold-card { background: linear-gradient(150deg,#fffdf7,#fff 62%,#f6faff); }
+  .asset-tag.gold-tag { background: #fff3cf; color: #9a6700; }
+
 </style>

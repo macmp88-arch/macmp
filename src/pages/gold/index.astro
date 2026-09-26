@@ -1,0 +1,525 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = '黄金行情与宏观资讯 · MacMP';
+const description =
+  '伦敦金 5 分钟 K 线、美联储与白宫官方来源、黄金相关宏观事件说明。行情延迟取决于数据源，仅提供信息参考，不构成投资建议。';
+const path = '/gold';
+
+const sources = [
+  {
+    name: '美联储 · 新闻稿',
+    desc: '利率决议、政策声明、讲话与监管公告。',
+    url: 'https://www.federalreserve.gov/newsevents/pressreleases.htm',
+    tag: 'Fed',
+  },
+  {
+    name: '美联储 · FOMC 日历',
+    desc: '议息会议时间、声明和会议纪要入口。',
+    url: 'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm',
+    tag: 'Fed',
+  },
+  {
+    name: '白宫 · 简报室',
+    desc: '总统讲话、行政令、财政与关税相关政策。',
+    url: 'https://www.whitehouse.gov/briefing-room/',
+    tag: 'White House',
+  },
+  {
+    name: '美国财政部 · 新闻',
+    desc: '国债发行、财政政策与经济数据发布。',
+    url: 'https://home.treasury.gov/news/press-releases',
+    tag: 'Treasury',
+  },
+  {
+    name: '美国劳工统计局 · 发布日历',
+    desc: 'CPI、非农就业、失业率等重要数据时间表。',
+    url: 'https://www.bls.gov/schedule/news_release/',
+    tag: 'BLS',
+  },
+  {
+    name: 'CFTC · 持仓报告',
+    desc: '黄金期货与期权的投机、商业持仓变化。',
+    url: 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',
+    tag: 'CFTC',
+  },
+  {
+    name: 'LBMA · 贵金属价格',
+    desc: '伦敦金、白银等贵金属基准价格与历史数据。',
+    url: 'https://www.lbma.org.uk/prices-and-data/precious-metal-prices',
+    tag: 'LBMA',
+  },
+  {
+    name: 'SPDR Gold Shares',
+    desc: '全球大型黄金 ETF 的持仓与资金变化入口。',
+    url: 'https://www.spdrgoldshares.com/',
+    tag: 'ETF',
+  },
+];
+
+const factors = [
+  {
+    icon: '🏦',
+    title: '美联储利率与美元',
+    desc: '利率预期、美元指数和美债收益率，通常会影响黄金的持有成本与资金偏好。',
+  },
+  {
+    icon: '📊',
+    title: 'CPI 与就业数据',
+    desc: '通胀和就业数据会改变市场对加息、降息的判断，是黄金短线波动的重要来源。',
+  },
+  {
+    icon: '🏛️',
+    title: '白宫财政与关税',
+    desc: '财政扩张、关税政策、地缘风险等消息，可能提升避险需求，也可能先引发流动性冲击。',
+  },
+  {
+    icon: '📈',
+    title: '期货与 ETF 持仓',
+    desc: 'CFTC 持仓、COMEX 成交和 ETF 持仓可以作为资金情绪参考，但不等于全市场主力资金。',
+  },
+];
+
+const faqs = [
+  {
+    q: '这里的伦敦金 K 线是实时行情吗？',
+    a: '页面使用 TradingView 组件，默认显示 5 分钟 K 线。实际延迟和是否实时取决于 TradingView、OANDA 的数据授权、地区和账户权限；5 分钟只是K线周期，不等于数据延迟一定不超过 5 分钟。正式交易请以持牌机构数据为准。',
+  },
+  {
+    q: '能做到严格 5 分钟延迟吗？',
+    a: '可以设定 5 分钟 K 线周期，但“数据延迟不超过 5 分钟”属于行情授权问题。免费 TradingView 组件不能承诺；要严格做到，需要接入提供 5 分钟延迟或实时授权的数据商、经纪商行情，并确认商用再分发许可。',
+  },
+  {
+    q: 'VIP 能看到主力资金买入和卖出吗？',
+    a: '当前不做。伦敦金是场外市场，没有统一的全市场“主力资金”口径。可展示的只能是 CFTC 持仓、期货成交、ETF 持仓等参考指标，不能宣称能识别所有主力买卖。',
+  },
+  {
+    q: '这里会提供买卖建议吗？',
+    a: '不会。页面只做行情入口、官方来源导航和宏观背景说明，不提供个性化投资建议、跟单信号或收益承诺。',
+  },
+  {
+    q: '为什么只链接官方新闻源？',
+    a: '官方来源更便于核查，也避免未经授权转载新闻全文。后续如果要接入付费新闻源，需要先确认授权范围和商用许可。',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description,
+  url: new URL(path, Astro.site).toString(),
+  about: ['伦敦金', '黄金', '美联储', '白宫', '宏观资讯'],
+  isAccessibleForFree: true,
+  significantLink: sources.map((source) => source.url),
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} path={path}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)}></script>
+
+  <section class="gold-hero">
+    <div class="container">
+      <p class="eyebrow">MacMP · 财经信息</p>
+      <h1>伦敦金行情<br />与宏观资讯</h1>
+      <p class="hero-lead">
+        一个克制的黄金信息入口：看 5 分钟 K 线、查美联储和白宫官方来源、理解会影响金价的宏观变量。
+        不喊单、不承诺收益，也不把场外市场包装成“主力资金内幕”。
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#market">查看行情 →</a>
+        <a class="btn" href="#sources">官方来源 →</a>
+      </div>
+      <div class="hero-meta">
+        <span><strong>XAU/USD</strong> 伦敦金参考</span>
+        <span><strong>8</strong> 个官方来源入口</span>
+        <span><strong>0</strong> 买卖建议</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container gold-shell">
+    <div class="risk-banner">
+      <strong>风险提示</strong>
+      <p>
+        本页仅为金融信息与数据工具导航，不构成投资建议、收益承诺或交易依据。黄金价格受宏观数据、政策、汇率和流动性影响，可能出现剧烈波动。第三方行情可能有延迟；5 分钟 K 线周期不等于数据延迟一定不超过 5 分钟。正式交易请以持牌机构数据为准。
+      </p>
+    </div>
+
+    <section class="market-grid" id="market">
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <span class="tag">行情图表</span>
+            <h2>XAU/USD · 伦敦金</h2>
+          </div>
+          <a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank" rel="noopener">打开完整行情 →</a>
+        </div>
+        <p class="chart-note">默认显示 5 分钟 K 线。是否实时、延迟多少取决于 TradingView / OANDA 的数据授权与地区；以图表数据状态为准。</p>
+        <div class="tradingview-widget-container gold-chart">
+          <div class="tradingview-widget-container__widget"></div>
+          <script
+            type="text/javascript"
+            src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
+            async
+            is:inline
+          >
+            {
+              "autosize": true,
+              "symbol": "OANDA:XAUUSD",
+              "interval": "5",
+              "timezone": "Asia/Shanghai",
+              "theme": "light",
+              "style": "1",
+              "locale": "zh_CN",
+              "backgroundColor": "rgba(255, 255, 255, 1)",
+              "gridColor": "rgba(240, 243, 250, 1)",
+              "hide_side_toolbar": false,
+              "allow_symbol_change": true,
+              "calendar": false,
+              "support_host": "https://www.tradingview.com"
+            }
+          </script>
+        </div>
+        <p class="chart-fallback">如果图表未加载，请直接打开 TradingView 查看完整行情。</p>
+      </div>
+
+      <aside class="side-stack">
+        <div class="side-card">
+          <span class="tag">先看什么</span>
+          <h3>黄金观察清单</h3>
+          <ol class="check-list">
+            <li><strong>利率预期</strong><span>美联储决议、点阵图、官员讲话</span></li>
+            <li><strong>通胀与就业</strong><span>CPI、PCE、非农和失业率</span></li>
+            <li><strong>美元与美债</strong><span>DXY、10 年期美债收益率</span></li>
+            <li><strong>资金参考</strong><span>CFTC 持仓、ETF 持仓、期货成交</span></li>
+          </ol>
+        </div>
+        <div class="side-card warning-card">
+          <span class="tag warning">我们不做</span>
+          <h3>避免误导性信号</h3>
+          <ul class="no-list">
+            <li>不宣称存在统一的全市场“主力资金”</li>
+            <li>不提供买入、卖出或持仓建议</li>
+            <li>不承诺收益，不展示“稳赚”案例</li>
+            <li>不把延迟行情包装成实时交易数据</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <section class="gold-section" id="sources">
+      <div class="section-title">
+        <div>
+          <span class="tag">官方来源</span>
+          <h2>白宫、美联储与黄金相关数据</h2>
+        </div>
+        <p>只做来源导航，不复制新闻全文。每张卡片都直达原始页面。</p>
+      </div>
+      <div class="source-grid">
+        {sources.map((source) => (
+          <a class="source-card" href={source.url} target="_blank" rel="noopener">
+            <span class="source-top">
+              <span class="source-tag">{source.tag}</span>
+              <span class="source-arrow">↗</span>
+            </span>
+            <strong>{source.name}</strong>
+            <span>{source.desc}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="gold-section">
+      <div class="section-title">
+        <div>
+          <span class="tag">宏观框架</span>
+          <h2>影响黄金的四个变量</h2>
+        </div>
+        <p>不是预测涨跌，而是先建立一套不容易被单一新闻带跑的观察框架。</p>
+      </div>
+      <div class="factor-grid">
+        {factors.map((factor) => (
+          <article class="factor-card">
+            <span class="factor-icon">{factor.icon}</span>
+            <h3>{factor.title}</h3>
+            <p>{factor.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="gold-section">
+      <div class="section-title">
+        <div>
+          <span class="tag">常见问题</span>
+          <h2>先把边界说清楚</h2>
+        </div>
+        <p>这个页面的价值是减少噪音，不是制造交易焦虑。</p>
+      </div>
+      <div class="faq-list">
+        {faqs.map((item) => (
+          <details class="faq-item">
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="next-card">
+      <div>
+        <span class="tag">后续可扩展</span>
+        <h2>宏观日历 · 提醒 · 数据导出</h2>
+        <p>
+          下一阶段可以接入官方发布日历、事件提醒和自选指标导出。但要先解决数据授权、来源标注和合规审核，再决定是否做 VIP 版本。
+        </p>
+      </div>
+      <a class="btn" href="/vip/">了解 VIP 内容 →</a>
+    </section>
+
+    <section class="disclaimer">
+      <h2>重要声明</h2>
+      <p>
+        本站不是券商、交易所、投资顾问或托管机构。页面中的行情、数据和新闻链接仅供信息参考，不构成任何形式的投资建议。用户应自行核实数据，并根据自身风险承受能力独立决策。任何投资行为及其后果由用户自行承担。
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .gold-hero {
+    padding: 72px 0 46px;
+    background:
+      radial-gradient(circle at 82% 12%, rgba(214, 158, 46, .22), transparent 38%),
+      radial-gradient(circle at 12% 88%, rgba(0, 113, 227, .10), transparent 36%),
+      linear-gradient(150deg, #fffdf7, #fff 56%, #f7faff);
+    border-bottom: 1px solid #ece6d8;
+  }
+  .gold-hero h1 {
+    margin: 10px 0 16px;
+    font-size: clamp(38px, 6vw, 66px);
+    line-height: 1.05;
+    letter-spacing: -.035em;
+  }
+  .hero-lead {
+    max-width: 780px;
+    margin: 0;
+    color: #5b5b60;
+    font-size: 17px;
+    line-height: 1.9;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    border: 1px solid #d9d9de;
+    border-radius: 999px;
+    background: #fff;
+    color: #1d1d1f;
+    font-size: 15px;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .btn:hover { border-color: #d69e2e; color: #9a6700; text-decoration: none; }
+  .btn.primary { border-color: #1d1d1f; background: #1d1d1f; color: #fff; }
+  .btn.primary:hover { border-color: #9a6700; background: #9a6700; color: #fff; }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-top: 22px;
+    color: #74747a;
+    font-size: 13.5px;
+  }
+  .hero-meta strong { color: #9a6700; }
+  .gold-shell { padding-top: 30px; padding-bottom: 72px; }
+  .risk-banner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 18px 20px;
+    border: 1px solid #f2d38b;
+    border-radius: 18px;
+    background: #fffaf0;
+  }
+  .risk-banner strong { color: #9a6700; white-space: nowrap; }
+  .risk-banner p { margin: 0; color: #6b5a32; font-size: 14px; line-height: 1.8; }
+  .market-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, .7fr);
+    gap: 18px;
+    margin-top: 24px;
+  }
+  .chart-card,
+  .side-card,
+  .factor-card,
+  .next-card,
+  .disclaimer {
+    border: 1px solid #e5e5e8;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(18, 31, 53, .05);
+  }
+  .chart-card { padding: 22px; min-width: 0; }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .card-head h2 { margin: 7px 0 0; font-size: 24px; letter-spacing: -.02em; }
+  .card-head a { flex: none; color: #0071e3; font-size: 13.5px; font-weight: 650; }
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #fff4d6;
+    color: #9a6700;
+    font-size: 12px;
+    font-weight: 750;
+  }
+  .tag.warning { background: #fff0f0; color: #b42318; }
+  .chart-note,
+  .chart-fallback {
+    color: #85858b;
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+  .chart-note { margin: 12px 0; }
+  .chart-fallback { margin: 10px 0 0; }
+  .gold-chart {
+    height: 560px;
+    min-height: 420px;
+    overflow: hidden;
+    border: 1px solid #eceef2;
+    border-radius: 14px;
+    background: #fafbfc;
+  }
+  .side-stack { display: grid; gap: 18px; align-content: start; }
+  .side-card { padding: 22px; }
+  .side-card h3 { margin: 10px 0 16px; font-size: 20px; letter-spacing: -.015em; }
+  .check-list,
+  .no-list { margin: 0; padding-left: 20px; color: #52525b; }
+  .check-list li,
+  .no-list li { margin: 0 0 13px; padding-left: 2px; }
+  .check-list strong,
+  .check-list span { display: block; }
+  .check-list strong { color: #1d1d1f; font-size: 14px; }
+  .check-list span { color: #85858b; font-size: 12.5px; line-height: 1.6; }
+  .no-list { padding-left: 18px; font-size: 13.5px; line-height: 1.7; }
+  .no-list li::marker { color: #b42318; }
+  .warning-card { background: #fffafa; border-color: #f2c7c7; }
+  .gold-section { margin-top: 54px; }
+  .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 22px;
+    margin-bottom: 18px;
+  }
+  .section-title h2 { margin: 8px 0 0; font-size: 28px; letter-spacing: -.025em; }
+  .section-title > p { max-width: 420px; margin: 0; color: #77777d; font-size: 13.5px; line-height: 1.7; }
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .source-card {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid #e5e5e8;
+    border-radius: 18px;
+    background: #fff;
+    color: #1d1d1f;
+    text-decoration: none;
+    transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .source-card:hover {
+    border-color: #d69e2e;
+    box-shadow: 0 14px 32px rgba(154, 103, 0, .10);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .source-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .source-tag { color: #9a6700; font-size: 11.5px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+  .source-arrow { color: #a3a3a8; font-size: 18px; }
+  .source-card strong { font-size: 16px; }
+  .source-card > span:last-child { color: #77777d; font-size: 13px; line-height: 1.7; }
+  .factor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .factor-card { padding: 22px; }
+  .factor-icon { font-size: 24px; }
+  .factor-card h3 { margin: 12px 0 8px; font-size: 18px; letter-spacing: -.015em; }
+  .factor-card p { margin: 0; color: #6e6e73; font-size: 13.5px; line-height: 1.75; }
+  .faq-list { display: grid; gap: 10px; }
+  .faq-item {
+    border: 1px solid #e5e5e8;
+    border-radius: 16px;
+    background: #fff;
+    padding: 0 20px;
+  }
+  .faq-item summary {
+    cursor: pointer;
+    padding: 17px 0;
+    font-size: 15px;
+    font-weight: 650;
+    color: #1d1d1f;
+  }
+  .faq-item p { margin: 0 0 18px; color: #6e6e73; font-size: 14px; line-height: 1.85; }
+  .next-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-top: 54px;
+    padding: 28px;
+    background: linear-gradient(135deg, #fffdf7, #fff 58%, #f6faff);
+    border-color: #f0dfb5;
+  }
+  .next-card h2 { margin: 9px 0 8px; font-size: 25px; letter-spacing: -.02em; }
+  .next-card p { max-width: 680px; margin: 0; color: #6e6e73; font-size: 14px; line-height: 1.8; }
+  .next-card .btn { flex: none; }
+  .disclaimer { margin-top: 20px; padding: 24px 26px; background: #f7f7f8; box-shadow: none; }
+  .disclaimer h2 { margin: 0 0 8px; font-size: 17px; }
+  .disclaimer p { margin: 0; color: #6e6e73; font-size: 13px; line-height: 1.8; }
+  @media (max-width: 980px) {
+    .market-grid { grid-template-columns: 1fr; }
+    .factor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 680px) {
+    .gold-hero { padding-top: 52px; }
+    .risk-banner { grid-template-columns: 1fr; gap: 6px; }
+    .section-title, .next-card { display: block; }
+    .section-title > p { margin-top: 10px; }
+    .next-card .btn { margin-top: 18px; }
+    .factor-grid { grid-template-columns: 1fr; }
+    .gold-chart { height: 460px; min-height: 360px; }
+  }
+</style>
