@@ -7,6 +7,7 @@ import {
   soundSourceCount,
   soundFreeCommercialCount,
 } from '../../data/soundEffects';
+import { soundPreviews } from '../../data/soundPreviews';
 
 const title = '免费音效与音乐库导航 · 可商用音效 / 婚礼音乐 / 短剧配乐 · MacMP';
 const description =
@@ -22,6 +23,13 @@ const licenseStyles: Record<string, string> = {
 
 const filters = ['全部', '音效', '音乐', '氛围', '短剧', '婚礼'];
 
+const previewAudience = (category: string) => {
+  if (category === '婚礼') return '婚礼,音乐';
+  if (category === '短剧') return '短剧,音效';
+  if (category === '氛围') return '氛围';
+  return '音效';
+};
+
 const faqs = [
   {
     q: '为什么不能直接把音频抓到本站提供下载？',
@@ -34,6 +42,10 @@ const faqs = [
   {
     q: 'Freesound 和 Free Music Archive 为什么写“逐条确认”？',
     a: '这两个平台有大量不同作者和不同许可证，同一网站上会同时存在 CC0、CC BY、CC BY-NC 等资源。必须进入单个音频页面查看作者标注的许可证。',
+  },
+  {
+    q: '本站原创合成音效可以商用吗？',
+    a: '可以用于个人或商业视频项目，也可以下载 WAV 使用；但不得把原始音频单独转售、重新打包成素材库，或作为竞品音效站的核心内容分发。',
   },
   {
     q: '婚礼片和短剧最推荐先看哪里？',
@@ -98,6 +110,7 @@ const faqJsonLd = {
         <span><strong>{soundCategoryCount}</strong> 个剪辑用途分类</span>
         <span><strong>{soundSourceCount}</strong> 个免费来源</span>
         <span><strong>{soundFreeCommercialCount}</strong> 个标注可商用</span>
+        <span><strong>{soundPreviews.length}</strong> 个原创试听</span>
       </div>
     </div>
   </section>
@@ -124,6 +137,61 @@ const faqJsonLd = {
         ))}
         <span class="result-count" id="sfxCount">当前显示 {soundCategoryCount + soundSourceCount} 个结果</span>
       </div>
+    </section>
+
+    <section class="sfx-section" id="previews">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">原创合成预览</span>
+          <h2>像素材库一样试听和下载</h2>
+        </div>
+        <p>这组音频由本站合成，避免第三方版权问题。可直接试听、下载 WAV，适合剪辑测试和项目补音。</p>
+      </div>
+
+      <div class="preview-grid" id="sfxPreviewGrid">
+        {soundPreviews.map((preview) => (
+          <article
+            class="sound-card"
+            data-search-card
+            data-search={`${preview.title} ${preview.titleZh} ${preview.category} ${preview.tags.join(' ')}`}
+            data-audience={previewAudience(preview.category)}
+          >
+            <div class="sound-wave">
+              <div class="wave-bars" aria-hidden="true">
+                {preview.peaks.map((peak) => (
+                  <span style={`height:${Math.max(8, Math.round(peak * 100))}%`}></span>
+                ))}
+              </div>
+              <div class="sound-progress" aria-hidden="true"></div>
+              <button
+                class="sound-play"
+                type="button"
+                data-audio-src={preview.file}
+                aria-label={`播放 ${preview.titleZh}`}
+              >▶</button>
+            </div>
+            <div class="sound-body">
+              <div class="sound-title-row">
+                <div>
+                  <h3>{preview.title}</h3>
+                  <span class="sound-title-zh">{preview.titleZh}</span>
+                </div>
+                <span class="sound-duration">{preview.duration}</span>
+              </div>
+              <div class="tag-row">
+                <span>{preview.category}</span>
+                {preview.tags.map((tag) => <span>{tag}</span>)}
+              </div>
+              <div class="sound-footer">
+                <span class="sound-license">原创合成 · 可下载 WAV</span>
+                <a class="sound-download" href={preview.file} download aria-label={`下载 ${preview.titleZh}`}>↓</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="empty-state" id="sfxPreviewEmpty" hidden>没有匹配的试听素材，换个关键词试试。</p>
+      <audio id="sfxAudio" preload="metadata"></audio>
     </section>
 
     <section class="sfx-section" id="categories">
@@ -269,13 +337,26 @@ const faqJsonLd = {
       var cards = Array.prototype.slice.call(document.querySelectorAll('[data-search-card]'));
       var emptyCategory = document.getElementById('sfxCategoryEmpty');
       var emptySource = document.getElementById('sfxSourceEmpty');
+      var emptyPreview = document.getElementById('sfxPreviewEmpty');
+      var audio = document.getElementById('sfxAudio');
       var activeFilter = '全部';
+      var activeButton = null;
+      var activeCard = null;
+
+      function resetPlaying() {
+        if (activeCard) activeCard.classList.remove('playing');
+        if (activeButton) activeButton.textContent = '▶';
+        if (activeCard) activeCard.style.setProperty('--progress', '0%');
+        activeButton = null;
+        activeCard = null;
+      }
 
       function applyFilter() {
         var query = (search && search.value ? search.value : '').trim().toLowerCase();
         var visible = 0;
         var categoryVisible = 0;
         var sourceVisible = 0;
+        var previewVisible = 0;
 
         cards.forEach(function (card) {
           var text = (card.getAttribute('data-search') || '').toLowerCase();
@@ -288,12 +369,14 @@ const faqJsonLd = {
             visible += 1;
             if (card.classList.contains('category-card')) categoryVisible += 1;
             if (card.classList.contains('source-card')) sourceVisible += 1;
+            if (card.classList.contains('sound-card')) previewVisible += 1;
           }
         });
 
         if (count) count.textContent = '当前显示 ' + visible + ' 个结果';
         if (emptyCategory) emptyCategory.hidden = categoryVisible !== 0;
         if (emptySource) emptySource.hidden = sourceVisible !== 0;
+        if (emptyPreview) emptyPreview.hidden = previewVisible !== 0;
       }
 
       chips.forEach(function (chip) {
@@ -309,6 +392,50 @@ const faqJsonLd = {
       });
 
       if (search) search.addEventListener('input', applyFilter);
+
+      if (audio) {
+        audio.volume = 0.72;
+
+        document.querySelectorAll('.sound-play[data-audio-src]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var src = button.getAttribute('data-audio-src');
+            var card = button.closest('.sound-card');
+            if (!src || !card) return;
+
+            if (activeButton === button && !audio.paused) {
+              audio.pause();
+              button.textContent = '▶';
+              card.classList.remove('playing');
+              return;
+            }
+
+            resetPlaying();
+            if (audio.getAttribute('src') !== src) {
+              audio.setAttribute('src', src);
+              audio.load();
+            }
+            activeButton = button;
+            activeCard = card;
+            card.classList.add('playing');
+            button.textContent = 'Ⅱ';
+            audio.play().catch(function () {
+              resetPlaying();
+            });
+          });
+        });
+
+        audio.addEventListener('timeupdate', function () {
+          if (!activeCard || !audio.duration || !isFinite(audio.duration)) return;
+          var progress = Math.max(0, Math.min(100, (audio.currentTime / audio.duration) * 100));
+          activeCard.style.setProperty('--progress', progress + '%');
+        });
+
+        audio.addEventListener('pause', function () {
+          if (!audio.ended && activeButton) activeButton.textContent = '▶';
+        });
+
+        audio.addEventListener('ended', resetPlaying);
+      }
     })();
   </script>
 </BaseLayout>
@@ -429,6 +556,88 @@ const faqJsonLd = {
     font-size: 12px;
     font-weight: 750;
   }
+  .preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .sound-card {
+    position: relative;
+    overflow: visible;
+    border: 1px solid #e4e8f0;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(18, 31, 53, .06);
+  }
+  .sound-wave {
+    position: relative;
+    height: 154px;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(180deg, #f5f9ff, #edf5ff);
+  }
+  .wave-bars {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 22px 24px;
+  }
+  .wave-bars span {
+    flex: 1;
+    min-width: 1px;
+    max-width: 5px;
+    border-radius: 2px;
+    background: #859ab5;
+    opacity: .74;
+  }
+  .sound-progress {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--progress, 0%);
+    background: rgba(0, 113, 227, .12);
+    border-right: 2px solid #0071e3;
+    pointer-events: none;
+  }
+  .sound-play {
+    position: absolute;
+    right: 20px;
+    bottom: -25px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding-left: 3px;
+    border: 0;
+    border-radius: 50%;
+    background: #1d1d1f;
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(18, 31, 53, .22);
+    font-size: 23px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .sound-play:hover { background: #0071e3; }
+  .sound-card.playing .sound-play { background: #0071e3; }
+  .sound-body { padding: 34px 20px 18px; }
+  .sound-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+  .sound-title-row h3 { margin: 0; font-size: 17px; line-height: 1.25; letter-spacing: -.01em; }
+  .sound-title-zh { display: block; margin-top: 4px; color: #98a2b3; font-size: 12.5px; }
+  .sound-duration { flex: none; color: #475467; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .sound-body .tag-row { margin-top: 14px; }
+  .sound-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+  .sound-license { color: #98a2b3; font-size: 11.5px; }
+  .sound-download {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1d1d1f;
+    color: #fff;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .sound-download:hover { background: #0071e3; color: #fff; text-decoration: none; }
+  #sfxAudio { display: none; }
   .category-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .category-card {
     display: grid;
@@ -525,6 +734,7 @@ const faqJsonLd = {
   .cta-links { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
   .empty-state { margin: 18px 0 0; padding: 16px 18px; border-radius: 14px; background: #f8fafc; color: #667085; font-size: 13.5px; }
   @media (max-width: 900px) {
+    .preview-grid { grid-template-columns: 1fr; }
     .category-grid { grid-template-columns: 1fr; }
     .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sfx-cta { display: block; }
