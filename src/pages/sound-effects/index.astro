@@ -30,6 +30,8 @@ const previewAudience = (category: string) => {
   return '音效';
 };
 
+const waveformPeaks = (peaks: number[]) => peaks.filter((_, index) => index % 2 === 0);
+
 const faqs = [
   {
     q: '为什么不能直接把音频抓到本站提供下载？',
@@ -158,8 +160,8 @@ const faqJsonLd = {
           >
             <div class="sound-wave">
               <div class="wave-bars" aria-hidden="true">
-                {preview.peaks.map((peak) => (
-                  <span style={`height:${Math.max(8, Math.round(peak * 100))}%`}></span>
+                {waveformPeaks(preview.peaks).map((peak) => (
+                  <span style={`height:${Math.max(12, Math.round(peak * 100))}%`}></span>
                 ))}
               </div>
               <div class="sound-progress" aria-hidden="true"></div>
@@ -495,12 +497,17 @@ const faqJsonLd = {
   .notice strong { color: #0066cc; white-space: nowrap; font-size: 13.5px; }
   .notice p { margin: 0; color: #3b5f82; font-size: 13px; line-height: 1.7; }
   .search-panel {
+    position: sticky;
+    top: 64px;
+    z-index: 20;
     margin-top: 16px;
     padding: 14px;
-    border: 1px solid #e4e8f0;
+    border: 1px solid rgba(194, 216, 245, .92);
     border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 10px 32px rgba(18, 31, 53, .05);
+    background: rgba(255, 255, 255, .92);
+    box-shadow: 0 12px 34px rgba(17, 55, 110, .08);
+    backdrop-filter: saturate(160%) blur(18px);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
   }
   .search-box {
     display: flex;
@@ -509,7 +516,12 @@ const faqJsonLd = {
     padding: 0 12px;
     border: 1px solid #d7dde8;
     border-radius: 12px;
-    background: #fbfcfe;
+    background: linear-gradient(180deg, #fff, #f9fbff);
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .search-box:focus-within {
+    border-color: #68a6f5;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, .10);
   }
   .search-box input {
     width: 100%;
@@ -523,19 +535,20 @@ const faqJsonLd = {
   }
   .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
   .filter-chip {
-    padding: 6px 11px;
-    border: 1px solid #e0e2e7;
+    padding: 6px 12px;
+    border: 1px solid #dde4ee;
     border-radius: 999px;
     background: #fff;
-    color: #52525b;
+    color: #526174;
     font: inherit;
     font-size: 12.5px;
     font-weight: 650;
     cursor: pointer;
+    transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
   }
-  .filter-chip:hover { border-color: #0071e3; color: #0071e3; }
-  .filter-chip.active { border-color: #1d1d1f; background: #1d1d1f; color: #fff; }
-  .result-count { margin-left: auto; color: #98a2b3; font-size: 12.5px; }
+  .filter-chip:hover { border-color: #9cc5f7; color: #0066cc; transform: translateY(-1px); }
+  .filter-chip.active { border-color: #0b66c3; background: linear-gradient(180deg, #1677ff, #0b66c3); color: #fff; box-shadow: 0 5px 14px rgba(11, 102, 195, .22); }
+  .result-count { margin-left: auto; color: #8b97a8; font-size: 12.5px; }
   .sfx-section { margin-top: 40px; }
   .section-head-sfx {
     display: flex;
@@ -555,91 +568,110 @@ const faqJsonLd = {
     font-size: 12px;
     font-weight: 750;
   }
-  .preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .sound-card {
     position: relative;
-    overflow: visible;
-    border: 1px solid #e4e8f0;
-    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #dfe7f2;
+    border-radius: 16px;
     background: #fff;
-    box-shadow: 0 7px 22px rgba(18, 31, 53, .05);
+    box-shadow: 0 10px 28px rgba(20, 48, 88, .07);
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  }
+  .sound-card:hover {
+    border-color: #b9d5f7;
+    box-shadow: 0 16px 38px rgba(20, 73, 143, .12);
+    transform: translateY(-2px);
   }
   .sound-wave {
     position: relative;
-    height: 82px;
+    height: 96px;
     overflow: hidden;
-    border-radius: 14px 14px 0 0;
-    background: linear-gradient(180deg, #f5f9ff, #edf5ff);
+    border-radius: 16px 16px 0 0;
+    background:
+      radial-gradient(circle at 86% 18%, rgba(88, 168, 255, .20), transparent 28%),
+      linear-gradient(180deg, #f7fbff 0%, #edf5ff 100%);
+  }
+  .sound-wave::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(24, 102, 196, .18), transparent);
   }
   .wave-bars {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
-    gap: 1.5px;
-    padding: 14px 16px;
+    gap: 3px;
+    padding: 16px 56px 15px 18px;
   }
   .wave-bars span {
     flex: 1;
-    min-width: 1px;
-    max-width: 3px;
-    border-radius: 2px;
-    background: #859ab5;
-    opacity: .74;
+    min-width: 2px;
+    max-width: 4px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #86bdfd 0%, #2f7ce7 52%, #1555ad 100%);
+    box-shadow: 0 0 7px rgba(0, 96, 210, .10);
+    opacity: .92;
   }
   .sound-progress {
     position: absolute;
     inset: 0 auto 0 0;
     width: var(--progress, 0%);
-    background: rgba(0, 113, 227, .12);
-    border-right: 2px solid #0071e3;
+    background: linear-gradient(90deg, rgba(0, 113, 227, .14), rgba(0, 113, 227, .04));
+    border-right: 2px solid rgba(0, 113, 227, .72);
     pointer-events: none;
   }
   .sound-play {
     position: absolute;
-    right: 14px;
-    bottom: -18px;
+    right: 12px;
+    bottom: 12px;
     z-index: 2;
     display: grid;
     place-items: center;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     padding-left: 2px;
     border: 0;
     border-radius: 50%;
-    background: #1d1d1f;
+    background: linear-gradient(135deg, #1e86ff, #075ec7);
     color: #fff;
-    box-shadow: 0 8px 22px rgba(18, 31, 53, .22);
-    font-size: 16px;
+    box-shadow: 0 8px 18px rgba(7, 94, 199, .28);
+    font-size: 13px;
     line-height: 1;
     cursor: pointer;
+    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
   }
-  .sound-play:hover { background: #0071e3; }
-  .sound-card.playing .sound-play { background: #0071e3; }
-  .sound-body { padding: 25px 15px 13px; }
+  .sound-play:hover { transform: scale(1.05); box-shadow: 0 10px 22px rgba(7, 94, 199, .34); filter: brightness(1.04); }
+  .sound-card.playing .sound-play { background: linear-gradient(135deg, #46a4ff, #0a6bd7); }
+  .sound-body { padding: 16px 15px 14px; }
   .sound-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .sound-title-row h3 { margin: 0; font-size: 14.5px; line-height: 1.25; letter-spacing: -.01em; }
-  .sound-title-zh { display: block; margin-top: 3px; color: #98a2b3; font-size: 11px; line-height: 1.4; }
-  .sound-duration { flex: none; color: #475467; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+  .sound-title-row h3 { margin: 0; font-size: 15px; line-height: 1.25; letter-spacing: -.012em; }
+  .sound-title-zh { display: block; margin-top: 4px; color: #8793a5; font-size: 11px; line-height: 1.45; }
+  .sound-duration { flex: none; color: #314158; font-size: 11.5px; font-variant-numeric: tabular-nums; }
   .sound-body .tag-row { margin-top: 10px; }
-  .sound-body .tag-row span { padding: 2px 7px; font-size: 10.5px; }
-  .sound-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
-  .sound-license { color: #98a2b3; font-size: 10.5px; }
+  .sound-body .tag-row span { padding: 3px 7px; border: 1px solid #edf1f6; border-radius: 999px; background: #f7f9fc; color: #64748b; font-size: 10.5px; }
+  .sound-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 11px; border-top: 1px solid #eef2f7; }
+  .sound-license { display: inline-flex; align-items: center; gap: 5px; color: #8b97a8; font-size: 10.5px; }
+  .sound-license::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #35a36b; box-shadow: 0 0 0 3px rgba(53, 163, 107, .10); }
   .sound-download {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 5px 9px;
-    border: 1px solid #dce3ee;
+    padding: 6px 10px;
+    border: 1px solid #dce6f3;
     border-radius: 999px;
-    background: #fff;
-    color: #344054;
+    background: #f8fbff;
+    color: #225ea8;
     font-size: 10.5px;
-    font-weight: 700;
+    font-weight: 750;
     white-space: nowrap;
     text-decoration: none;
+    transition: border-color .16s ease, background .16s ease, color .16s ease;
   }
-  .sound-download:hover { border-color: #0071e3; background: #0071e3; color: #fff; text-decoration: none; }
+  .sound-download:hover { border-color: #0b66c3; background: #0b66c3; color: #fff; text-decoration: none; }
   #sfxAudio { display: none; }
   .category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
   .category-card {
@@ -745,6 +777,7 @@ const faqJsonLd = {
   }
   @media (max-width: 640px) {
     .sfx-hero { padding-top: 38px; }
+    .search-panel { position: static; }
     .preview-grid,
     .category-grid { grid-template-columns: 1fr; }
     .notice { grid-template-columns: 1fr; gap: 6px; }
