@@ -56,4 +56,14 @@ export const affiliates: Record<string, Affiliate> = {
     noteEn: 'Subscription apps usually offer 25%-30% recurring commission.',
     url: '#',
   },
+
+  own: {
+    id: 'own',
+    name: 'MacMP 自研产品',
+    commission: 'MacMP 官方自研产品',
+    commissionEn: 'Official MacMP product',
+    note: '下载开发预览版，正式上架前请以页面说明和系统要求为准。',
+    noteEn: 'Download the developer preview. Check requirements and release notes before production use.',
+    url: '/software/',
+  },
 };
