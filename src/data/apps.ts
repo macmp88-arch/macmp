@@ -23,10 +23,385 @@ export interface App {
   cons?: string[];
   consEn?: string[];
   features?: { title: string; titleEn: string; desc: string; descEn: string }[];
+  isOwnApp?: boolean;
+  heroImage?: string;
+  gallery?: { src: string; title: string; titleEn: string; desc: string; descEn: string }[];
   faqs?: { q: string; qEn: string; a: string; aEn: string }[];
 }
 
 export const apps: App[] = [
+    {
+      "slug": "macmp-disk-manager",
+      "name": "MacMP 磁盘管理器",
+      "nameEn": "MacMP Disk Manager",
+      "category": "磁盘管理",
+      "categoryEn": "Disk Management",
+      "type": "系统",
+      "typeEn": "System",
+      "tagline": "为 Mac 用户和摄影师打造的本地磁盘工作台：先看清状态，再做安全操作。",
+      "taglineEn": "A native macOS storage workspace for photographers and power users: inspect first, act safely.",
+      "description": "MacMP 磁盘管理器把卷信息、容量、文件系统、SMART、读写速度和挂载状态集中在一个原生界面中。它不复制 Tuxera 的驱动和界面，也不会默认开放格式化、分区等高危操作；更适合用来快速判断移动硬盘、相机存储卡和备份盘是否健康，并在需要时完成挂载、卸载、推出和只读验证。",
+      "descriptionEn": "MacMP Disk Manager brings volume details, capacity, file system, SMART, throughput and mount state into one native macOS interface. It does not reuse a third-party disk driver or UI, and it keeps destructive partition operations out of the default workflow. It is designed for checking camera cards, portable SSDs and backup drives before taking action.",
+      "price": "VIP 年费免费 / 非会员一机一码买断",
+      "setapp": false,
+      "affiliate": "generic",
+      "url": "/support/?product=disk-manager&region=cn",
+      "tags": [
+        "磁盘",
+        "SMART",
+        "NTFS",
+        "速度测试",
+        "摄影师"
+      ],
+      "bestFor": "需要管理移动硬盘、相机存储卡和备份盘，并希望减少命令行操作的用户。",
+      "bestForEn": "Users who manage portable drives, camera cards and backups and want fewer command-line steps.",
+      "pros": [
+        "原生 AppKit 界面，启动和操作路径清楚",
+        "卷、容量、文件系统和 SMART 状态集中查看",
+        "读写速度与 NTFS 驱动状态有明确反馈",
+        "支持中文与 English 界面切换"
+      ],
+      "prosEn": [
+        "Native AppKit interface with a clear action path",
+        "Volume, capacity, file system and SMART details in one view",
+        "Throughput and NTFS driver status are visible",
+        "Simplified Chinese and English interface"
+      ],
+      "cons": [
+        "当前版本不开放格式化、分区和删除卷等高危写入操作",
+        "NTFS 真正的写入能力仍取决于第三方驱动或系统支持",
+        "系统盘的部分挂载操作可能需要用户明确授权"
+      ],
+      "consEn": [
+        "Formatting, partitioning and deleting volumes are intentionally disabled in this build",
+        "Writable NTFS still depends on a compatible third-party driver or system support",
+        "Some system-volume operations require explicit user authorization"
+      ],
+      "features": [
+        {
+          "title": "卷与磁盘总览",
+          "titleEn": "Volume & Disk Overview",
+          "desc": "集中显示容量、可用空间、文件系统、设备标识、连接方式与挂载位置，先判断状态再操作。",
+          "descEn": "See capacity, free space, file system, device ID, bus and mount point before acting."
+        },
+        {
+          "title": "只读文件系统验证",
+          "titleEn": "Read-only Verification",
+          "desc": "调用 macOS 原生工具检查卷状态，适合在交付素材前确认存储卡和备份盘结构。",
+          "descEn": "Uses native macOS tools to verify volume state before handing off footage or archive drives."
+        },
+        {
+          "title": "挂载、卸载与推出",
+          "titleEn": "Mount, Unmount & Eject",
+          "desc": "用清晰的卷级操作替代记忆命令，避免在文件仍被占用时强行拔出设备。",
+          "descEn": "Provides straightforward volume actions so devices are not pulled while files are still in use."
+        },
+        {
+          "title": "NTFS 驱动检测",
+          "titleEn": "NTFS Driver Detection",
+          "desc": "检查 Tuxera、Paragon、ntfs-3g 与系统内置能力，明确当前卷究竟是只读还是可写。",
+          "descEn": "Detects Tuxera, Paragon, ntfs-3g and built-in support so read-only versus writable status is clear."
+        },
+        {
+          "title": "顺序读写测试",
+          "titleEn": "Sequential I/O Test",
+          "desc": "仅在用户主动点击后创建临时测试文件，快速比较不同硬盘、读卡器和连接线。",
+          "descEn": "Creates temporary files only after an explicit action, making it easy to compare drives, readers and cables."
+        },
+        {
+          "title": "设备指纹与授权中心",
+          "titleEn": "Device Identity & Licensing",
+          "desc": "生成稳定的设备标识，为后续 MacMP VIP 或一机一码授权同步预留完整入口。",
+          "descEn": "Creates a stable device identity for future MacMP VIP or machine-bound license sync."
+        }
+      ],
+      "faqs": [
+        {
+          "q": "MacMP 磁盘管理器会直接格式化硬盘吗？",
+          "qEn": "Does MacMP Disk Manager format drives directly?",
+          "a": "当前版本不会。格式化、分区和删除卷属于高风险操作，默认不开放；现阶段重点是状态读取、验证、挂载管理和性能测试。",
+          "aEn": "Not in this build. High-risk operations are intentionally disabled while the product focuses on inspection, verification, mounting and performance testing."
+        },
+        {
+          "q": "为什么 NTFS 盘显示只读？",
+          "qEn": "Why is my NTFS drive read-only?",
+          "a": "macOS 默认通常只提供 NTFS 读取。写入能力取决于已安装并授权的 Tuxera、Paragon 或 ntfs-3g 等驱动，应用会显示检测结果。",
+          "aEn": "macOS commonly provides NTFS read access only. Writing depends on a compatible and licensed driver such as Tuxera, Paragon or ntfs-3g, which the app reports."
+        },
+        {
+          "q": "买断版和 VIP 年费有什么区别？",
+          "qEn": "What is the difference between the lifetime license and VIP?",
+          "a": "购买一机一码可获得指定设备上的长期使用授权；MacMP VIP 年费用户可在有效期内免费使用本站自研工具。最终价格和授权方式以购买页面为准。",
+          "aEn": "A machine-bound license covers a specific device. MacMP VIP includes the site's own tools during the active term. Final pricing and entitlement are shown on the purchase page."
+        }
+      ],
+      "isOwnApp": true,
+      "heroImage": "/images/products/macmp-disk-manager.svg",
+      "gallery": [
+        {
+          "src": "/images/products/macmp-disk-manager.svg",
+          "title": "磁盘总览与读写状态",
+          "titleEn": "Dashboard & Throughput",
+          "desc": "在一个界面中查看容量、健康、文件系统、读写速度和挂载卷。",
+          "descEn": "See capacity, health, file system, throughput and mounted volumes in one screen."
+        },
+        {
+          "src": "/images/products/macmp-disk-manager-workflow.svg",
+          "title": "安全磁盘工作流",
+          "titleEn": "Safe Disk Workflow",
+          "desc": "接入、验证、测速、挂载四步独立呈现，避免模糊的“一键操作”。",
+          "descEn": "Connect, verify, benchmark and mount are separate steps instead of an opaque one-click action."
+        }
+      ]
+    },
+    {
+      "slug": "macmp-recover-studio",
+      "name": "MacMP Recover Studio",
+      "nameEn": "MacMP Recover Studio",
+      "category": "数据恢复",
+      "categoryEn": "Data Recovery",
+      "type": "工具",
+      "typeEn": "Utilities",
+      "tagline": "面向摄影师的只读恢复工作台：存储卡、RAW、照片和损坏视频集中处理。",
+      "taglineEn": "A read-first recovery workspace for camera cards, RAW files, photos and damaged video.",
+      "description": "MacMP Recover Studio 面向格式化存储卡、误删照片和未封装视频的紧急处理场景。工作流优先使用只读扫描，按文件签名重建 JPEG、PNG、RAW、MP4 和 MOV 等候选文件，再通过 macOS 媒体框架验证并重新封装视频。它不会承诺“任何数据都能恢复”，而是把扫描范围、候选文件、置信度和输出位置透明地展示出来。",
+      "descriptionEn": "MacMP Recover Studio is built for formatted camera cards, deleted photos and unfinished video containers. It scans read-only, carves candidates by file signature and validates media with native macOS frameworks before exporting. It avoids blanket recovery promises and keeps scan scope, candidates, confidence and output paths visible.",
+      "price": "VIP 年费免费 / 非会员一机一码买断",
+      "setapp": false,
+      "affiliate": "generic",
+      "url": "/support/?product=recover-studio&region=cn",
+      "tags": [
+        "数据恢复",
+        "存储卡",
+        "RAW",
+        "视频修复",
+        "只读扫描"
+      ],
+      "bestFor": "摄影师、视频创作者和需要处理 SD/CFexpress 卡、误删照片或损坏视频的用户。",
+      "bestForEn": "Photographers and video creators dealing with SD/CFexpress cards, deleted photos or damaged video.",
+      "pros": [
+        "默认只读扫描，减少对原始存储卡的二次写入",
+        "覆盖常见照片、RAW、HEIC、AVIF、MP4、MOV 和 MXF 签名",
+        "视频验证与重新封装使用 macOS 原生媒体框架",
+        "中文 / English 与本地授权入口已经具备"
+      ],
+      "prosEn": [
+        "Read-only scan path reduces writes to the original card",
+        "Recognises common photo, RAW, HEIC, AVIF, MP4, MOV and MXF signatures",
+        "Video validation and remuxing use native macOS media frameworks",
+        "Chinese / English UI and local licensing entry are present"
+      ],
+      "cons": [
+        "当前为签名恢复引擎，尚未覆盖 APFS / HFS+ 全目录结构解析",
+        "碎片化严重的视频恢复率仍取决于原始写入情况",
+        "真实故障盘应先制作只读镜像，不能把扫描当成硬件修复"
+      ],
+      "consEn": [
+        "The current engine uses signature carving; full APFS/HFS+ directory reconstruction is not included yet",
+        "Heavily fragmented video recovery still depends on writes after deletion",
+        "A failing drive should be imaged read-only first; scanning is not hardware repair"
+      ],
+      "features": [
+        {
+          "title": "存储卡只读扫描",
+          "titleEn": "Read-only Card Scan",
+          "desc": "以设备镜像或挂载点作为输入，默认避免向源设备写入临时数据。",
+          "descEn": "Accepts a device image or mount point and avoids writing temporary data to the source by default."
+        },
+        {
+          "title": "照片与 RAW 签名恢复",
+          "titleEn": "Photo & RAW Carving",
+          "desc": "识别 JPEG、PNG、GIF、TIFF、CR2、NEF、ARW、DNG 等常见文件签名并生成候选列表。",
+          "descEn": "Detects common signatures including JPEG, PNG, GIF, TIFF, CR2, NEF, ARW and DNG."
+        },
+        {
+          "title": "损坏视频验证与重新封装",
+          "titleEn": "Video Validation & Remux",
+          "desc": "检查媒体结构，并通过 AVFoundation 尝试把可读轨道重新封装为可编辑的 MOV。",
+          "descEn": "Checks media structure and attempts to remux readable tracks into an editable MOV with AVFoundation."
+        },
+        {
+          "title": "存储卡诊断",
+          "titleEn": "Card Diagnostics",
+          "desc": "读取设备、文件系统和容量信息，帮助区分误删、格式异常与硬件故障。",
+          "descEn": "Reads device, file system and capacity information to separate deletion, format and hardware issues."
+        },
+        {
+          "title": "候选文件清单",
+          "titleEn": "Candidate Inventory",
+          "desc": "输出文件类型、偏移、长度、置信度和建议文件名，恢复过程可以复核而不是盲扫。",
+          "descEn": "Exports type, offset, length, confidence and suggested name for review instead of blind recovery."
+        },
+        {
+          "title": "本地授权与双语言",
+          "titleEn": "Local Licensing & Bilingual UI",
+          "desc": "内置 MacMP VIP 与一机一码入口，支持简体中文和 English 设置。",
+          "descEn": "Includes MacMP VIP and machine-bound license entry, with Simplified Chinese and English settings."
+        }
+      ],
+      "faqs": [
+        {
+          "q": "格式化后的存储卡还能恢复吗？",
+          "qEn": "Can a formatted card still be recovered?",
+          "a": "有机会，但取决于格式化后是否继续拍摄或写入。越早停止使用并制作只读镜像，恢复可能性越高。",
+          "aEn": "It can be possible, depending on whether new data was written after formatting. Stop using the card and make a read-only image as soon as possible."
+        },
+        {
+          "q": "视频修复是不是保证一定能播放？",
+          "qEn": "Does video repair guarantee playback?",
+          "a": "不能保证。应用会先验证轨道与媒体结构，只对具备可解析轨道的内容尝试重新封装；严重损坏或碎片缺失的文件仍可能失败。",
+          "aEn": "No. The app validates tracks and media structure first and only remuxes recoverable tracks. Severely damaged or incomplete files can still fail."
+        },
+        {
+          "q": "可以直接扫描正在出现坏道的硬盘吗？",
+          "qEn": "Can I scan a failing drive directly?",
+          "a": "不建议。机械硬盘出现异响、掉盘或持续 I/O 错误时，应优先停止通电并交给专业数据恢复机构，避免扫描加剧损伤。",
+          "aEn": "It is not recommended. If a mechanical drive is clicking, dropping offline or showing persistent I/O errors, stop using it and consult a professional recovery service."
+        }
+      ],
+      "isOwnApp": true,
+      "heroImage": "/images/products/macmp-recover-studio.svg",
+      "gallery": [
+        {
+          "src": "/images/products/macmp-recover-studio.svg",
+          "title": "只读扫描与候选文件",
+          "titleEn": "Read-only Scan & Candidates",
+          "desc": "扫描过程、候选文件数量、进度和输出动作集中展示。",
+          "descEn": "Scan progress, candidate count and export actions are shown together."
+        },
+        {
+          "src": "/images/products/macmp-recover-studio-workflow.svg",
+          "title": "摄影师恢复流程",
+          "titleEn": "Photographer Recovery Flow",
+          "desc": "先镜像、再签名扫描、验证结构，最后导出到安全磁盘。",
+          "descEn": "Image first, carve by signature, validate structure, then export to a safe disk."
+        }
+      ]
+    },
+    {
+      "slug": "macmp-sun-galaxy",
+      "name": "MacMP Sun & Galaxy",
+      "nameEn": "MacMP Sun & Galaxy",
+      "category": "摄影规划",
+      "categoryEn": "Photo Planning",
+      "type": "工具",
+      "typeEn": "Utilities",
+      "tagline": "在出发前和现场，同时看清太阳、月亮与银河中心的方位和高度。",
+      "taglineEn": "Plan and track the Sun, Moon and galactic center before and during the shoot.",
+      "description": "MacMP Sun & Galaxy 是面向风光摄影师的 iPhone / iPad 规划工具。核心天文计算在本地完成，可查看日出、日落、太阳正午、月相、月亮和银河中心方位/高度，并通过罗盘与 AR 相机把天空坐标叠加到实景中。数字功能使用 Apple StoreKit 一次性买断，不绕过 App Store 内购。",
+      "descriptionEn": "MacMP Sun & Galaxy is an iPhone and iPad planning tool for landscape photographers. Core astronomy runs locally, covering sunrise, sunset, solar noon, moon phase, and the altitude/azimuth of the Moon and galactic center. A compass and AR camera align sky coordinates with the live scene. Digital features use a one-time StoreKit purchase.",
+      "price": "App Store 一次性买断，目标 $4.99 / ¥30",
+      "setapp": false,
+      "affiliate": "generic",
+      "url": "/support/?product=sun-galaxy&region=cn",
+      "tags": [
+        "太阳",
+        "月亮",
+        "银河",
+        "AR",
+        "风光摄影"
+      ],
+      "bestFor": "需要提前规划日出日落、蓝调时刻和银河机位的风光摄影师。",
+      "bestForEn": "Landscape photographers planning sunrise, blue hour and Milky Way positions.",
+      "pros": [
+        "太阳、月亮和银河中心使用同一套本地坐标体系",
+        "罗盘和 AR 实景用于把计划带回现场",
+        "离线计算适合无网络的山区和海边",
+        "支持中文 / English 与地图、日期模拟"
+      ],
+      "prosEn": [
+        "Sun, Moon and galactic center share one local coordinate model",
+        "Compass and AR bring the plan back to the field",
+        "Offline calculation suits remote mountains and coastlines",
+        "Chinese / English, map and date simulation are included"
+      ],
+      "cons": [
+        "首版仅支持 iOS 17 及以上，暂不包含 Android",
+        "天气、云量、光污染和地形遮挡属于后续版本",
+        "AR 结果仍需要现场校准并受设备磁力计精度影响"
+      ],
+      "consEn": [
+        "The first release targets iOS 17 and later; Android is not included",
+        "Weather, cloud cover, light pollution and terrain occlusion are planned for later",
+        "AR still needs field calibration and depends on device magnetometer accuracy"
+      ],
+      "features": [
+        {
+          "title": "太阳、月亮与银河位置",
+          "titleEn": "Sun, Moon & Galaxy",
+          "desc": "实时计算方位角、高度角、赤经赤纬和银河中心最高高度。",
+          "descEn": "Calculates azimuth, altitude, right ascension, declination and galactic-center peak altitude."
+        },
+        {
+          "title": "日出日落与黄金时刻",
+          "titleEn": "Sunrise, Sunset & Golden Hour",
+          "desc": "按所选日期与经纬度计算日出、太阳正午、日落和昼长，为拍摄窗口排序。",
+          "descEn": "Computes sunrise, solar noon, sunset and day length for the selected date and coordinates."
+        },
+        {
+          "title": "现场方向罗盘",
+          "titleEn": "Field Compass",
+          "desc": "转动设备时让太阳、月亮和银河标记跟随真实方向，快速判断相机应该朝向哪里。",
+          "descEn": "Rotating the device moves sky markers with the real direction so the camera heading is immediately clear."
+        },
+        {
+          "title": "AR 实景叠加",
+          "titleEn": "AR Viewfinder",
+          "desc": "通过相机实景与 ARKit 把天空坐标叠加到画面上，支持现场校准和标签开关。",
+          "descEn": "Uses the camera and ARKit to overlay sky coordinates with field calibration and label controls."
+        },
+        {
+          "title": "地图与日期计划",
+          "titleEn": "Map & Date Planner",
+          "desc": "在地图上选择机位，模拟不同日期的日出、月相和银河高度。",
+          "descEn": "Choose a location on the map and simulate sunrise, moon phase and galactic altitude for different dates."
+        },
+        {
+          "title": "本地计算与买断授权",
+          "titleEn": "Offline Core & Lifetime Purchase",
+          "desc": "核心天文算法离线运行，数字功能使用 StoreKit 一次性买断并提供恢复购买。",
+          "descEn": "The astronomy core runs offline; digital features use a one-time StoreKit purchase with restore support."
+        }
+      ],
+      "faqs": [
+        {
+          "q": "MacMP Sun & Galaxy 支持哪些设备？",
+          "qEn": "Which devices does MacMP Sun & Galaxy support?",
+          "a": "目标平台为 iPhone 和 iPad，最低 iOS 17。AR 功能需要支持 ARKit 的摄像头设备，方位功能需要定位和运动传感器权限。",
+          "aEn": "The target platforms are iPhone and iPad on iOS 17 or later. AR requires a supported camera, while direction features need location and motion permissions."
+        },
+        {
+          "q": "没有网络可以使用吗？",
+          "qEn": "Does it work offline?",
+          "a": "天文计算和已保存的机位计划可以在离线状态下使用。地图底图是否能离线显示取决于系统缓存和 Apple 地图能力。",
+          "aEn": "Astronomy calculation and saved plans work offline. Map tile availability depends on system caching and Apple Maps."
+        },
+        {
+          "q": "为什么 AR 标记和实景有偏差？",
+          "qEn": "Why do AR markers drift from the real scene?",
+          "a": "手机磁力计容易受支架、相机配件、车辆和强磁环境影响。进入现场后先做方向校准，再移动设备确认多个参考点。",
+          "aEn": "Phone magnetometers are affected by mounts, camera accessories, vehicles and nearby magnets. Calibrate on site and verify against more than one landmark."
+        }
+      ],
+      "isOwnApp": true,
+      "heroImage": "/images/products/macmp-sun-galaxy.svg",
+      "gallery": [
+        {
+          "src": "/images/products/macmp-sun-galaxy.svg",
+          "title": "天空位置与 AR 规划",
+          "titleEn": "Sky Position & AR Planning",
+          "desc": "太阳、月亮、银河中心和 AR 构图入口在同一套界面语言中呈现。",
+          "descEn": "Sun, Moon, galactic center and AR framing share one visual system."
+        },
+        {
+          "src": "/images/products/macmp-sun-galaxy-workflow.svg",
+          "title": "从机位到现场拍摄",
+          "titleEn": "From Location to Shoot",
+          "desc": "选机位、定日期、AR 校准、现场执行四步完成规划。",
+          "descEn": "Choose a location, set the date, calibrate AR and execute in the field."
+        }
+      ]
+    },
   {
     slug: 'setapp', name: 'Setapp', nameEn: 'Setapp',
     category: '订阅合集', categoryEn: 'Subscription Bundle',
@@ -553,64 +928,6 @@ export const apps: App[] = [
     bestFor: "需要快速提升视频音质的创作者", bestForEn: "Creators who want better audio quickly",
     pros: ["AI 一键处理", "音频降噪效果明显", "简单易用"], prosEn: ["One-click AI processing", "Clear noise reduction", "Easy to use"],
     cons: ["订阅收费", "专业音频场景有限"], consEn: ["Subscription", "Limited for pro audio"],
-  },
-  {
-    slug: 'macmp-disk-manager', name: 'MacMP Disk Manager', nameEn: 'MacMP Disk Manager',
-    category: '系统工具', categoryEn: 'System Utility', type: '系统', typeEn: 'System',
-    tagline: 'MacMP 自研磁盘管理、NTFS 驱动检测与真实读写性能测试',
-    taglineEn: 'MacMP disk management, NTFS driver detection and real read/write performance testing',
-    description: 'MacMP Disk Manager 是 MacMP 官方自研的 macOS 磁盘管理工具。它可以查看卷容量、文件系统、SMART 状态和挂载状态，执行挂载、卸载、推出、验证卷与顺序读写测试，并检测 Tuxera、Paragon、ntfs-3g 等 NTFS 驱动。当前版本是开发预览版，不复制 Tuxera 的私有驱动、代码、界面或商标；NTFS 写入能力取决于合法授权的第三方驱动。',
-    descriptionEn: 'MacMP Disk Manager is an in-house MacMP utility for macOS storage. It shows volume capacity, file systems, SMART status and mount state, performs mount/eject/verify and sequential read/write tests, and detects Tuxera, Paragon and ntfs-3g. This developer preview does not copy Tuxera private drivers, code, UI or trademarks. NTFS write support depends on a properly licensed third-party driver.',
-    price: 'VIP 年费免费 / 买断 ¥89 / $19.99', setapp: false, affiliate: 'own', url: '/downloads/MacMP-Disk-Manager-0.1.0.zip',
-    tags: ['磁盘管理', 'NTFS', 'SMART', '性能测试', '一机一码'],
-    bestFor: '需要管理多块外置盘、检测 NTFS 驱动状态并测试真实读写速度的 Mac 用户',
-    bestForEn: 'Mac users who manage external drives, need NTFS driver visibility and want real read/write tests',
-    pros: ['原生 AppKit，启动轻量；所有卷信息集中展示', '支持挂载、卸载、推出、验证和 128 MB 顺序读写测试', '一机一码与 MacMP VIP 授权入口已经预留'],
-    prosEn: ['Native AppKit app with a lightweight, unified storage view', 'Mount, eject, verify and 128 MB sequential read/write tests', 'One-device licensing and MacMP VIP entitlement hooks are prepared'],
-    cons: ['当前是开发预览版，尚未完成 Apple Developer ID 公证', 'NTFS 写入仍需要合法授权的第三方驱动', '格式化、分区等高危写入操作默认不开放'],
-    consEn: ['Developer preview is not yet notarized with an Apple Developer ID', 'NTFS writing still requires a properly licensed third-party driver', 'Formatting and partition writes are intentionally disabled by default'],
-    features: [
-      { title: '卷宗总览', titleEn: 'Volume Overview', desc: '显示卷名、容量、可用空间、文件系统、设备标识和挂载点。', descEn: 'Shows volume name, capacity, free space, file system, device ID and mount point.' },
-      { title: '磁盘操作', titleEn: 'Disk Actions', desc: '通过 macOS diskutil 执行挂载、卸载、推出和验证卷。', descEn: 'Mounts, unmounts, ejects and verifies volumes through macOS diskutil.' },
-      { title: 'NTFS 驱动检测', titleEn: 'NTFS Driver Detection', desc: '检测内置 NTFS、Tuxera、Paragon 与 ntfs-3g，并明确读写边界。', descEn: 'Detects built-in NTFS, Tuxera, Paragon and ntfs-3g with clear read/write boundaries.' },
-      { title: '真实速度测试', titleEn: 'Real Speed Test', desc: '在用户选择的可写卷上创建 128 MB 临时文件，测完自动删除。', descEn: 'Creates a 128 MB temporary file on a selected writable volume and removes it after testing.' },
-      { title: '授权中心', titleEn: 'License Center', desc: '展示设备指纹，预留 MacMP VIP 年费和一机一码买断入口。', descEn: 'Displays a device fingerprint and prepares MacMP VIP and one-device perpetual licensing.' },
-      { title: '中英文界面', titleEn: 'Chinese & English', desc: '设置中可切换中文 / English 主要界面。', descEn: 'Switch the main interface between Chinese and English in Settings.' },
-    ],
-    faqs: [
-      { q: 'MacMP Disk Manager 能替代 Tuxera 的 NTFS 驱动吗？', qEn: 'Can MacMP Disk Manager replace Tuxera NTFS driver?', a: '不能。App 负责检测、管理和调用驱动；NTFS 写入仍需要合法授权的第三方驱动，不能复制或转售 Tuxera 私有驱动。', aEn: 'No. The app detects, manages and invokes drivers. NTFS writing still requires a properly licensed third-party driver; it does not copy or resell Tuxera private drivers.' },
-      { q: '开发预览版可以直接商用吗？', qEn: 'Can the developer preview be used commercially?', a: '正式商用前需要完成 Apple Developer ID 签名、公证、授权服务和支付回调测试。当前版本适合内部测试。', aEn: 'Before commercial release it needs Apple Developer ID signing, notarization, licensing services and payment callback testing. The current build is for internal testing.' },
-      { q: 'VIP 年费和一机一码买断有什么区别？', qEn: 'What is the difference between VIP and perpetual license?', a: 'MacMP VIP 年费会员在有效期内免费使用；一机一码买断版把授权码绑定到单台设备，适合不愿持续订阅的用户。', aEn: 'MacMP VIP gives access while the annual membership is active. The one-device perpetual license binds a code to one Mac for users who prefer not to subscribe.' },
-    ],
-  },
-  {
-    slug: 'macmp-recover-studio', name: 'MacMP Recover Studio', nameEn: 'MacMP Recover Studio',
-    category: '摄影工具', categoryEn: 'Photography Utility', type: '工具', typeEn: 'Utilities',
-    tagline: '存储卡只读诊断、格式化后签名恢复、未封装视频修复与摄影师数据救援',
-    taglineEn: 'Read-only card diagnostics, signature carving after formatting and video repair for photographers',
-    description: 'MacMP Recover Studio 是面向摄影师的 MacMP 自研数据恢复工具。它可以用只读方式扫描存储卡设备、磁盘镜像或导出目录，按文件签名识别 JPEG、PNG、GIF、TIFF、CR2、NEF、ARW、DNG、MP4、MOV、HEIC、AVIF、MXF、R3D 与 BRAW 等候选文件，并通过 AVFoundation 或 avconvert 对可识别视频进行重新封装验证。当前版本不复制 Wondershare Recoverit 的私有引擎、界面或素材。',
-    descriptionEn: 'MacMP Recover Studio is an in-house MacMP recovery tool for photographers. It scans card devices, disk images or export folders read-only, identifies candidate JPEG, PNG, GIF, TIFF, CR2, NEF, ARW, DNG, MP4, MOV, HEIC, AVIF, MXF, R3D and BRAW signatures, and validates recoverable video through AVFoundation or avconvert. It does not copy Wondershare Recoverit private engines, UI or assets.',
-    price: 'VIP 年费免费 / 买断 ¥129 / $29.99', setapp: false, affiliate: 'own', url: '/downloads/MacMP-Recover-Studio-0.1.0.zip',
-    tags: ['数据恢复', '摄影', '存储卡', '视频修复', '一机一码'],
-    bestFor: '需要从 SD / CFexpress / XQD 卡或磁盘镜像恢复照片和视频，并希望先做只读诊断的摄影师',
-    bestForEn: 'Photographers recovering photos and videos from SD, CFexpress or XQD cards who want read-only diagnosis first',
-    pros: ['默认只读扫描，自动测试会验证源镜像未被修改', '照片签名恢复与视频重新封装均有独立测试', '保留原始文件、目录筛选、中文 / English 界面和授权入口'],
-    prosEn: ['Read-only scanning by default, with automated tests proving the source image is unchanged', 'Independent tests for photo signature carving and video remuxing', 'Original files, directory triage, Chinese/English UI and licensing hooks'],
-    cons: ['当前是开发预览版，未完成 Apple Developer ID 公证', '高度碎片化的视频仍可能需要专用 FFmpeg / 商业恢复引擎', 'RAID、加密卷和物理坏道恢复不在当前 MVP 范围内'],
-    consEn: ['Developer preview is not yet notarized with an Apple Developer ID', 'Highly fragmented video may still require dedicated FFmpeg or commercial recovery engines', 'RAID, encrypted volume and physical bad-sector recovery are outside the current MVP'],
-    features: [
-      { title: '只读签名扫描', titleEn: 'Read-only Signature Scan', desc: '扫描磁盘镜像或设备中的文件签名，不修改源存储卡。', descEn: 'Scans signatures in a disk image or device without modifying the source card.' },
-      { title: '照片恢复', titleEn: 'Photo Recovery', desc: '覆盖 JPEG、PNG、GIF、TIFF 与常见相机 RAW 签名。', descEn: 'Covers JPEG, PNG, GIF, TIFF and common camera RAW signatures.' },
-      { title: '视频重新封装', titleEn: 'Video Remux', desc: '先用 AVFoundation 验证轨道，再尝试无损重新封装为 MOV。', descEn: 'Validates tracks with AVFoundation, then attempts lossless remuxing to MOV.' },
-      { title: '目录筛选', titleEn: 'Directory Triage', desc: '对导出目录中可读取的图片、视频和音频进行整理复制。', descEn: 'Copies supported images, videos and audio from an export folder for triage.' },
-      { title: '存储卡诊断', titleEn: 'Card Diagnostics', desc: '通过 diskutil 读取文件系统、容量和设备状态，先诊断再恢复。', descEn: 'Uses diskutil to inspect file system, capacity and device state before recovery.' },
-      { title: '自动测试', titleEn: 'Automated Tests', desc: '使用合成镜像自动验证 JPEG、PNG、MP4 恢复、只读性和视频重新封装。', descEn: 'Synthetic images automatically verify JPEG, PNG, MP4 recovery, read-only behavior and video remuxing.' },
-    ],
-    faqs: [
-      { q: '格式化后的卡可以恢复吗？', qEn: 'Can a formatted card be recovered?', a: '如果数据块尚未被覆盖，只读签名扫描有机会恢复未碎片化的照片和视频。格式化后请立即停止写入，并优先制作整盘只读镜像。', aEn: 'If data blocks have not been overwritten, read-only signature carving may recover non-fragmented photos and videos. Stop writing immediately after formatting and make a read-only disk image first.' },
-      { q: '能把 Recoverit 的引擎集成进来吗？', qEn: 'Can the Recoverit engine be integrated?', a: '不能复制或封装 Recoverit 私有引擎。正式版应继续使用自研签名恢复，并在获得授权的前提下接入 FFmpeg、PhotoRec 等合规组件。', aEn: 'No. The private Recoverit engine cannot be copied or wrapped. Production builds should continue with the in-house carving engine and only use compliant components such as FFmpeg or PhotoRec with proper licensing.' },
-      { q: '为什么视频恢复需要 ffmpeg？', qEn: 'Why is ffmpeg needed for some video recovery?', a: 'AVFoundation 能处理标准容器，但对于未封装或高度碎片化的流，FFmpeg 的流级修复更合适。没有 FFmpeg 时，App 会安全失败并保留原文件。', aEn: 'AVFoundation handles standard containers, but stream-level repair for unencapsulated or highly fragmented data is better suited to FFmpeg. Without FFmpeg the app fails safely and preserves the original.' },
-    ],
   },
 ];
 

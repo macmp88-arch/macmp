@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { apps } from '../data/apps';
+import { ownAppProfiles } from '../data/ownAppProfiles';
 import { guides } from '../data/guides';
 import { affiliates } from '../data/affiliates';
 import Newsletter from '../components/Newsletter.astro';
@@ -17,41 +18,89 @@ const categories = [
   { zh: '教程', en: 'Tutorials', href: '/ai-local/' },
 ];
 
+const ownApps = apps.filter((app) => app.isOwnApp);
 const directory = apps.slice(0, 24);
 const featuredGuides = guides.filter((guide) => guide.featured).slice(0, 4);
 const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
 ---
 <BaseLayout path="/">
-  <section class="hero" style="padding-bottom:20px">
-    <p class="eyebrow"><span class="zh">正版 Mac 软件推荐</span><span class="en">Official Mac software picks</span></p>
-    <h1>MacMP</h1>
-    <p class="sub"><span class="zh">发现好用的 Mac 软件、优惠与教程。</span><span class="en">Discover the best Mac apps, deals and tutorials.</span></p>
-    <div class="hero-links">
-      <a href="/software/"><span class="zh">浏览全部软件</span><span class="en">Browse all software</span></a>
-      <a href="/deals/"><span class="zh">查看优惠情报</span><span class="en">View deals</span></a>
-      <a href="/gold/"><span class="zh">黄金投资行情</span><span class="en">Gold market</span></a>
-      <a href="/sound-effects/"><span class="zh">免费音效库</span><span class="en">Free SFX library</span></a>
-      {memberEnabled && <a href="/vip/"><span class="zh">加入 VIP 会员</span><span class="en">Join VIP</span></a>}
-    </div>
-    <form class="hero-search" action="/software/" method="get">
-      <input type="search" name="q" placeholder="搜索软件… Search…" autocomplete="off" />
-      <button type="submit"><span class="zh">搜索</span><span class="en">Search</span></button>
-    </form>
-    <div class="hero-stats">
-      <span><strong>{apps.length}</strong> 款精选软件</span>
-      <span><strong>{guides.length}</strong> 篇原创专题</span>
-      <span><strong>16:9</strong> 工作流思维</span>
+  <section class="home-stage">
+    <div class="container home-stage-inner">
+      <div class="home-stage-copy">
+        <p class="home-eyebrow">MACMP · FOR CREATORS & PHOTOGRAPHERS</p>
+        <h1>把 Mac 和移动设备，变成真正可靠的生产工具。</h1>
+        <p class="home-stage-lead">精选正版软件、原创工作流和三款 MacMP 自研工具。我们不堆功能，而是围绕存储、恢复和现场拍摄，把问题一层层解决。</p>
+        <div class="home-stage-actions">
+          <a class="home-action-primary" href="/apps/">探索 MacMP Apps <span>→</span></a>
+          <a class="home-action-secondary" href="/software/">浏览软件目录</a>
+        </div>
+        <div class="home-stage-proof">
+          <span><strong>{apps.length}</strong> 款精选软件</span>
+          <span><strong>{guides.length}</strong> 篇原创指南</span>
+          <span><strong>{ownApps.length}</strong> 款自研产品</span>
+        </div>
+      </div>
+
+      <div class="home-product-stack" aria-label="MacMP 自研工具">
+        {ownApps.map((app, index) => {
+          const profile = ownAppProfiles[app.slug];
+          return (
+            <a class={`home-stack-card home-stack-card-${index + 1}`} href={`/apps/${app.slug}/`} style={`--accent:${profile.accent};--accent-2:${profile.accent2};--product-dark:${profile.dark}`}>
+              <img src={app.heroImage} alt={`${app.name} 产品界面`} width="1600" height="900" loading={index === 0 ? 'eager' : 'lazy'} />
+              <span class="home-stack-meta">
+                <img src={`/images/apps/${app.slug}.png`} alt="" width="42" height="42" />
+                <span><strong>{app.name}</strong><small>{profile.status} · {profile.platform}</small></span>
+                <em>↗</em>
+              </span>
+            </a>
+          );
+        })}
+      </div>
     </div>
   </section>
 
-  <!-- 分类导航 -->
-  <section class="container" style="padding:8px 0 0">
-    <div class="cat-nav">
-      {categories.map((c) => (
-        <a class="cat-nav-item" href={c.href}>
-          <span class="zh">{c.zh}</span><span class="en">{c.en}</span>
-        </a>
-      ))}
+  <section class="container home-trust-strip">
+    <div><span class="trust-icon">⌘</span><strong>原生体验</strong><small>Intel 与 Apple Silicon</small></div>
+    <div><span class="trust-icon">◌</span><strong>本地优先</strong><small>减少不必要的数据上传</small></div>
+    <div><span class="trust-icon">◒</span><strong>创作者视角</strong><small>摄影师、剪辑师与旅行创作者</small></div>
+    <div><span class="trust-icon">↗</span><strong>持续更新</strong><small>产品、指南与工具一起迭代</small></div>
+  </section>
+
+  <section class="section container home-products">
+    <div class="section-head home-section-head">
+      <div><p class="home-section-kicker">MACMP APPS</p><h2>三款产品，一条清晰的生产力主线。</h2></div>
+      <a href="/apps/">查看全部产品 →</a>
+    </div>
+    <div class="official-app-grid">
+      {ownApps.map((app) => {
+        const profile = ownAppProfiles[app.slug];
+        return (
+          <a class="official-app-card" href={`/apps/${app.slug}/`} style={`--accent:${profile.accent};--accent-2:${profile.accent2};--accent-soft:${profile.accentSoft};--product-dark:${profile.dark}`}>
+            <span class="official-app-media">
+              <img src={app.heroImage} alt={`${app.name} 产品界面`} width="1600" height="900" loading="lazy" />
+              <small><i></i>{profile.status}</small>
+            </span>
+            <span class="official-app-copy">
+              <span class="official-app-title">
+                <img src={`/images/apps/${app.slug}.png`} alt="" width="50" height="50" />
+                <span><strong>{app.name}</strong><small>{profile.platform}</small></span>
+              </span>
+              <span class="official-app-desc">{app.tagline}</span>
+              <span class="official-app-points">{profile.highlights.slice(0, 3).map((item) => <span>{item}</span>)}</span>
+              <span class="official-app-link">打开官方产品页 <strong>→</strong></span>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+
+  <section class="container home-categories">
+    <span class="home-categories-label">继续浏览</span>
+    <div class="home-category-list">
+      {categories.map((c) => <a href={c.href}><span>{c.zh}</span><small>{c.en}</small><em>→</em></a>)}
+      <a href="/sound-effects/"><span>免费音效</span><small>SFX & Music</small><em>→</em></a>
+      <a href="/gold/"><span>黄金行情</span><small>Gold & Macro</small><em>→</em></a>
     </div>
   </section>
 
@@ -63,7 +112,7 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
     </div>
     <div class="dir-grid">
       {directory.map((app) => (
-        <a class="dir-card" href={`/software/${app.slug}/`}>
+        <a class="dir-card" href={app.isOwnApp ? `/apps/${app.slug}/` : `/software/${app.slug}/`}>
           <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
           <span class="dir-body">
             <strong><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></strong>
@@ -287,5 +336,37 @@ const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
   .asset-go { margin-top: 4px; font-size: 13.5px; font-weight: 600; color: var(--blue); }
   .asset-card.gold-card { background: linear-gradient(150deg,#fffdf7,#fff 62%,#f6faff); }
   .asset-tag.gold-tag { background: #fff3cf; color: #9a6700; }
+
+
+  .own-product-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+  .own-product-card { overflow:hidden; border:1px solid var(--border); border-radius:24px; background:#fff; color:var(--ink); transition:transform .2s ease, box-shadow .2s ease; }
+  .own-product-card:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(15,23,42,.13); text-decoration:none; }
+  .own-product-card > img { width:100%; aspect-ratio:16/9; object-fit:cover; background:#07111f; }
+  .own-product-body { display:flex; align-items:center; gap:12px; padding:16px; }
+  .own-product-body > span:nth-child(2) { display:flex; flex-direction:column; gap:4px; min-width:0; flex:1; }
+  .own-product-body strong { font-size:17px; }
+  .own-product-body small { color:var(--ink-2); font-size:12px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .own-product-go { color:var(--blue); font-size:20px; font-weight:700; }
+  @media (max-width:900px) { .own-product-grid { grid-template-columns:1fr; } }
+
+  /* ---------- 首页统一产品视觉 ---------- */
+  .home-stage { position:relative; overflow:hidden; padding:72px 0 58px; background:linear-gradient(145deg,#f7fbff 0%,#fff 48%,#f3f7fd 100%); border-bottom:1px solid #e7ebf1; }
+  .home-stage::before { content:''; position:absolute; width:700px; height:700px; left:-280px; top:-340px; border-radius:50%; background:radial-gradient(circle,rgba(10,132,255,.13),transparent 68%); }
+  .home-stage::after { content:''; position:absolute; width:600px; height:600px; right:-250px; bottom:-340px; border-radius:50%; background:radial-gradient(circle,rgba(0,199,190,.10),transparent 68%); }
+  .home-stage-inner { position:relative; z-index:1; display:grid; grid-template-columns:.82fr 1.18fr; align-items:center; gap:70px; min-height:610px; }
+  .home-stage-copy { max-width:560px; min-width:0; }.home-eyebrow,.home-section-kicker { color:#0a84ff; font:800 11px/1.2 'SFMono-Regular',Menlo,monospace; letter-spacing:.14em; }
+  .home-stage-copy h1 { overflow-wrap:anywhere; word-break:break-word; margin:23px 0 20px; color:#10141b; font-size:clamp(42px,5.2vw,68px); line-height:1.04; letter-spacing:-.06em; }
+  .home-stage-lead { margin:0; color:#5f6b7a; font-size:17px; line-height:1.85; }
+  .home-stage-actions { display:flex; flex-wrap:wrap; gap:11px; margin-top:30px; }.home-action-primary,.home-action-secondary { display:inline-flex; align-items:center; gap:10px; min-height:49px; padding:0 23px; border-radius:999px; font-size:14px; font-weight:750; transition:transform .18s ease,box-shadow .18s ease; }
+  .home-action-primary { background:#0a84ff; color:#fff; box-shadow:0 14px 26px rgba(10,132,255,.22); }.home-action-primary:hover { transform:translateY(-2px); color:#fff; text-decoration:none; box-shadow:0 18px 34px rgba(10,132,255,.28); }.home-action-secondary { border:1px solid #d9e0e9; background:#fff; color:#435061; }.home-action-secondary:hover { transform:translateY(-2px); border-color:#0a84ff; color:#0a84ff; text-decoration:none; }
+  .home-stage-proof { display:flex; flex-wrap:wrap; gap:12px 24px; margin-top:30px; color:#87909d; font-size:12px; }.home-stage-proof span { display:flex; align-items:baseline; gap:5px; }.home-stage-proof strong { color:#242c38; font-size:16px; }
+  .home-product-stack { position:relative; height:540px; min-width:0; overflow:hidden; }.home-stack-card { position:absolute; display:block; overflow:hidden; border:1px solid rgba(255,255,255,.8); border-radius:24px; background:#0b111a; box-shadow:0 32px 70px rgba(18,29,50,.20); transition:transform .3s ease,box-shadow .3s ease; }.home-stack-card:hover { text-decoration:none; box-shadow:0 38px 82px rgba(18,29,50,.26); }.home-stack-card img { display:block; width:100%; height:auto; }.home-stack-card-1 { z-index:3; left:8%; top:75px; width:73%; transform:rotate(-4deg); }.home-stack-card-2 { z-index:2; right:0; top:190px; width:65%; transform:rotate(4deg); }.home-stack-card-3 { z-index:1; left:0; bottom:0; width:61%; transform:rotate(-1deg); }.home-stack-card-1:hover { transform:rotate(-2deg) translateY(-7px); }.home-stack-card-2:hover { transform:rotate(2deg) translateY(-7px); }.home-stack-card-3:hover { transform:rotate(0) translateY(-7px); }
+  .home-stack-meta { display:flex; align-items:center; gap:10px; padding:12px 14px; background:rgba(255,255,255,.96); }.home-stack-meta img { width:40px; height:40px; border-radius:11px; flex:none; }.home-stack-meta span { display:flex; flex-direction:column; gap:3px; min-width:0; }.home-stack-meta strong { color:#222a35; font-size:12px; }.home-stack-meta small { overflow:hidden; color:#7e8895; font-size:9px; text-overflow:ellipsis; white-space:nowrap; }.home-stack-meta em { margin-left:auto; color:var(--accent); font-size:17px; font-style:normal; }
+  .home-trust-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:-20px; margin-bottom:18px; position:relative; z-index:5; padding:15px; border:1px solid #e3e8ef; border-radius:21px; background:rgba(255,255,255,.94); box-shadow:0 18px 45px rgba(18,29,50,.07); backdrop-filter:blur(18px); }.home-trust-strip > div { display:grid; grid-template-columns:34px 1fr; grid-template-rows:auto auto; column-gap:11px; align-items:center; padding:9px 12px; border-right:1px solid #edf0f4; }.home-trust-strip > div:last-child { border-right:0; }.trust-icon { grid-row:1/3; display:grid; place-items:center; width:34px; height:34px; border-radius:11px; background:#edf5ff; color:#0a84ff; font-size:17px; }.home-trust-strip strong { color:#28313c; font-size:12px; }.home-trust-strip small { color:#8b95a2; font-size:10px; }
+  .home-products { padding-top:58px; }.home-section-head { align-items:flex-end; }.home-section-head h2 { margin:9px 0 0; color:#11151b; font-size:clamp(28px,3.5vw,42px); letter-spacing:-.05em; }.home-section-head a { color:#0a84ff; font-size:13px; font-weight:750; }.official-app-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }.official-app-card { display:flex; flex-direction:column; overflow:hidden; border:1px solid #e5e9ef; border-radius:23px; background:#fff; color:#202631; transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease; }.official-app-card:hover { transform:translateY(-6px); border-color:color-mix(in srgb,var(--accent) 48%,#fff); box-shadow:0 25px 58px rgba(18,29,50,.12); text-decoration:none; }.official-app-media { position:relative; display:block; overflow:hidden; background:var(--product-dark); }.official-app-media img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; transition:transform .4s ease; }.official-app-card:hover .official-app-media img { transform:scale(1.025); }.official-app-media small { position:absolute; left:12px; top:12px; display:inline-flex; align-items:center; gap:6px; padding:6px 9px; border:1px solid rgba(255,255,255,.18); border-radius:999px; background:rgba(8,15,27,.54); color:#fff; font-size:9px; font-weight:700; backdrop-filter:blur(12px); }.official-app-media i { width:5px; height:5px; border-radius:50%; background:var(--accent-2); }.official-app-copy { display:flex; flex-direction:column; gap:14px; flex:1; padding:20px; }.official-app-title { display:flex; align-items:center; gap:12px; }.official-app-title img { width:48px; height:48px; border-radius:13px; box-shadow:0 8px 20px rgba(15,23,42,.13); }.official-app-title > span { display:flex; flex-direction:column; gap:4px; }.official-app-title strong { color:#181e26; font-size:16px; }.official-app-title small { color:#939ca8; font-size:9px; }.official-app-desc { min-height:66px; color:#697482; font-size:13px; line-height:1.7; }.official-app-points { display:flex; flex-wrap:wrap; gap:6px; }.official-app-points span { padding:5px 8px; border-radius:8px; background:var(--accent-soft); color:color-mix(in srgb,var(--accent) 87%,#111); font-size:9px; font-weight:700; }.official-app-link { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:16px; border-top:1px solid #edf0f4; color:var(--accent); font-size:11px; font-weight:750; }.official-app-link strong { font-size:16px; }
+  .home-categories { margin-top:55px; margin-bottom:10px; padding:22px; border:1px solid #e5e9ef; border-radius:21px; background:#fff; }.home-categories-label { display:block; margin-bottom:14px; color:#9aa3af; font:800 10px/1 'SFMono-Regular',Menlo,monospace; letter-spacing:.12em; }.home-category-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }.home-category-list a { display:grid; grid-template-columns:1fr auto; gap:3px 8px; padding:13px 14px; border-radius:13px; background:#f7f9fb; color:#303946; }.home-category-list a:hover { background:#edf5ff; color:#0a84ff; text-decoration:none; }.home-category-list span { font-size:13px; font-weight:700; }.home-category-list small { grid-column:1; color:#9099a5; font-size:9px; }.home-category-list em { grid-column:2; grid-row:1/3; align-self:center; color:#b0b8c2; font-size:14px; font-style:normal; }
+  @media (max-width:1000px) { .home-stage-inner { grid-template-columns:1fr; gap:30px; }.home-stage-copy { max-width:720px; }.home-product-stack { height:500px; }.official-app-grid { grid-template-columns:1fr 1fr; }.official-app-card:last-child { grid-column:1/-1; }.home-category-list { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  @media (max-width:700px) { .home-stage { padding-top:48px; }.home-stage-copy h1 { font-size:38px; line-height:1.08; }.home-product-stack { height:410px; }.home-stack-card-1 { left:3%; width:80%; }.home-stack-card-2 { width:72%; }.home-stack-card-3 { width:68%; }.home-trust-strip { grid-template-columns:1fr 1fr; margin-top:20px; }.home-trust-strip > div { border-right:0; border-bottom:1px solid #edf0f4; }.home-trust-strip > div:nth-last-child(-n+2) { border-bottom:0; }.official-app-grid { grid-template-columns:1fr; }.official-app-card:last-child { grid-column:auto; }.home-category-list { grid-template-columns:1fr 1fr; } }
+  @media (max-width:460px) { .home-stage-proof { display:grid; grid-template-columns:1fr 1fr; }.home-product-stack { height:330px; }.home-stack-meta { padding:9px; }.home-stack-meta img { width:31px; height:31px; }.home-stack-meta strong { font-size:10px; }.home-stack-meta small { font-size:8px; }.home-trust-strip { grid-template-columns:1fr; }.home-trust-strip > div { border-bottom:1px solid #edf0f4; }.home-trust-strip > div:last-child { border-bottom:0; }.home-category-list { grid-template-columns:1fr; } }
 
 </style>

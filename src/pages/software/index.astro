@@ -48,7 +48,7 @@ const typeCount = Object.fromEntries(types.map((type) => [type, apps.filter((app
               <img class="app-icon" src={`/images/apps/${app.slug}.png`} alt={app.name} width="48" height="48" loading="lazy" />
               <div class="card-body">
                 <span class="cat"><span class="zh">{app.category}</span><span class="en">{app.categoryEn}</span></span>
-                <h3><a href={`/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
+                <h3><a href={app.isOwnApp ? `/apps/${app.slug}/` : `/software/${app.slug}/`}><span class="zh">{app.name}</span><span class="en">{app.nameEn}</span></a></h3>
                 <p><span class="zh">{app.tagline}</span><span class="en">{app.taglineEn}</span></p>
                 <div class="meta">
                   <span>{app.price}</span>

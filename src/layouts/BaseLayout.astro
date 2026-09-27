@@ -27,6 +27,7 @@ const ogImage = new URL(image, Astro.site).toString();
 
 const memberEnabled = import.meta.env.PUBLIC_MEMBER_ENABLED === 'true';
 const nav = [
+  { href: '/apps/', zh: 'MacMP Apps', en: 'Apps', active: path.startsWith('/apps') },
   { href: '/software/', zh: '软件推荐', en: 'Software', active: path.startsWith('/software') },
   { href: '/guides/', zh: '专题指南', en: 'Guides', active: path.startsWith('/guides') },
   { href: '/deals/', zh: '优惠情报', en: 'Deals', active: path.startsWith('/deals') },
@@ -103,6 +104,7 @@ const nav = [
           <div>
             <h4><span class="zh">发现</span><span class="en">Discover</span></h4>
             <ul>
+              <li><a href="/apps/"><span class="zh">MacMP Apps</span><span class="en">MacMP Apps</span></a></li>
               <li><a href="/software/"><span class="zh">软件推荐</span><span class="en">Software</span></a></li>
               <li><a href="/guides/"><span class="zh">专题指南</span><span class="en">Guides</span></a></li>
               <li><a href="/deals/"><span class="zh">优惠情报</span><span class="en">Deals</span></a></li>
@@ -143,6 +145,17 @@ const nav = [
         document.documentElement.setAttribute('lang', en ? 'zh-CN' : 'en');
         try{localStorage.setItem('lang', en ? 'zh' : 'en');}catch(e){}
       });
+    </script>
+    <script is:inline>
+      (function(){
+        var map = {
+          'disk.macmp.com': '/apps/macmp-disk-manager/',
+          'recover.macmp.com': '/apps/macmp-recover-studio/',
+          'sky.macmp.com': '/apps/macmp-sun-galaxy/'
+        };
+        var route = map[location.hostname];
+        if (route && (location.pathname === '/' || location.pathname === '')) location.replace(route);
+      })();
     </script>
   </body>
 </html>

@@ -1,0 +1,279 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { apps } from '../../data/apps';
+import { guides } from '../../data/guides';
+import { ownAppProfiles } from '../../data/ownAppProfiles';
+import type { App } from '../../data/apps';
+
+export function getStaticPaths() {
+  return apps
+    .filter((app) => app.isOwnApp && ownAppProfiles[app.slug])
+    .map((app) => ({ params: { slug: app.slug }, props: { app } }));
+}
+
+interface Props {
+  app: App;
+}
+
+const { app } = Astro.props;
+const profile = ownAppProfiles[app.slug];
+const ownApps = apps.filter((item) => item.isOwnApp && ownAppProfiles[item.slug]);
+const otherApps = ownApps.filter((item) => item.slug !== app.slug);
+const faqs = app.faqs ?? [];
+const relatedGuides = guides.filter((guide) => guide.relatedApps.includes(app.slug)).slice(0, 3);
+const gallery = app.gallery ?? [];
+const features = app.features ?? [];
+const title = `${app.name} · MacMP`;
+---
+<BaseLayout title={title} description={app.tagline} path={`/apps/${app.slug}`} image={app.heroImage}>
+  <div class="app-product" style={`--accent:${profile.accent};--accent-2:${profile.accent2};--accent-soft:${profile.accentSoft};--product-dark:${profile.dark}`}>
+    <div class="container app-product-nav">
+      <a href="/apps/" class="app-back"><span>←</span> MacMP Apps</a>
+      <div class="app-switcher-mini" aria-label="切换产品">
+        {ownApps.map((item) => (
+          <a class={item.slug === app.slug ? 'active' : ''} href={`/apps/${item.slug}/`}>{item.name.replace('MacMP ', '')}</a>
+        ))}
+      </div>
+      <span class="app-status"><i></i>{profile.status}</span>
+    </div>
+
+    <section class="container product-hero">
+      <div class="product-hero-copy">
+        <p class="product-eyebrow">{profile.eyebrow}</p>
+        <div class="product-title-row">
+          <img src={`/images/apps/${app.slug}.png`} alt="" width="72" height="72" />
+          <div>
+            <h1>{app.name}</h1>
+            <p class="product-subtitle">{app.tagline}</p>
+          </div>
+        </div>
+        <h2>{profile.heroLine}</h2>
+        <p class="product-lead">{app.description}</p>
+        <div class="product-actions">
+          <a class="product-primary" href={app.url}>{profile.ctaZh}<span>→</span></a>
+          <a class="product-secondary" href="#features">查看功能</a>
+        </div>
+        <div class="product-platform">
+          <span class="platform-dot"></span>{profile.platform}
+          <span class="platform-domain">{profile.subdomain}</span>
+        </div>
+      </div>
+
+      <div class="product-visual">
+        <div class="visual-glow visual-glow-a"></div>
+        <div class="visual-glow visual-glow-b"></div>
+        <div class="product-window">
+          <div class="window-bar"><span></span><span></span><span></span><small>MacMP / {profile.eyebrow}</small></div>
+          <img src={app.heroImage} alt={`${app.name} 产品界面`} width="1600" height="900" loading="eager" />
+        </div>
+        <div class="floating-note floating-note-a">
+          <span class="floating-icon">✓</span>
+          <span><strong>{profile.metrics[0].value}</strong><small>{profile.metrics[0].label}</small></span>
+        </div>
+        <div class="floating-note floating-note-b">
+          <span class="floating-icon">↗</span>
+          <span><strong>{profile.metrics[1].value}</strong><small>{profile.metrics[1].label}</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="container product-proof">
+      {profile.metrics.map((metric) => (
+        <div><strong>{metric.value}</strong><span>{metric.label}</span></div>
+      ))}
+      <div><strong>{profile.status}</strong><span>当前交付阶段</span></div>
+    </section>
+
+    <section class="container product-intro">
+      <div class="section-kicker">{profile.sectionEyebrow}</div>
+      <div class="intro-grid">
+        <h2>{profile.sectionTitle}</h2>
+        <p>{profile.sectionBody}</p>
+      </div>
+    </section>
+
+    <section class="container product-features" id="features">
+      <div class="section-head-product">
+        <div><span class="section-kicker">CAPABILITIES</span><h2>关键能力</h2></div>
+        <p>每一项都围绕真实工作流，不用先学习一套复杂术语。</p>
+      </div>
+      <div class="feature-shell">
+        {features.map((feature, index) => (
+          <article>
+            <span class="feature-index">{String(index + 1).padStart(2, '0')}</span>
+            <div class="feature-icon">{index === 0 ? '◉' : index === 1 ? '⌁' : index === 2 ? '↗' : '◆'}</div>
+            <h3>{feature.title}</h3>
+            <p>{feature.desc}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    {gallery.length > 0 && (
+      <section class="container product-gallery-section">
+        <div class="section-head-product">
+          <div><span class="section-kicker">{profile.galleryEyebrow}</span><h2>{profile.galleryTitle}</h2></div>
+        </div>
+        <div class="app-gallery">
+          {gallery.map((item, index) => (
+            <article class={index % 2 === 1 ? 'reverse' : ''}>
+              <div class="gallery-copy">
+                <span class="gallery-number">0{index + 1}</span>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+                <ul>
+                  {index === 0 ? profile.highlights.slice(0, 3).map((highlight) => <li>{highlight}</li>) : profile.highlights.slice(3, 6).map((highlight) => <li>{highlight}</li>)}
+                </ul>
+              </div>
+              <div class="gallery-shot"><img src={item.src} alt={item.title} width="1600" height="900" loading="lazy" /></div>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="container product-fit">
+      <div>
+        <span class="section-kicker">WHO IT IS FOR</span>
+        <h2>适合谁</h2>
+      </div>
+      <div class="fit-list">
+        {profile.audience.map((item, index) => <div><span>0{index + 1}</span><p>{item}</p></div>)}
+      </div>
+    </section>
+
+    <section class="container product-cta">
+      <div class="cta-panel">
+        <div>
+          <span class="section-kicker">AVAILABLE SOON</span>
+          <h2>获取 {app.name}</h2>
+          <p>{app.price}。当前页面用于产品介绍与交付前验证，不在页面中宣称已经正式上架。</p>
+        </div>
+        <div class="cta-actions">
+          <a class="product-primary" href={app.url}>{profile.ctaZh}<span>→</span></a>
+          <a class="product-secondary" href="/support/">联系支持</a>
+        </div>
+      </div>
+    </section>
+
+    {faqs.length > 0 && (
+      <section class="container product-faq">
+        <div class="section-head-product"><div><span class="section-kicker">FAQ</span><h2>常见问题</h2></div></div>
+        <div class="faq-list">
+          {faqs.map((faq) => (
+            <details>
+              <summary>{faq.q}<span>+</span></summary>
+              <p>{faq.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {relatedGuides.length > 0 && (
+      <section class="container product-related">
+        <div class="section-head-product"><div><span class="section-kicker">LEARN MORE</span><h2>配套指南</h2></div><a href="/guides/">全部指南 →</a></div>
+        <div class="related-guide-grid">
+          {relatedGuides.map((guide) => (
+            <a href={`/guides/${guide.slug}/`}>
+              <img src={guide.cover} alt="" width="1200" height="675" loading="lazy" />
+              <span>{guide.category}</span><strong>{guide.title}</strong><small>{guide.readTime}</small>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="container more-products">
+      <div><span class="section-kicker">MORE FROM MACMP</span><h2>继续探索 MacMP 工具</h2></div>
+      <div class="more-product-grid">
+        {otherApps.map((item) => {
+          const itemProfile = ownAppProfiles[item.slug];
+          return (
+            <a href={`/apps/${item.slug}/`} style={`--card-accent:${itemProfile.accent}`}>
+              <img src={item.heroImage} alt="" width="1600" height="900" loading="lazy" />
+              <span><strong>{item.name}</strong><small>{item.tagline}</small><em>{itemProfile.subdomain}</em></span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .app-product { overflow: hidden; background: #fbfcfe; }
+  .app-product-nav { min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid #e7ebf1; font-size: 13px; }
+  .app-back { color: #4f5a6a; font-weight: 700; }
+  .app-back:hover { color: var(--accent); text-decoration: none; }
+  .app-switcher-mini { display: flex; align-items: center; gap: 5px; padding: 4px; border-radius: 999px; background: #f0f3f7; }
+  .app-switcher-mini a { padding: 7px 13px; border-radius: 999px; color: #6c7583; font-size: 12px; font-weight: 700; }
+  .app-switcher-mini a:hover { color: var(--accent); text-decoration: none; }
+  .app-switcher-mini a.active { background: #fff; color: #111827; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+  .app-status { display: flex; align-items: center; gap: 7px; color: #7b8491; }
+  .app-status i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent); }
+
+  .product-hero { min-width: 0; min-height: 650px; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 70px; padding-top: 70px; padding-bottom: 70px; }
+  .product-hero-copy { max-width: 520px; min-width: 0; position: relative; z-index: 2; }
+  .product-eyebrow, .section-kicker { color: var(--accent); font: 800 11px/1.2 'SFMono-Regular',Menlo,monospace; letter-spacing: .13em; }
+  .product-title-row { display: flex; align-items: center; gap: 17px; margin-top: 28px; }
+  .product-title-row img { width: 70px; height: 70px; border-radius: 19px; box-shadow: 0 14px 32px rgba(15,23,42,.17); }
+  .product-title-row h1 { overflow-wrap:anywhere; margin: 0 0 7px; font-size: clamp(28px, 3vw, 42px); line-height: 1.05; letter-spacing: -.035em; color: #111318; }
+  .product-subtitle { margin: 0; color: #667080; font-size: 14px; line-height: 1.6; }
+  .product-hero-copy h2 { overflow-wrap:anywhere; word-break:break-word; margin: 34px 0 16px; font-size: clamp(38px, 5vw, 66px); line-height: 1.04; letter-spacing: -.055em; color: #10141b; }
+  .product-lead { margin: 0; color: #566171; font-size: 17px; line-height: 1.8; }
+  .product-actions, .cta-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 29px; }
+  .product-primary, .product-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 999px; font-size: 14px; font-weight: 750; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+  .product-primary { background: var(--accent); color: #fff; box-shadow: 0 12px 24px color-mix(in srgb, var(--accent) 24%, transparent); }
+  .product-primary:hover { transform: translateY(-2px); box-shadow: 0 17px 30px color-mix(in srgb, var(--accent) 30%, transparent); color: #fff; text-decoration: none; }
+  .product-secondary { border: 1px solid #d9dee7; background: #fff; color: #465162; }
+  .product-secondary:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .product-platform { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 24px; color: #7b8491; font-size: 12px; }
+  .platform-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2); }
+  .platform-domain { margin-left: 8px; padding-left: 10px; border-left: 1px solid #dfe3e9; color: #a4abb6; font-family: 'SFMono-Regular',Menlo,monospace; }
+
+  .product-visual { position: relative; min-height: 470px; display: flex; align-items: center; justify-content: center; }
+  .visual-glow { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .7; }
+  .visual-glow-a { width: 390px; height: 390px; left: 4%; top: 8%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 32%, transparent), transparent 67%); }
+  .visual-glow-b { width: 340px; height: 340px; right: 0; bottom: 0; background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 25%, transparent), transparent 67%); }
+  .product-window { position: relative; z-index: 1; width: min(100%, 680px); overflow: hidden; border: 1px solid rgba(255,255,255,.75); border-radius: 27px; background: #fff; box-shadow: 0 38px 90px rgba(18,29,50,.20), 0 6px 18px rgba(18,29,50,.07); transform: rotate(-1.4deg); }
+  .window-bar { height: 35px; display: flex; align-items: center; gap: 6px; padding: 0 14px; background: color-mix(in srgb, var(--product-dark) 93%, #fff 7%); }
+  .window-bar span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.30); }
+  .window-bar span:first-child { background: #ff6259; }.window-bar span:nth-child(2) { background: #ffc44d; }.window-bar span:nth-child(3) { background: #3ad06c; }
+  .window-bar small { margin-left: auto; color: rgba(255,255,255,.52); font: 700 9px/1 'SFMono-Regular',Menlo,monospace; letter-spacing: .08em; }
+  .product-window img { display: block; width: 100%; height: auto; }
+  .floating-note { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; min-width: 150px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.8); border-radius: 15px; background: rgba(255,255,255,.78); box-shadow: 0 18px 38px rgba(22,35,60,.15); backdrop-filter: blur(18px); }
+  .floating-note-a { left: -2%; bottom: 12%; }.floating-note-b { right: -2%; top: 12%; }
+  .floating-icon { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-weight: 850; }
+  .floating-note strong, .floating-note small { display: block; }.floating-note strong { color: #202632; font-size: 13px; }.floating-note small { margin-top: 2px; color: #8b94a1; font-size: 10px; }
+
+  .product-proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 98px; padding: 20px; border: 1px solid #e5e9ef; border-radius: 22px; background: #fff; box-shadow: 0 14px 40px rgba(22,35,60,.05); }
+  .product-proof > div { min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; border-right: 1px solid #edf0f4; }
+  .product-proof > div:last-child { border-right: 0; }.product-proof strong { color: #171c24; font-size: 18px; letter-spacing: -.02em; }.product-proof span { color: #8a94a2; font-size: 12px; }
+
+  .product-intro { padding: 0 0 105px; }.product-intro .section-kicker { display: block; margin-bottom: 23px; }
+  .intro-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 70px; align-items: start; }.intro-grid h2 { margin: 0; color: #11151b; font-size: clamp(28px, 4vw, 48px); line-height: 1.13; letter-spacing: -.04em; }.intro-grid p { margin: 4px 0 0; color: #5d6877; font-size: 17px; line-height: 1.9; }
+
+  .product-features { padding: 90px 0 108px; border-top: 1px solid #e7ebf1; }
+  .section-head-product { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; margin-bottom: 30px; }.section-head-product h2 { margin: 10px 0 0; color: #11151b; font-size: clamp(26px, 3vw, 38px); letter-spacing: -.04em; }.section-head-product > p { max-width: 390px; margin: 0 0 4px; color: #7b8593; font-size: 14px; line-height: 1.7; text-align: right; }.section-head-product > a { color: var(--accent); font-size: 14px; font-weight: 700; }
+  .feature-shell { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }.feature-shell article { min-height: 214px; position: relative; padding: 27px; border: 1px solid #e8ebf0; border-radius: 20px; background: #fff; overflow: hidden; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }.feature-shell article:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 45%, #fff); box-shadow: 0 18px 40px rgba(18,29,50,.08); }.feature-index { position: absolute; right: 22px; top: 20px; color: #dfe4eb; font: 800 12px/1 'SFMono-Regular',Menlo,monospace; }.feature-icon { display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 30px; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 19px; }.feature-shell h3 { margin: 0 0 9px; color: #202631; font-size: 17px; }.feature-shell p { margin: 0; color: #747f8d; font-size: 13px; line-height: 1.7; }
+
+  .product-gallery-section { padding: 0 0 108px; }.app-gallery { display: grid; gap: 72px; }.app-gallery article { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: 70px; }.app-gallery article.reverse { grid-template-columns: 1.2fr .8fr; }.app-gallery article.reverse .gallery-copy { order: 2; }.app-gallery article.reverse .gallery-shot { order: 1; }.gallery-number { color: var(--accent); font: 800 13px/1 'SFMono-Regular',Menlo,monospace; }.gallery-copy h3 { margin: 17px 0 12px; color: #11151b; font-size: clamp(25px, 3vw, 36px); line-height: 1.18; letter-spacing: -.035em; }.gallery-copy p { margin: 0; color: #6d7887; font-size: 15px; line-height: 1.8; }.gallery-copy ul { display: grid; gap: 8px; margin: 23px 0 0; padding: 0; list-style: none; }.gallery-copy li { color: #3e4856; font-size: 13px; }.gallery-copy li::before { content: '✓'; margin-right: 9px; color: var(--accent); font-weight: 850; }.gallery-shot { padding: 8px; border: 1px solid #e4e9ef; border-radius: 25px; background: #fff; box-shadow: 0 24px 60px rgba(18,29,50,.11); }.gallery-shot img { display: block; width: 100%; height: auto; border-radius: 18px; }
+
+  .product-fit { display: grid; grid-template-columns: .75fr 1.25fr; gap: 70px; padding: 90px 0 105px; border-top: 1px solid #e7ebf1; }.product-fit h2 { margin: 11px 0 0; color: #11151b; font-size: clamp(28px, 3vw, 40px); letter-spacing: -.04em; }.fit-list { display: grid; gap: 12px; }.fit-list > div { display: grid; grid-template-columns: 45px 1fr; align-items: start; gap: 15px; padding: 19px 0; border-bottom: 1px solid #e7ebf1; }.fit-list span { color: var(--accent); font: 800 12px/1 'SFMono-Regular',Menlo,monospace; }.fit-list p { margin: 0; color: #4f5a69; font-size: 15px; line-height: 1.65; }
+
+  .product-cta { padding-bottom: 105px; }.cta-panel { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 35px; padding: 48px; border-radius: 28px; background: linear-gradient(128deg, var(--product-dark), color-mix(in srgb, var(--product-dark) 74%, var(--accent))); color: #fff; box-shadow: 0 30px 70px color-mix(in srgb, var(--accent) 17%, transparent); }.cta-panel::after { content: ''; position: absolute; width: 360px; height: 360px; right: -120px; top: -150px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 58%, transparent), transparent 68%); }.cta-panel > div { position: relative; z-index: 1; }.cta-panel h2 { margin: 10px 0 9px; color: #fff; font-size: 34px; letter-spacing: -.04em; }.cta-panel p { max-width: 580px; margin: 0; color: rgba(255,255,255,.66); font-size: 14px; line-height: 1.7; }.cta-panel .section-kicker { color: var(--accent-2); }.cta-panel .product-primary { background: #fff; color: #10151c; box-shadow: none; }.cta-panel .product-secondary { border-color: rgba(255,255,255,.25); background: transparent; color: #fff; }.cta-panel .product-secondary:hover { border-color: #fff; color: #fff; }
+
+  .product-faq { padding: 0 0 108px; }.faq-list { display: grid; gap: 8px; }.faq-list details { border: 1px solid #e6eaf0; border-radius: 16px; background: #fff; }.faq-list summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px 21px; color: #303844; font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; }.faq-list summary::-webkit-details-marker { display: none; }.faq-list summary span { color: var(--accent); font-size: 20px; font-weight: 400; }.faq-list details[open] summary span { transform: rotate(45deg); }.faq-list p { margin: -3px 21px 21px; max-width: 840px; color: #727d8b; font-size: 14px; line-height: 1.8; }
+
+  .product-related { padding: 0 0 108px; }.related-guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }.related-guide-grid a { display: flex; flex-direction: column; gap: 8px; padding: 9px; border: 1px solid #e6eaf0; border-radius: 18px; background: #fff; color: #202631; }.related-guide-grid a:hover { border-color: var(--accent); text-decoration: none; }.related-guide-grid img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; }.related-guide-grid span { margin-top: 3px; color: var(--accent); font-size: 11px; font-weight: 800; }.related-guide-grid strong { font-size: 14px; line-height: 1.45; }.related-guide-grid small { color: #929ba7; font-size: 11px; }
+
+  .more-products { padding: 72px 0 110px; border-top: 1px solid #e7ebf1; }.more-products h2 { margin: 11px 0 25px; color: #11151b; font-size: 30px; letter-spacing: -.04em; }.more-product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }.more-product-grid a { overflow: hidden; border: 1px solid #e6eaf0; border-radius: 20px; background: #fff; color: #202631; }.more-product-grid a:hover { border-color: var(--card-accent); text-decoration: none; }.more-product-grid img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #08101c; }.more-product-grid span { display: flex; flex-direction: column; gap: 5px; padding: 16px 18px 18px; }.more-product-grid strong { font-size: 16px; }.more-product-grid small { min-height: 38px; color: #727d8b; font-size: 12px; line-height: 1.55; }.more-product-grid em { color: var(--card-accent); font: 700 10px/1 'SFMono-Regular',Menlo,monospace; font-style: normal; }
+
+  @media (max-width: 900px) {
+    .product-hero { grid-template-columns: 1fr; gap: 45px; padding-top: 50px; }.product-hero-copy { max-width: 680px; min-width:0; }.product-visual { min-height: 390px; min-width:0; overflow:hidden; }.intro-grid, .product-fit { grid-template-columns: 1fr; gap: 35px; }.feature-shell { grid-template-columns: repeat(2, minmax(0, 1fr)); }.app-gallery article, .app-gallery article.reverse { grid-template-columns: 1fr; gap: 35px; }.app-gallery article.reverse .gallery-copy, .app-gallery article.reverse .gallery-shot { order: unset; }.related-guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 620px) {
+    .app-product-nav { flex-wrap: wrap; padding: 13px 0; }.app-switcher-mini { order: 3; width: 100%; max-width:100%; justify-content:flex-start; overflow-x:auto; -webkit-overflow-scrolling:touch; }.product-title-row img { width: 56px; height: 56px; border-radius: 15px; }.product-hero-copy h2 { font-size: 36px; line-height:1.1; }.product-lead { font-size: 16px; }.product-proof { grid-template-columns: repeat(2, minmax(0, 1fr)); }.product-proof > div { border-right: 0; border-bottom: 1px solid #edf0f4; }.product-proof > div:nth-last-child(-n+2) { border-bottom: 0; }.feature-shell, .related-guide-grid, .more-product-grid { grid-template-columns: 1fr; }.section-head-product { align-items: flex-start; flex-direction: column; gap: 12px; }.section-head-product > p { text-align: left; }.cta-panel { display: block; padding: 32px 25px; }.floating-note { display: none; }.product-window { transform: none; }.product-platform { line-height: 1.6; }
+  }
+</style>

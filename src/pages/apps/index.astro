@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { apps } from '../../data/apps';
+import { ownAppProfiles } from '../../data/ownAppProfiles';
+
+const ownApps = apps.filter((app) => app.isOwnApp && ownAppProfiles[app.slug]);
+---
+<BaseLayout title="MacMP Apps · 为创作者打造的 Mac 与 iOS 工具" description="浏览 MacMP 自研工具：磁盘管理器、Recover Studio 与 Sun & Galaxy。" path="/apps">
+  <div class="apps-hub">
+    <section class="container apps-hub-hero">
+      <p class="hub-eyebrow">MACMP PRODUCTS</p>
+      <h1>少一点软件堆叠，多一点真正解决问题。</h1>
+      <p>MacMP 自研工具围绕创作者、摄影师和移动工作流设计。一个产品解决一个明确问题，界面、文档和授权方式保持统一。</p>
+    </section>
+
+    <section class="container apps-hub-grid">
+      {ownApps.map((app, index) => {
+        const profile = ownAppProfiles[app.slug];
+        return (
+          <article class="hub-product" style={`--accent:${profile.accent};--accent-2:${profile.accent2};--accent-soft:${profile.accentSoft};--product-dark:${profile.dark}`}>
+            <a class="hub-product-image" href={`/apps/${app.slug}/`}>
+              <img src={app.heroImage} alt={`${app.name} 产品界面`} width="1600" height="900" loading={index === 0 ? 'eager' : 'lazy'} />
+              <span class="hub-product-status"><i></i>{profile.status}</span>
+            </a>
+            <div class="hub-product-body">
+              <div class="hub-product-title">
+                <img src={`/images/apps/${app.slug}.png`} alt="" width="48" height="48" />
+                <div><h2>{app.name}</h2><small>{profile.platform}</small></div>
+              </div>
+              <p>{app.tagline}</p>
+              <ul>{profile.highlights.slice(0, 3).map((item) => <li>{item}</li>)}</ul>
+              <div class="hub-product-footer">
+                <span>{profile.subdomain}</span>
+                <a href={`/apps/${app.slug}/`}>查看产品 <strong>→</strong></a>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </section>
+
+    <section class="container apps-hub-note">
+      <div><span>统一授权</span><strong>VIP 年费期内可用，也可按设备买断。</strong><p>国内扫码与海外 PayPal 使用同一套账号与交付逻辑。</p></div>
+      <div><span>本地优先</span><strong>核心能力尽量在设备端完成。</strong><p>减少上传、等待和不必要的数据暴露。</p></div>
+      <div><span>持续交付</span><strong>产品页会随测试与版本进度更新。</strong><p>未正式发布前不会标注“已上线”。</p></div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .apps-hub { background: #fbfcfe; overflow: hidden; }
+  .apps-hub-hero { max-width: 980px; padding-top: 96px; padding-bottom: 70px; text-align: center; }
+  .hub-eyebrow { color: #0a84ff; font: 800 11px/1.2 'SFMono-Regular',Menlo,monospace; letter-spacing: .14em; }
+  .apps-hub-hero h1 { overflow-wrap:anywhere; word-break:break-word; margin: 22px auto 20px; max-width: 860px; color: #10141b; font-size: clamp(40px, 6vw, 72px); line-height: 1.04; letter-spacing: -.06em; }
+  .apps-hub-hero p:last-child { overflow-wrap:anywhere; max-width: 680px; margin: 0 auto; color: #65707f; font-size: 17px; line-height: 1.85; }
+  .apps-hub-grid { display: grid; gap: 24px; padding-bottom: 85px; }
+  .hub-product { display: grid; grid-template-columns: 1.18fr .82fr; overflow: hidden; border: 1px solid #e3e8ef; border-radius: 29px; background: #fff; box-shadow: 0 24px 65px rgba(18,29,50,.08); }
+  .hub-product:nth-child(2) { grid-template-columns: .82fr 1.18fr; }.hub-product:nth-child(2) .hub-product-image { order: 2; }
+  .hub-product-image { position: relative; display: block; min-height: 420px; background: var(--product-dark); overflow: hidden; }
+  .hub-product-image::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 18% 10%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 42%); pointer-events: none; }
+  .hub-product-image img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }.hub-product-image:hover img { transform: scale(1.018); }
+  .hub-product-status { position: absolute; z-index: 2; left: 20px; top: 20px; display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.19); border-radius: 999px; background: rgba(8,15,27,.54); color: rgba(255,255,255,.86); font-size: 11px; font-weight: 700; backdrop-filter: blur(12px); }.hub-product-status i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2); }
+  .hub-product-body { display: flex; flex-direction: column; padding: 42px 38px 35px; }.hub-product-title { display: flex; align-items: center; gap: 14px; }.hub-product-title img { width: 48px; height: 48px; border-radius: 13px; box-shadow: 0 9px 22px rgba(15,23,42,.14); }.hub-product-title h2 { margin: 0 0 5px; color: #151a22; font-size: 25px; letter-spacing: -.035em; }.hub-product-title small { color: #919aa6; font-size: 11px; }.hub-product-body > p { margin: 26px 0 0; color: #5f6a79; font-size: 15px; line-height: 1.8; }.hub-product-body ul { display: grid; gap: 10px; margin: 23px 0 0; padding: 0; list-style: none; }.hub-product-body li { display: flex; align-items: center; gap: 9px; color: #424c5a; font-size: 13px; }.hub-product-body li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent); }.hub-product-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: auto; padding-top: 34px; border-top: 1px solid #edf0f4; }.hub-product-footer > span { color: #a0a8b3; font: 700 10px/1 'SFMono-Regular',Menlo,monospace; }.hub-product-footer a { color: var(--accent); font-size: 13px; font-weight: 750; }
+  .apps-hub-note { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; padding-bottom: 105px; }.apps-hub-note > div { padding: 25px; border: 1px solid #e6eaf0; border-radius: 20px; background: #fff; }.apps-hub-note span { color: #0a84ff; font: 800 10px/1 'SFMono-Regular',Menlo,monospace; letter-spacing: .08em; }.apps-hub-note strong { display: block; margin: 15px 0 8px; color: #1a2029; font-size: 16px; }.apps-hub-note p { margin: 0; color: #7a8492; font-size: 12px; line-height: 1.65; }
+  @media (max-width: 850px) { .hub-product, .hub-product:nth-child(2) { grid-template-columns: 1fr; }.hub-product:nth-child(2) .hub-product-image { order: 0; }.hub-product-image { min-height: 340px; }.apps-hub-note { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .apps-hub-hero { padding-top: 62px; }.hub-product-body { padding: 30px 24px 26px; }.hub-product-image { min-height: 250px; }.hub-product-footer { align-items: flex-start; flex-direction: column; } }
+</style>
