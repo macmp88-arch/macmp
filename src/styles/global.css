@@ -45,6 +45,7 @@ img { max-width: 100%; height: auto; display: block; }
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, .08);
 }
+.site-header .container { max-width: 1240px; }
 .site-header .inner {
   display: flex;
   align-items: center;
@@ -52,19 +53,46 @@ img { max-width: 100%; height: auto; display: block; }
   height: 52px;
 }
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  flex: none;
+  height: 52px;
   gap: 8px;
   font-size: 19px;
+  line-height: 1;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ink);
+  white-space: nowrap;
 }
 .brand:hover { text-decoration: none; }
-.brand svg { display: block; }
-.nav { display: flex; gap: 28px; }
+.brand svg { display: block; flex: none; }
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: none;
+  min-width: 0;
+  height: 52px;
+  gap: clamp(12px, 1.4vw, 20px);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: clamp(12px, 1.55vw, 22px);
+  height: 52px;
+  white-space: nowrap;
+}
 .nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 1px;
   font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--ink);
   opacity: .8;
   transition: opacity .15s ease;
@@ -331,8 +359,10 @@ img { max-width: 100%; height: auto; display: block; }
   .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .guide-grid.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 760px) {
+@media (max-width: 940px) {
   .nav { display: none; }
+}
+@media (max-width: 760px) {
   .hero { padding: 56px 16px 36px; }
   .tiles { grid-template-columns: 1fr; }
   .tile { min-height: 320px; }
@@ -345,12 +375,19 @@ html:not([lang="en"]) .en { display: none !important; }
 html[lang="en"] .zh { display: none !important; }
 
 .lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-height: 30px;
   border: 1px solid var(--border);
   background: #fff;
   border-radius: 999px;
   padding: 4px 12px;
   font-size: 13px;
+  line-height: 1;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   color: var(--ink);
 }
