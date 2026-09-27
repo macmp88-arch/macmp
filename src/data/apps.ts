@@ -40,8 +40,8 @@ export const apps: App[] = [
       "typeEn": "System",
       "tagline": "为 Mac 用户和摄影师打造的本地磁盘工作台：先看清状态，再做安全操作。",
       "taglineEn": "A native macOS storage workspace for photographers and power users: inspect first, act safely.",
-      "description": "MacMP 磁盘管理器把卷信息、容量、文件系统、SMART、读写速度和挂载状态集中在一个原生界面中。它不复制 Tuxera 的驱动和界面，也不会默认开放格式化、分区等高危操作；更适合用来快速判断移动硬盘、相机存储卡和备份盘是否健康，并在需要时完成挂载、卸载、推出和只读验证。",
-      "descriptionEn": "MacMP Disk Manager brings volume details, capacity, file system, SMART, throughput and mount state into one native macOS interface. It does not reuse a third-party disk driver or UI, and it keeps destructive partition operations out of the default workflow. It is designed for checking camera cards, portable SSDs and backup drives before taking action.",
+      "description": "MacMP 磁盘管理器把卷信息、容量、文件系统、SMART、读写速度和挂载状态集中在一个原生界面中。它不复制 Tuxera 的驱动和界面，也不会默认开放格式化、分区等高危操作；在检测到已安装并授权的 Tuxera 或 Paragon NTFS 驱动后，可先安全卸载 Windows NTFS 卷，再执行读写重挂载，让 U 盘和移动硬盘直接在 Finder 中复制、修改和删除文件。",
+      "descriptionEn": "MacMP Disk Manager brings volume details, capacity, file system, SMART, throughput and mount state into one native macOS interface. It does not reuse a third-party disk driver or UI, and it keeps destructive partition operations out of the default workflow. When an activated Tuxera or Paragon NTFS driver is present, it safely unmounts a Windows NTFS volume and remounts it read/write so files can be copied, edited or deleted directly in Finder.",
       "price": "VIP 年费免费 / 非会员一机一码买断",
       "setapp": false,
       "affiliate": "generic",
@@ -59,22 +59,24 @@ export const apps: App[] = [
         "原生 AppKit 界面，启动和操作路径清楚",
         "卷、容量、文件系统和 SMART 状态集中查看",
         "读写速度与 NTFS 驱动状态有明确反馈",
+        "检测到已授权 NTFS 驱动后，可把 Windows U 盘或移动硬盘切换为读写挂载",
         "支持中文与 English 界面切换"
       ],
       "prosEn": [
         "Native AppKit interface with a clear action path",
         "Volume, capacity, file system and SMART details in one view",
         "Throughput and NTFS driver status are visible",
+        "Remounts Windows NTFS drives read/write when an activated compatible driver is available",
         "Simplified Chinese and English interface"
       ],
       "cons": [
         "当前版本不开放格式化、分区和删除卷等高危写入操作",
-        "NTFS 真正的写入能力仍取决于第三方驱动或系统支持",
+        "NTFS 写入仍取决于已安装并授权的第三方驱动；App 不会内置、绕过或伪造驱动能力",
         "系统盘的部分挂载操作可能需要用户明确授权"
       ],
       "consEn": [
         "Formatting, partitioning and deleting volumes are intentionally disabled in this build",
-        "Writable NTFS still depends on a compatible third-party driver or system support",
+        "NTFS writing still depends on an installed and activated third-party driver; the app does not bundle or bypass it",
         "Some system-volume operations require explicit user authorization"
       ],
       "features": [
@@ -97,10 +99,10 @@ export const apps: App[] = [
           "descEn": "Provides straightforward volume actions so devices are not pulled while files are still in use."
         },
         {
-          "title": "NTFS 驱动检测",
-          "titleEn": "NTFS Driver Detection",
-          "desc": "检查 Tuxera、Paragon、ntfs-3g 与系统内置能力，明确当前卷究竟是只读还是可写。",
-          "descEn": "Detects Tuxera, Paragon, ntfs-3g and built-in support so read-only versus writable status is clear."
+          "title": "NTFS 读写重挂载",
+          "titleEn": "NTFS Read/Write Remount",
+          "desc": "检查 Tuxera、Paragon、ntfs-3g 与系统内置能力；检测到已授权驱动时，可安全卸载只读卷并以 rw 方式重新挂载。",
+          "descEn": "Detects Tuxera, Paragon, ntfs-3g and built-in support. With an activated driver, it safely unmounts a read-only volume and remounts it read/write."
         },
         {
           "title": "顺序读写测试",
@@ -125,8 +127,8 @@ export const apps: App[] = [
         {
           "q": "为什么 NTFS 盘显示只读？",
           "qEn": "Why is my NTFS drive read-only?",
-          "a": "macOS 默认通常只提供 NTFS 读取。写入能力取决于已安装并授权的 Tuxera、Paragon 或 ntfs-3g 等驱动，应用会显示检测结果。",
-          "aEn": "macOS commonly provides NTFS read access only. Writing depends on a compatible and licensed driver such as Tuxera, Paragon or ntfs-3g, which the app reports."
+          "a": "macOS 默认通常只提供 NTFS 读取。MacMP 磁盘管理器会显示驱动检测结果；若已安装并授权 Tuxera 或 Paragon，点击“读写挂载”后会先安全卸载，再以 rw 方式重新挂载。未授权驱动时仍会保持只读，不会绕过系统安全边界。对于 Windows 系统启动盘，请先在 Windows 中关闭快速启动并完全关机；BitLocker 加密盘还需要驱动支持解锁。",
+          "aEn": "macOS commonly provides NTFS read access only. MacMP Disk Manager reports driver status; when Tuxera or Paragon is installed and activated, Mount Read/Write safely unmounts and remounts the volume in rw mode. Without an activated driver it remains read-only and does not bypass the system boundary. For a Windows system drive, disable Fast Startup and shut down Windows completely; BitLocker also requires driver-level unlock support."
         },
         {
           "q": "买断版和 VIP 年费有什么区别？",
