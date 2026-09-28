@@ -9,9 +9,9 @@ import {
 } from '../../data/soundEffects';
 import { soundPreviews } from '../../data/soundPreviews';
 
-const title = '免费音效与音乐库导航 · 可商用音效 / 婚礼音乐 / 短剧配乐 · MacMP';
+const title = '免费音效与音乐库导航 · 音频转 MP3 / 婚礼音乐 / 短剧配乐 · MacMP';
 const description =
-  '按用途整理的免费音效与免版税音乐导航：转场、环境音、婚礼、短剧、玄幻、宣传片、UI、Foley 等，标注可商用、需署名或逐条确认，直达原始下载页面。';
+  '按用途整理的免费音效与免版税音乐导航：转场、环境音、婚礼、短剧、玄幻、宣传片、UI、Foley 等；并提供浏览器本地音频转 MP3 工具，文件不上传服务器。';
 const path = '/sound-effects';
 
 const licenseStyles: Record<string, string> = {
@@ -33,6 +33,10 @@ const previewAudience = (category: string) => {
 const waveformPeaks = (peaks: number[]) => peaks.filter((_, index) => index % 2 === 0);
 
 const faqs = [
+  {
+    q: '为什么能转 WAV、FLAC，却不提供 NCM 或 QQ 加密格式？',
+    a: 'NCM、QMC、MGG、MFLAC 等属于平台加密或受保护格式，转换需要移除保护，可能涉及平台条款、著作权与 DRM 问题。本站不提供解密或绕过保护的功能，只支持浏览器能够正常读取的未加密音频；请使用合法来源和未加密母版。',
+  },
   {
     q: '为什么不能直接把音频抓到本站提供下载？',
     a: '免费不等于可以重新托管。很多素材站允许你在作品中商用，但不允许把音频文件本身转载、打包或做成竞品素材库。本站采用“来源导航 + 原始下载页”的方式，规避二次分发风险。',
@@ -102,9 +106,11 @@ const faqJsonLd = {
       <p class="hero-lead">
         精选适合婚礼正片的钢琴、弦乐、竖琴与回忆氛围音乐。
         在线试听、按段落使用，下载直达 Mixkit 官方授权页面，不二次托管音频。
+        常用未加密音频也可以直接在浏览器里转换成 MP3，文件不会上传。
       </p>
       <div class="hero-actions">
         <a class="hero-btn primary" href="#categories">按用途找音效 →</a>
+        <a class="hero-btn" href="#audio-converter">音频转 MP3 →</a>
         <a class="hero-btn" href="#sources">看免版税来源 →</a>
         <a class="hero-btn" href="https://mixkit.co/free-sound-effects/" target="_blank" rel="noopener">打开 Mixkit →</a>
       </div>
@@ -138,6 +144,75 @@ const faqJsonLd = {
           </button>
         ))}
         <span class="result-count" id="sfxCount">当前显示 {soundCategoryCount + soundSourceCount} 个结果</span>
+      </div>
+    </section>
+
+    <section class="sfx-section audio-converter" id="audio-converter" aria-labelledby="audioConverterTitle">
+      <div class="section-head-sfx">
+        <div>
+          <span class="section-tag">本地音频转 MP3</span>
+          <h2 id="audioConverterTitle">常用音频一键转 MP3，文件不上传</h2>
+        </div>
+        <p>支持浏览器可正常解码的未加密音频。转换全部在当前设备完成，最高输出 320 kbps，适合剪辑前整理素材。</p>
+      </div>
+
+      <div class="audio-converter-shell">
+        <div class="audio-converter-topline">
+          <div>
+            <span class="audio-converter-kicker">PRIVATE AUDIO TOOL</span>
+            <h3>把零散音频整理成通用 MP3</h3>
+            <p>WAV、FLAC、M4A、AAC、OGG、OPUS、AIFF、CAF、MP3 等未加密文件均可尝试。转换不是无损，320 kbps 会优先保留听感质量。</p>
+          </div>
+          <div class="audio-privacy-badge">
+            <strong>不上传服务器</strong>
+            <span>本机浏览器处理</span>
+          </div>
+        </div>
+
+        <div class="audio-converter-grid">
+          <div class="audio-input-column">
+            <label class="audio-drop-zone" id="audioDropZone" for="audioFileInput">
+              <span class="audio-drop-icon" aria-hidden="true">＋</span>
+              <strong>拖入音频文件</strong>
+              <span>或点击浏览，可批量选择</span>
+              <small>单文件 ≤ 300 MB，单次最多 30 个</small>
+              <input id="audioFileInput" type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.aif,.aiff,.caf" multiple hidden />
+            </label>
+            <div class="audio-quality-row">
+              <label for="audioQuality">输出品质</label>
+              <select id="audioQuality">
+                <option value="320" selected>320 kbps · 质量优先</option>
+                <option value="256">256 kbps · 平衡</option>
+                <option value="192">192 kbps · 节省空间</option>
+                <option value="128">128 kbps · 体积最小</option>
+              </select>
+              <button class="audio-clear-button" id="audioClearQueue" type="button" disabled>清空列表</button>
+            </div>
+            <p class="audio-converter-hint">浏览器无法识别受保护内容。若文件本身有加密或 DRM，即使能选择也无法转换。</p>
+          </div>
+
+          <div class="audio-queue-panel" aria-live="polite">
+            <div class="audio-queue-head">
+              <div>
+                <strong>转换队列</strong>
+                <span>逐条输出，转换完成后单独下载</span>
+              </div>
+              <span id="audioQueueCount">0 个文件</span>
+            </div>
+            <div class="audio-queue" id="audioQueue">
+              <div class="audio-queue-empty">还没有文件。拖入未加密音频，或点击左侧选择文件。</div>
+            </div>
+            <div class="audio-converter-actions">
+              <button class="audio-convert-button" id="audioConvertButton" type="button" disabled>开始转换 MP3</button>
+              <span class="audio-status" id="audioStatus" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="audio-format-notice">
+          <strong>NCM、QMC、MGG、MFLAC 等加密格式暂不支持</strong>
+          <span>这些格式通常需要移除内容保护才能读取。本站不提供解密、绕过 DRM 或破坏平台保护的功能，请使用合法来源和未加密母版。</span>
+        </div>
       </div>
     </section>
 
@@ -439,6 +514,7 @@ const faqJsonLd = {
       }
     })();
   </script>
+  <script src="/audio-converter.js" defer></script>
 </BaseLayout>
 
 <style>
@@ -769,6 +845,7 @@ const faqJsonLd = {
   .cta-links { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
   .empty-state { margin: 18px 0 0; padding: 16px 18px; border-radius: 14px; background: #f8fafc; color: #667085; font-size: 13.5px; }
   @media (max-width: 900px) {
+    .audio-converter-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -776,6 +853,13 @@ const faqJsonLd = {
     .cta-links { margin-top: 18px; }
   }
   @media (max-width: 640px) {
+    .audio-converter-topline { display: block; padding: 20px 16px 16px; }
+    .audio-privacy-badge { margin-top: 14px; }
+    .audio-converter-grid { padding: 16px 16px 0; }
+    .audio-quality-row { grid-template-columns: 1fr 1fr; }
+    .audio-quality-row > label { grid-column: 1 / -1; }
+    .audio-converter-actions { align-items: stretch; flex-direction: column; }
+    .audio-format-notice { margin: 14px 16px 18px; }
     .sfx-hero { padding-top: 38px; }
     .search-panel { position: static; }
     .preview-grid,
@@ -787,4 +871,153 @@ const faqJsonLd = {
     .steps-grid { grid-template-columns: 1fr; }
     .source-grid { grid-template-columns: 1fr; }
   }
+  .audio-converter-shell {
+    overflow: hidden;
+    border: 1px solid #dbe7f5;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #f8fbff 0%, #ffffff 48%, #f7f5ff 100%);
+    box-shadow: 0 18px 50px rgba(27, 67, 124, .08);
+  }
+  .audio-converter-topline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid #e7eef8;
+  }
+  .audio-converter-kicker { color: #0071e3; font-size: 11.5px; font-weight: 800; letter-spacing: .12em; }
+  .audio-converter-topline h3 { margin: 8px 0 8px; font-size: 25px; letter-spacing: -.025em; }
+  .audio-converter-topline p { max-width: 720px; margin: 0; color: #667085; font-size: 13.5px; line-height: 1.75; }
+  .audio-privacy-badge {
+    display: grid;
+    flex: none;
+    gap: 4px;
+    min-width: 170px;
+    padding: 13px 15px;
+    border: 1px solid #cfe4ff;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .82);
+  }
+  .audio-privacy-badge strong { color: #0066cc; font-size: 13px; }
+  .audio-privacy-badge span { color: #667085; font-size: 11.5px; }
+  .audio-converter-grid {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+    gap: 18px;
+    padding: 20px 24px 0;
+  }
+  .audio-input-column { display: grid; gap: 12px; align-content: start; }
+  .audio-drop-zone {
+    display: grid;
+    place-items: center;
+    gap: 7px;
+    min-height: 206px;
+    padding: 24px;
+    border: 1.5px dashed #9bc5f8;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #f9fcff, #f1f7ff);
+    color: #172033;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .audio-drop-zone:hover,
+  .audio-drop-zone.is-dragging { border-color: #0071e3; background: #edf6ff; transform: translateY(-1px); }
+  .audio-drop-zone strong { font-size: 16px; }
+  .audio-drop-zone > span:not(.audio-drop-icon) { color: #667085; font-size: 13px; }
+  .audio-drop-zone small { color: #98a2b3; font-size: 11.5px; }
+  .audio-drop-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #0071e3;
+    color: #fff;
+    font-size: 25px;
+    line-height: 1;
+    box-shadow: 0 8px 20px rgba(0, 113, 227, .22);
+  }
+  .audio-quality-row { display: grid; grid-template-columns: auto 1fr auto; gap: 9px; align-items: center; }
+  .audio-quality-row > label { color: #344054; font-size: 12.5px; font-weight: 700; }
+  .audio-quality-row select {
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #d7dde8;
+    border-radius: 10px;
+    background: #fff;
+    color: #172033;
+    font: inherit;
+    font-size: 12.5px;
+  }
+  .audio-clear-button,
+  .audio-convert-button {
+    border: 0;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+  }
+  .audio-clear-button { padding: 9px 11px; background: #f2f4f7; color: #475467; font-size: 12.5px; }
+  .audio-clear-button:disabled,
+  .audio-convert-button:disabled { cursor: not-allowed; opacity: .45; }
+  .audio-converter-hint { margin: 0; color: #98a2b3; font-size: 11.5px; line-height: 1.65; }
+  .audio-queue-panel {
+    display: grid;
+    grid-template-rows: auto minmax(206px, 1fr) auto;
+    overflow: hidden;
+    border: 1px solid #e4e8f0;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .82);
+  }
+  .audio-queue-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #edf1f6; }
+  .audio-queue-head > div { display: grid; gap: 3px; }
+  .audio-queue-head strong { font-size: 14px; }
+  .audio-queue-head span { color: #98a2b3; font-size: 11.5px; }
+  .audio-queue { display: grid; gap: 8px; align-content: start; max-height: 340px; padding: 10px; overflow: auto; }
+  .audio-queue-empty { display: grid; place-items: center; min-height: 190px; padding: 20px; color: #98a2b3; text-align: center; font-size: 12.5px; }
+  .audio-queue-item { padding: 11px; border: 1px solid #e9eef5; border-radius: 12px; background: #fff; }
+  .audio-queue-item[data-state="done"] { border-color: #b8e2c5; background: #f7fdf9; }
+  .audio-queue-item[data-state="error"] { border-color: #f3cdb4; background: #fffaf7; }
+  .audio-item-main { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+  .audio-file-badge { padding: 5px 7px; border-radius: 7px; background: #e8f2ff; color: #0071e3; font-size: 10.5px; font-weight: 800; }
+  .audio-file-info { display: grid; gap: 3px; min-width: 0; }
+  .audio-file-info strong { overflow: hidden; color: #172033; font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+  .audio-file-info small { color: #98a2b3; font-size: 11px; }
+  .audio-item-state { color: #667085; font-size: 11.5px; white-space: nowrap; }
+  .audio-queue-item[data-state="done"] .audio-item-state { color: #1d7a3b; }
+  .audio-queue-item[data-state="error"] .audio-item-state { color: #b45309; }
+  .audio-progress-track { height: 4px; margin: 10px 0 7px; overflow: hidden; border-radius: 999px; background: #eef2f7; }
+  .audio-progress-track i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #1677ff, #66a9f6); transition: width .18s ease; }
+  .audio-queue-item[data-state="done"] .audio-progress-track i { background: linear-gradient(90deg, #22a05a, #6acb8b); }
+  .audio-item-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 17px; }
+  .audio-item-message { overflow: hidden; color: #98a2b3; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+  .audio-queue-item[data-state="error"] .audio-item-message { color: #b45309; white-space: normal; }
+  .audio-download-link { flex: none; padding: 5px 9px; border-radius: 8px; background: #e8f5ec; color: #1d7a3b; font-size: 11.5px; font-weight: 750; text-decoration: none; }
+  .audio-download-link:hover { background: #d9efdf; text-decoration: none; }
+  .audio-converter-actions { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-top: 1px solid #edf1f6; background: #fbfcfe; }
+  .audio-convert-button { flex: none; padding: 10px 16px; background: linear-gradient(180deg, #1677ff, #0b66c3); color: #fff; font-size: 12.5px; box-shadow: 0 7px 18px rgba(11, 102, 195, .18); }
+  .audio-convert-button:not(:disabled):hover { background: linear-gradient(180deg, #0b66c3, #07539d); }
+  .audio-status { color: #667085; font-size: 11.5px; line-height: 1.5; }
+  .audio-format-notice { display: grid; gap: 5px; margin: 16px 24px 22px; padding: 13px 15px; border: 1px solid #ffe1a8; border-radius: 13px; background: #fff8e6; }
+  .audio-format-notice strong { color: #9a5b00; font-size: 12.5px; }
+  .audio-format-notice span { color: #8a5a00; font-size: 11.5px; line-height: 1.65; }
+
+  .audio-converter { scroll-margin-top: 84px; }
+  @media (max-width: 900px) {
+    .audio-converter-grid { grid-template-columns: 1fr; }
+    .audio-queue-panel { grid-template-rows: auto minmax(190px, 1fr) auto; }
+  }
+  @media (max-width: 640px) {
+    .audio-converter-topline { display: block; padding: 20px 16px 16px; }
+    .audio-privacy-badge { margin-top: 14px; }
+    .audio-converter-grid { padding: 16px 16px 0; }
+    .audio-quality-row { grid-template-columns: 1fr; }
+    .audio-quality-row > label { grid-column: auto; }
+    .audio-clear-button { width: 100%; }
+    .audio-converter-actions { align-items: stretch; flex-direction: column; }
+    .audio-format-notice { margin: 14px 16px 18px; }
+  }
+
 </style>
