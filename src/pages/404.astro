@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = '页面未找到 · MacMP';
+const description = '你访问的页面不存在或已经移动，请返回 MacMP 首页继续浏览。';
+---
+
+<BaseLayout title={title} description={description} path="/404" noindex canonical={false}>
+  <section class="not-found">
+    <div class="container">
+      <p class="code">404</p>
+      <h1>页面未找到</h1>
+      <p class="intro">你访问的页面不存在、已经移动，或者链接有误。</p>
+      <div class="actions">
+        <a class="primary" href="/">返回首页</a>
+        <a class="secondary" href="/software/">浏览软件推荐</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 62vh;
+    display: grid;
+    place-items: center;
+    padding: 88px 0;
+    text-align: center;
+  }
+  .code {
+    color: var(--blue);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: .16em;
+  }
+  .not-found h1 {
+    margin: 8px 0 14px;
+    font-size: clamp(34px, 5vw, 56px);
+    letter-spacing: -.04em;
+  }
+  .intro {
+    max-width: 560px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.8;
+  }
+  .actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .primary { background: var(--blue); color: #fff; }
+  .secondary { background: var(--soft); color: var(--ink); }
+</style>

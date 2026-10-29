@@ -6,7 +6,10 @@ export default defineConfig({
   site: 'https://www.macmp.com',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/admin') && !page.includes('/vip'),
+      filter: (page) =>
+        !page.includes('/admin') &&
+        !page.includes('/vip') &&
+        !page.includes('/404'),
     }),
   ],
 });
